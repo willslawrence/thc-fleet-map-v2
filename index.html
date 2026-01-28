@@ -89,7 +89,7 @@
 </head>
 <body>
 <div id="map"></div>
-<div id="last-updated">Last updated: <!-- LAST_UPDATED -->28 Jan 2026 11:25<!-- /LAST_UPDATED --></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->28 Jan 2026 11:28<!-- /LAST_UPDATED --></div>
 
 <div id="briefing-tab">
   <div class="tab-title">📋 Ops Brief</div>
@@ -256,7 +256,7 @@ legend.onAdd = () => {
       <div><span class="dot" style="background:#7eb8ff"></span>Serviceable (${fleet.filter(h=>h.status==='parked').length})</div>
       <div><span class="dot" style="background:#4caf50"></span>Flying today (${fleet.filter(h=>h.status==='flying').length})</div>
       <div><span class="dot" style="background:#ff9800"></span>Maintenance (${fleet.filter(h=>h.status==='maint').length})</div>
-      <div style="margin-top:8px;font-size:11px;color:#888">HC53, HC56 — not in P135 FSR</div>
+      <!-- FSR_NOTE_START --><div style="margin-top:8px;font-size:11px;color:#888">HC56 — not in P135 FSR</div><!-- FSR_NOTE_END -->
     </div>
     <!-- LEGEND_END -->
   `;

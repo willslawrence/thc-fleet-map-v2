@@ -238,19 +238,22 @@
   .event-bar {
     position: absolute;
     height: 16px;
+    min-width: 100px;
     border-radius: 3px;
     display: flex;
     align-items: center;
     padding: 0 6px;
     cursor: pointer;
     transition: all 0.2s ease;
-    overflow: hidden;
+    overflow: visible;
     font-size: 0.5rem;
   }
   .event-bar:hover {
     transform: translateY(-1px);
     box-shadow: 0 3px 10px rgba(0,0,0,0.4);
   }
+
+/* Vertical separation used instead of minimized overlaps */
   .event-bar.current {
     background: linear-gradient(135deg, rgba(46, 204, 113, 0.85), rgba(46, 204, 113, 0.65));
     border: 1px solid rgba(46, 204, 113, 0.6);
@@ -264,9 +267,9 @@
     border: 1px solid rgba(231, 76, 60, 0.6);
   }
   .event-icon { font-size: 0.65rem; margin-right: 4px; flex-shrink: 0; }
-  .event-title { font-size: 0.5rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; color: #fff; }
-  .event-dates { font-size: 0.4rem; opacity: 0.8; margin-left: 4px; white-space: nowrap; flex-shrink: 0; }
-  .event-aircraft { font-size: 0.35rem; opacity: 0.7; background: rgba(0,0,0,0.2); padding: 1px 3px; border-radius: 2px; margin-left: 4px; flex-shrink: 0; }
+  .event-title { font-size: 0.55rem; font-weight: 600; white-space: nowrap; color: #fff; margin-right: 4px; }
+  .event-dates { font-size: 0.45rem; opacity: 0.85; white-space: nowrap; }
+  .event-aircraft { display: none; }
   .connector {
     position: absolute;
     width: 1px;
@@ -353,8 +356,8 @@
     <!-- TIMELINE_START -->
     <div class="timeline-body">
       <div class="lanes-above">
+        <!-- Lane 1: Skybridge -->
         <div class="lane">
-          <!-- Skybridge: Mar 1 - Dec 31 (pending) -->
           <div class="event-bar pending" style="left: 16.4%; width: 83.6%;">
             <span class="event-icon">🌉</span>
             <span class="event-title">Skybridge</span>
@@ -363,21 +366,23 @@
             <div class="connector" style="left: 5%;"></div>
           </div>
         </div>
+        <!-- Lane 2: AlUla Tour (separate from Al Fursan) -->
         <div class="lane">
-          <!-- AlUla Tour: Jan 15 - Feb 15 (current) -->
-          <div class="event-bar current" style="left: 4.1%; width: 8.5%;">
+          <div class="event-bar current" style="left: 6.85%; width: 5.75%;">
             <span class="event-icon">🎬</span>
             <span class="event-title">AlUla Tour</span>
-            <span class="event-dates">Jan 15 – Feb 15</span>
+            <span class="event-dates">Jan 25 – Feb 15</span>
             <span class="event-aircraft">HC55</span>
             <div class="connector" style="left: 50%;"></div>
           </div>
-          <!-- Al Fursan Cup: Feb 6-7 (future) -->
-          <div class="event-bar future" style="left: 10.14%; width: 5%;">
+        </div>
+        <!-- Lane 3: Al Fursan Cup (own lane) -->
+        <div class="lane">
+          <div class="event-bar future" style="left: 10.14%; width: 4%;">
             <span class="event-icon">🏆</span>
             <span class="event-title">Al Fursan Cup</span>
             <span class="event-dates">Feb 6 – 7</span>
-            <span class="event-aircraft">TBA</span>
+            <span class="event-aircraft">HC55</span>
             <div class="connector" style="left: 30%;"></div>
           </div>
         </div>
@@ -385,7 +390,6 @@
 
       <div class="timeline-axis">
         <div class="axis-line"></div>
-        <!-- Month tick marks at actual day-of-year positions -->
         <div class="month-tick" style="left: 0%;"><span class="tick-label">Jan</span></div>
         <div class="month-tick" style="left: 8.49%;"><span class="tick-label">Feb</span></div>
         <div class="month-tick" style="left: 16.16%;"><span class="tick-label">Mar</span></div>
@@ -404,9 +408,9 @@
       </div>
 
       <div class="lanes-below">
+        <!-- Lane 1: Riyadh UAM -->
         <div class="lane">
-          <!-- Riyadh UAM: Apr 2 - Dec 31 (pending) -->
-          <div class="event-bar pending" style="left: 25.2%; width: 74.8%;">
+          <div class="event-bar pending" style="left: 25.21%; width: 74.79%;">
             <span class="event-icon">🚁</span>
             <span class="event-title">Riyadh UAM</span>
             <span class="event-dates">Apr 2 – Dec 31</span>
@@ -414,33 +418,33 @@
             <div class="connector" style="left: 3%;"></div>
           </div>
         </div>
+        <!-- Lane 2: Rally Hail -->
         <div class="lane">
-          <!-- Rally Hail 2026: Jan 29 - Feb 1 (current) -->
-          <div class="event-bar current" style="left: 7.9%; width: 6%;">
+          <div class="event-bar current" style="left: 7.95%; width: 4%;">
             <span class="event-icon">🏁</span>
-            <span class="event-title">Rally Hail 2026</span>
+            <span class="event-title">Rally Hail</span>
             <span class="event-dates">Jan 29 – Feb 1</span>
             <span class="event-aircraft">HC54/58/62/63</span>
             <div class="connector" style="left: 20%;"></div>
           </div>
-          <!-- Al Jouf Rally: Apr 3-4 (pending) -->
-          <div class="event-bar pending" style="left: 25.5%; width: 5%;">
+        </div>
+        <!-- Lane 3: Other rallies (non-overlapping) -->
+        <div class="lane">
+          <div class="event-bar pending" style="left: 25.48%; width: 4%;">
             <span class="event-icon">🏁</span>
             <span class="event-title">Al Jouf Rally</span>
             <span class="event-dates">Apr 3 – 4</span>
             <span class="event-aircraft">TBA</span>
             <div class="connector" style="left: 15%;"></div>
           </div>
-          <!-- Rally Qassim 2026: May 8-9 (pending) -->
-          <div class="event-bar pending" style="left: 35%; width: 5%;">
+          <div class="event-bar pending" style="left: 35.07%; width: 4%;">
             <span class="event-icon">🏁</span>
             <span class="event-title">Qassim Rally</span>
             <span class="event-dates">May 8 – 9</span>
             <span class="event-aircraft">TBA</span>
             <div class="connector" style="left: 30%;"></div>
           </div>
-          <!-- Jeddah Rally 2026: Dec 4-5 (pending) -->
-          <div class="event-bar pending" style="left: 92.6%; width: 5%;">
+          <div class="event-bar pending" style="left: 92.60%; width: 4%;">
             <span class="event-icon">🏁</span>
             <span class="event-title">Jeddah Rally</span>
             <span class="event-dates">Dec 4 – 5</span>
@@ -579,6 +583,8 @@ legend.onAdd = () => {
   return d;
 };
 legend.addTo(map);
+
+// Vertical separation used - no overlap detection needed
 </script>
 </body>
 </html>

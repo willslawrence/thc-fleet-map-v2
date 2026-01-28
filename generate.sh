@@ -27,6 +27,7 @@ fleet_js=""
 count_parked=0
 count_flying=0
 count_maint=0
+declare -a fleet_regs=() fleet_locs=() fleet_statuses=() fleet_notes=() fleet_missions=()
 
 for f in "$HELIS_DIR"/HZHC*.md; do
   [ -f "$f" ] || continue
@@ -54,20 +55,13 @@ for f in "$HELIS_DIR"/HZHC*.md; do
     note=$(echo "$status_raw" | sed 's/^[^-]*-[[:space:]]*//')
   fi
 
-  case "$map_status" in
-    parked) count_parked=$((count_parked + 1)) ;;
-    flying) count_flying=$((count_flying + 1)) ;;
-    maint)  count_maint=$((count_maint + 1)) ;;
-  esac
-
-  entry="  { reg: \"${reg}\", loc: \"${loc}\", status: \"${map_status}\""
-  [ -n "$note" ] && entry+=", note: \"$(echo "$note" | sed 's/"/\\"/g')\""
-  [ -n "$mission" ] && entry+=", mission: \"$(echo "$mission" | sed 's/"/\\"/g')\""
-  entry+=" },"
-  fleet_js+="${entry}\n"
+  # Store fleet data for later (after flights parsed)
+  fleet_regs+=("$reg")
+  fleet_locs+=("$loc")
+  fleet_statuses+=("$map_status")
+  fleet_notes+=("$note")
+  fleet_missions+=("$mission")
 done
-
-fleet_block="const fleet = [\n${fleet_js}];"
 
 ###############################################################################
 # 2b. FSR NOTE — Obsidian is the master. No hardcoded list.
@@ -85,6 +79,7 @@ NEXT_MONTH_NAME=$(date -v+1m "+%B" 2>/dev/null || date -d "+1 month" "+%B")
 # Collect per-pilot data into arrays
 comp_overdue_names="" comp_this_names="" comp_next_names=""
 rems_overdue_list="" rems_this_list="" rems_next_list=""
+med_overdue_list="" med_this_list="" med_next_list=""
 
 for dir in "$PILOTS_DIR"/*/; do
   name=$(basename "$dir")
@@ -93,6 +88,7 @@ for dir in "$PILOTS_DIR"/*/; do
 
   rems=$(grep "^30 Mins REMS:" "$md" | head -1 | sed 's/^30 Mins REMS:[[:space:]]*//')
   comp=$(grep "^Last Competency Check:" "$md" | head -1 | sed 's/^Last Competency Check:[[:space:]]*//')
+  med=$(grep "^Medical Certificate Date:" "$md" | head -1 | sed 's/^Medical Certificate Date:[[:space:]]*//')
   base_month=$(grep "^Base Month:" "$md" | head -1 | sed 's/^Base Month:[[:space:]]*//')
 
   # Use full name for display
@@ -126,6 +122,21 @@ for dir in "$PILOTS_DIR"/*/; do
       comp_this_names="${comp_this_names}${fullname}|"
     elif [[ "$next_due_ym" == "$NEXT_YM" ]]; then
       comp_next_names="${comp_next_names}${fullname}|"
+    fi
+  fi
+
+  # Medical (12 calendar months from issue date)
+  if [ -n "$med" ] && [ "$med" != "N/A" ]; then
+    med_expiry=$(date -jf "%Y-%m-%d" -v+12m "$med" "+%Y-%m" 2>/dev/null || echo "")
+    med_issue_fmt=$(date -jf "%Y-%m-%d" "$med" "+%B %Y" 2>/dev/null || echo "$med")
+    if [ -n "$med_expiry" ]; then
+      if [[ "$med_expiry" < "$THIS_YM" ]]; then
+        med_overdue_list="${med_overdue_list}${fullname} — issued ${med_issue_fmt}|"
+      elif [[ "$med_expiry" == "$THIS_YM" ]]; then
+        med_this_list="${med_this_list}${fullname} — issued ${med_issue_fmt}|"
+      elif [[ "$med_expiry" == "$NEXT_YM" ]]; then
+        med_next_list="${med_next_list}${fullname} — issued ${med_issue_fmt}|"
+      fi
     fi
   fi
 done
@@ -185,34 +196,58 @@ if [ -z "$rems_this_list" ] && [ -z "$rems_next_list" ] && [ -z "$rems_overdue_l
   currency+="  <div class=\"alert ok\">✅ All REMS current</div>\n"
 fi
 
+# Medical section
+currency+="  <h4>Medical Certificate (12 month validity)</h4>\n"
+
+if [ -n "$med_this_list" ]; then
+  IFS='|' read -ra items <<< "${med_this_list%|}"
+  for item in "${items[@]}"; do
+    currency+="  <div class=\"alert warn\">⚠️ Expires this month: ${item}</div>\n"
+  done
+fi
+
+if [ -n "$med_next_list" ]; then
+  IFS='|' read -ra items <<< "${med_next_list%|}"
+  for item in "${items[@]}"; do
+    currency+="  <div class=\"alert warn\">⚠️ Expires next month: ${item}</div>\n"
+  done
+fi
+
+if [ -n "$med_overdue_list" ]; then
+  names=$(echo "${med_overdue_list%|}" | sed 's/|/ · /g')
+  currency+="  <div class=\"alert danger\">🔴 Expired: ${names}</div>\n"
+fi
+
+if [ -z "$med_this_list" ] && [ -z "$med_next_list" ] && [ -z "$med_overdue_list" ]; then
+  currency+="  <div class=\"alert ok\">✅ All medicals current</div>\n"
+fi
+
 ###############################################################################
 # 4. FLIGHT SCHEDULE
 ###############################################################################
 flights_html=""
 report_period=""
+# Associative-style: collect today's flying regs → pilot
+declare -a today_flying_regs=()
+declare -a today_flying_pilots=()
 
 if [ -f "$FLIGHTS_FILE" ]; then
-  # Extract report period from frontmatter
   report_period=$(grep "^report_period:" "$FLIGHTS_FILE" | sed 's/^report_period:[[:space:]]*//')
 
-  # Parse the file: section headers become h4, flight lines become rows
   current_section=""
   while IFS= read -r line; do
-    # Skip frontmatter, comments, blank lines
     [[ "$line" =~ ^---$ ]] && continue
     [[ "$line" =~ ^report_period: ]] && continue
     [[ "$line" =~ ^#\ Flights ]] && continue
     [[ "$line" =~ ^\<\!-- ]] && continue
     [[ -z "$line" ]] && continue
 
-    # Section header (## Title)
     if [[ "$line" =~ ^##\  ]]; then
       current_section="${line#\#\# }"
       flights_html+="  <h4>${current_section}</h4>\n"
       continue
     fi
 
-    # Flight line: DATE | REG | MISSION | PILOT | FLAGS
     if [[ "$line" =~ \| ]]; then
       IFS='|' read -ra parts <<< "$line"
       reg=$(echo "${parts[1]:-}" | xargs)
@@ -221,19 +256,67 @@ if [ -f "$FLIGHTS_FILE" ]; then
       flags=$(echo "${parts[4]:-}" | xargs | tr '[:upper:]' '[:lower:]')
 
       row_class=""
-      [[ "$flags" == *today* ]] && row_class=" today"
+      if [[ "$flags" == *today* ]]; then
+        row_class=" today"
+        # Track today's flying helicopters (expand multi-reg like HC54/62/63)
+        for r in $(echo "$reg" | tr '/' '\n'); do
+          # Normalize: ensure HZHC prefix
+          r_clean=$(echo "$r" | sed 's/^HC//')
+          today_flying_regs+=("HZHC${r_clean}")
+          today_flying_pilots+=("${pilot}")
+        done
+      fi
 
       flights_html+="  <div class=\"flight-row${row_class}\"><span class=\"reg\">${reg}</span><span class=\"info\">${mission}</span><span class=\"pilot\">${pilot}</span></div>\n"
     fi
   done < "$FLIGHTS_FILE"
 
-  echo "✅ Flight schedule parsed from Obsidian"
+  echo "✅ Flight schedule parsed (${#today_flying_regs[@]} flying today)"
 else
   echo "⚠️  No Flights Schedule.md found — skipping flight schedule"
 fi
 
 ###############################################################################
-# 5. APPLY TO HTML
+# 5. BUILD FLEET ARRAY (after flights so we can mark flying helicopters)
+###############################################################################
+for i in "${!fleet_regs[@]}"; do
+  reg="${fleet_regs[$i]}"
+  loc="${fleet_locs[$i]}"
+  map_status="${fleet_statuses[$i]}"
+  note="${fleet_notes[$i]}"
+  mission="${fleet_missions[$i]}"
+  pilot=""
+
+  # Check if this helicopter is flying today
+  for j in "${!today_flying_regs[@]}"; do
+    if [[ "${today_flying_regs[$j]}" == "$reg" ]]; then
+      flying_pilot="${today_flying_pilots[$j]}"
+      if [[ "$flying_pilot" != "TBA" && -n "$flying_pilot" ]]; then
+        map_status="flying"
+        pilot="$flying_pilot"
+      fi
+      break
+    fi
+  done
+
+  case "$map_status" in
+    parked) count_parked=$((count_parked + 1)) ;;
+    flying) count_flying=$((count_flying + 1)) ;;
+    maint)  count_maint=$((count_maint + 1)) ;;
+  esac
+
+  entry="  { reg: \"${reg}\", loc: \"${loc}\", status: \"${map_status}\""
+  [ -n "$note" ] && entry+=", note: \"$(echo "$note" | sed 's/"/\\"/g')\""
+  [ -n "$mission" ] && entry+=", mission: \"$(echo "$mission" | sed 's/"/\\"/g')\""
+  [ -n "$pilot" ] && entry+=", pilot: \"${pilot}\""
+  entry+=" },"
+  fleet_js+="${entry}\n"
+done
+
+fleet_block="const fleet = [\n${fleet_js}];"
+
+###############################################################################
+# 6. APPLY TO HTML
 ###############################################################################
 
 # Fleet array

@@ -38,13 +38,15 @@ for dir in "$PILOTS_DIR"/*/; do
   last=$(echo "$name" | awk '{print $NF}')
 
   # --- REMS check ---
+  # Normalize: accept YYYY-MM or YYYY-MM-DD, compare as YYYY-MM
   if [ -n "$rems" ] && [ "$rems" != "NA" ] && [ "$rems" != "N/A" ]; then
-    rems_fmt=$(date -jf "%Y-%m-%d" "$rems" "+%b %Y" 2>/dev/null || echo "$rems")
-    if [[ "$rems" < "$THIS_MONTH" ]]; then
+    rems_ym="${rems:0:7}"  # extract YYYY-MM
+    rems_fmt=$(date -jf "%Y-%m-%d" "${rems_ym}-01" "+%b %Y" 2>/dev/null || echo "$rems_ym")
+    if [[ "$rems_ym" < "${THIS_MONTH:0:7}" ]]; then
       overdue_rems="${overdue_rems}${last} (${rems_fmt}), "
-    elif [[ "$rems" < "$NEXT_MONTH" ]]; then
+    elif [[ "$rems_ym" < "${NEXT_MONTH:0:7}" ]]; then
       due_now_rems="${due_now_rems}${last} (${rems_fmt}), "
-    elif [[ "$rems" < "$THREE_MONTHS" ]]; then
+    elif [[ "$rems_ym" < "${THREE_MONTHS:0:7}" ]]; then
       due_soon_rems="${due_soon_rems}${last} (${rems_fmt}), "
     else
       current_rems="${current_rems}${last}, "

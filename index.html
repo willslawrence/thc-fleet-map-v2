@@ -220,7 +220,7 @@ pts.push([filmLat, filmLng]);
 map.fitBounds(L.latLngBounds(pts).pad(0.15));
 
 // Legend
-const legend = L.control({ position: 'bottomleft' });
+const legend = L.control({ position: 'bottomright' });
 legend.onAdd = () => {
   const d = L.DomUtil.create('div', 'legend');
   d.innerHTML = `

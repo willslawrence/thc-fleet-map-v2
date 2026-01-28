@@ -78,7 +78,7 @@ fsr_note=""
 # 3. PILOT CURRENCY
 ###############################################################################
 overdue_rems="" due_now_rems="" due_soon_rems=""
-comp_overdue="" comp_this_month="" comp_next_month="" comp_soon=""
+comp_overdue="" comp_this_month="" comp_next_month=""
 
 for dir in "$PILOTS_DIR"/*/; do
   name=$(basename "$dir")
@@ -98,7 +98,7 @@ for dir in "$PILOTS_DIR"/*/; do
       overdue_rems="${overdue_rems}${last} (${rems_fmt}), "
     elif [[ "$rems_ym" == "$THIS_YM" ]]; then
       due_now_rems="${due_now_rems}${last} (${rems_fmt}), "
-    elif [[ "$rems_ym" < "$THREE_YM" ]]; then
+    elif [[ "$rems_ym" == "$NEXT_YM" ]]; then
       due_soon_rems="${due_soon_rems}${last} (${rems_fmt}), "
     fi
   fi
@@ -117,8 +117,6 @@ for dir in "$PILOTS_DIR"/*/; do
       comp_this_month="${comp_this_month}${last} (${next_due_fmt}), "
     elif [[ "$next_due_ym" == "$NEXT_YM" ]]; then
       comp_next_month="${comp_next_month}${last} (${next_due_fmt}), "
-    elif [[ "$next_due_ym" < "$THREE_YM" ]]; then
-      comp_soon="${comp_soon}${last} (${next_due_fmt}), "
     fi
   fi
 done
@@ -135,10 +133,7 @@ fi
 if [ -n "$comp_next_month" ]; then
   currency+="  <div class=\"alert warn\">⚠️ Competency due next month: ${comp_next_month%, }</div>\n"
 fi
-if [ -n "$comp_soon" ]; then
-  currency+="  <div class=\"alert warn\">⚠️ Competency due soon: ${comp_soon%, }</div>\n"
-fi
-if [ -z "$comp_overdue" ] && [ -z "$comp_this_month" ] && [ -z "$comp_next_month" ] && [ -z "$comp_soon" ]; then
+if [ -z "$comp_overdue" ] && [ -z "$comp_this_month" ] && [ -z "$comp_next_month" ]; then
   currency+="  <div class=\"alert ok\">✅ Competency — all current</div>\n"
 fi
 
@@ -150,7 +145,7 @@ if [ -n "$due_now_rems" ]; then
   currency+="  <div class=\"alert warn\">⚠️ Due this month: ${due_now_rems%, }</div>\n"
 fi
 if [ -n "$due_soon_rems" ]; then
-  currency+="  <div class=\"alert warn\">⚠️ Due within 3 months: ${due_soon_rems%, }</div>\n"
+  currency+="  <div class=\"alert warn\">⚠️ Due next month: ${due_soon_rems%, }</div>\n"
 fi
 if [ -z "$overdue_rems" ] && [ -z "$due_now_rems" ] && [ -z "$due_soon_rems" ]; then
   currency+="  <div class=\"alert ok\">✅ All REMS current</div>\n"

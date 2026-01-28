@@ -179,39 +179,32 @@
     background: linear-gradient(90deg, #2ecc71, #3498db, #2ecc71);
     transform: translateY(-50%);
   }
-  .month-markers {
-    position: relative;
-    width: 100%;
-    display: flex;
+  .month-tick {
+    position: absolute;
+    top: 50%;
+    transform: translateX(-50%);
     z-index: 10;
   }
-  .month-marker {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-  }
-  .month-marker::before {
+  .month-tick::before {
     content: '';
-    width: 1px;
-    height: 6px;
-    background: #3498db;
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 12px;
+    background: rgba(255,255,255,0.4);
+    top: -6px;
   }
-  .month-label {
+  .tick-label {
     font-size: 0.45rem;
     font-weight: 600;
-    color: #555;
+    color: #666;
     text-transform: uppercase;
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: #0a0a0a;
-    padding: 1px 3px;
-    border-radius: 2px;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
   }
   .today-marker {
     position: absolute;
@@ -392,20 +385,19 @@
 
       <div class="timeline-axis">
         <div class="axis-line"></div>
-        <div class="month-markers">
-          <div class="month-marker"><span class="month-label">Jan</span></div>
-          <div class="month-marker"><span class="month-label">Feb</span></div>
-          <div class="month-marker"><span class="month-label">Mar</span></div>
-          <div class="month-marker"><span class="month-label">Apr</span></div>
-          <div class="month-marker"><span class="month-label">May</span></div>
-          <div class="month-marker"><span class="month-label">Jun</span></div>
-          <div class="month-marker"><span class="month-label">Jul</span></div>
-          <div class="month-marker"><span class="month-label">Aug</span></div>
-          <div class="month-marker"><span class="month-label">Sep</span></div>
-          <div class="month-marker"><span class="month-label">Oct</span></div>
-          <div class="month-marker"><span class="month-label">Nov</span></div>
-          <div class="month-marker"><span class="month-label">Dec</span></div>
-        </div>
+        <!-- Month tick marks at actual day-of-year positions -->
+        <div class="month-tick" style="left: 0%;"><span class="tick-label">Jan</span></div>
+        <div class="month-tick" style="left: 8.49%;"><span class="tick-label">Feb</span></div>
+        <div class="month-tick" style="left: 16.16%;"><span class="tick-label">Mar</span></div>
+        <div class="month-tick" style="left: 24.66%;"><span class="tick-label">Apr</span></div>
+        <div class="month-tick" style="left: 32.88%;"><span class="tick-label">May</span></div>
+        <div class="month-tick" style="left: 41.37%;"><span class="tick-label">Jun</span></div>
+        <div class="month-tick" style="left: 49.59%;"><span class="tick-label">Jul</span></div>
+        <div class="month-tick" style="left: 58.08%;"><span class="tick-label">Aug</span></div>
+        <div class="month-tick" style="left: 66.58%;"><span class="tick-label">Sep</span></div>
+        <div class="month-tick" style="left: 74.79%;"><span class="tick-label">Oct</span></div>
+        <div class="month-tick" style="left: 83.29%;"><span class="tick-label">Nov</span></div>
+        <div class="month-tick" style="left: 91.51%;"><span class="tick-label">Dec</span></div>
         <div class="today-marker" style="left: 7.67%;">
           <span class="today-label">Today</span>
         </div>

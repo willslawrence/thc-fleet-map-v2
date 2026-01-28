@@ -69,24 +69,10 @@ done
 fleet_block="const fleet = [\n${fleet_js}];"
 
 ###############################################################################
-# 2b. FSR NOTE — known H125 regs NOT in Obsidian fleet (not in P135 FSR)
-# Compare sequential range 52-69 against files that exist; skip gaps that
-# never existed (60, 61) by only flagging regs that WERE in the fleet.
+# 2b. FSR NOTE — Obsidian is the master. No hardcoded list.
+# The fleet IS whatever HZHC*.md files exist. Nothing else.
 ###############################################################################
-KNOWN_FLEET=(52 54 55 56 57 58 59 62 63 64 65 66 67 68 69)
-missing_fsr=""
-for n in "${KNOWN_FLEET[@]}"; do
-  if [ ! -f "$HELIS_DIR/HZHC${n}.md" ]; then
-    missing_fsr="${missing_fsr}HC${n}, "
-  fi
-done
-missing_fsr="${missing_fsr%, }"
-
-if [ -n "$missing_fsr" ]; then
-  fsr_note="<div style=\"margin-top:8px;font-size:11px;color:#888\">${missing_fsr} — not in P135 FSR</div>"
-else
-  fsr_note=""
-fi
+fsr_note=""
 
 ###############################################################################
 # 3. PILOT CURRENCY
@@ -173,12 +159,6 @@ if grep -q "// FLEET_START" "$HTML"; then
   echo "✅ Fleet array updated ($((count_parked + count_flying + count_maint)) helicopters)"
 else
   echo "⚠️  Missing // FLEET_START marker"
-fi
-
-# FSR note
-if grep -q "<!-- FSR_NOTE_START -->" "$HTML"; then
-  sed -i '' "s|<!-- FSR_NOTE_START -->.*<!-- FSR_NOTE_END -->|<!-- FSR_NOTE_START -->${fsr_note}<!-- FSR_NOTE_END -->|" "$HTML"
-  echo "✅ FSR note updated: ${missing_fsr:-none missing}"
 fi
 
 # Legend date (counts are JS-computed from fleet array automatically)

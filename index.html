@@ -120,26 +120,26 @@
 <script>
 const bases = {
   OETH:  { lat: 25.213, lng: 46.640, name: "THUMAMAH" },
-  XRSC:  { lat: 24.680, lng: 46.820, name: "ALSALAM" },
+  RUH:   { lat: 24.960, lng: 46.700, name: "RIYADH" },
   OEHL:  { lat: 27.438, lng: 41.686, name: "HA'IL" },
   OEAO:  { lat: 26.485, lng: 38.126, name: "AL ULA" },
 };
 
 const fleet = [
-  { reg: "HZHC52", loc: "OETH", status: "parked" },
-  { reg: "HZHC53", loc: "OETH", status: "parked" },
+  { reg: "HZHC52", loc: "RUH", status: "parked", note: "For Sale" },
   { reg: "HZHC54", loc: "OEHL", status: "parked" },
   { reg: "HZHC55", loc: "OEAO", status: "flying", mission: "Filming – AlUla Tour", pilot: "Bonet" },
-  { reg: "HZHC56", loc: "OETH", status: "parked" },
-  { reg: "HZHC57", loc: "OETH", status: "parked" },
+  { reg: "HZHC57", loc: "RUH", status: "maint", note: "Post Dakar maint, ERTS 05-Feb" },
   { reg: "HZHC58", loc: "OEHL", status: "parked" },
-  { reg: "HZHC59", loc: "OEHL", status: "parked" },
+  { reg: "HZHC59", loc: "RUH", status: "parked" },
   { reg: "HZHC62", loc: "OEHL", status: "parked" },
   { reg: "HZHC63", loc: "OEHL", status: "parked" },
-  { reg: "HZHC64", loc: "OETH", status: "parked" },
-  { reg: "HZHC66", loc: "OETH", status: "parked" },
-  { reg: "HZHC67", loc: "XRSC", status: "aog" },
-  { reg: "HZHC68", loc: "XRSC", status: "aog" },
+  { reg: "HZHC64", loc: "OETH", status: "maint", note: "MEL Hydraulic" },
+  { reg: "HZHC65", loc: "OETH", status: "parked" },
+  { reg: "HZHC66", loc: "RUH", status: "parked", note: "UAM Project" },
+  { reg: "HZHC67", loc: "OETH", status: "parked" },
+  { reg: "HZHC68", loc: "OETH", status: "parked" },
+  { reg: "HZHC69", loc: "OETH", status: "parked" },
 ];
 
 const map = L.map('map', { zoomControl: false }).setView([26.2, 42.5], 6);
@@ -181,12 +181,13 @@ fleet.forEach(h => {
   const lat = b.lat + latOff;
   const lng = b.lng + lngOff;
 
-  const cls = h.status === 'flying' ? 'flying' : h.status === 'aog' ? 'aog' : '';
+  const cls = h.status === 'flying' ? 'flying' : h.status === 'aog' ? 'aog' : h.status === 'maint' ? 'aog' : '';
   let label = h.reg.replace('HZHC','HC');
   if (h.pilot) label += `<span class="sub">${h.pilot}</span>`;
   if (h.status === 'aog') label += `<span class="sub">AOG</span>`;
+  if (h.status === 'maint') label += `<span class="sub">MAINT</span>`;
 
-  const color = h.status === 'flying' ? '#4caf50' : h.status === 'aog' ? '#666' : '#7eb8ff';
+  const color = h.status === 'flying' ? '#4caf50' : h.status === 'aog' ? '#666' : h.status === 'maint' ? '#ff9800' : '#7eb8ff';
   L.circleMarker([lat, lng], {
     radius: 3, fillColor: color, color: '#fff', weight: 1, fillOpacity: 0.85
   }).addTo(map);
@@ -229,10 +230,10 @@ legend.onAdd = () => {
   const d = L.DomUtil.create('div', 'legend');
   d.innerHTML = `
     <h4>🚁 H125 Fleet — 28 Jan 2026</h4>
-    <div><span class="dot" style="background:#7eb8ff"></span>Parked (${fleet.filter(h=>h.status==='parked').length})</div>
+    <div><span class="dot" style="background:#7eb8ff"></span>Serviceable (${fleet.filter(h=>h.status==='parked').length})</div>
     <div><span class="dot" style="background:#4caf50"></span>Flying today (${fleet.filter(h=>h.status==='flying').length})</div>
-    <div><span class="dot" style="background:#666"></span>AOG (${fleet.filter(h=>h.status==='aog').length})</div>
-    <div style="margin-top:8px;font-size:11px;color:#888">HC65, HC69 — location unknown</div>
+    <div><span class="dot" style="background:#ff9800"></span>Maintenance (${fleet.filter(h=>h.status==='maint').length})</div>
+    <div style="margin-top:8px;font-size:11px;color:#888">HC53, HC56 — not in P135 FSR</div>
   `;
   return d;
 };

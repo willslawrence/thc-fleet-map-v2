@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # generate.sh — Refreshes the fleet map from Obsidian THC Vault.
-# Updates: fleet array, legend, pilot currency alerts, page date.
-# Does NOT touch: ops plan flights, routes, or mission schedule.
+# Updates: fleet array, legend, pilot currency, flight schedule, dates.
+# Source of truth: Obsidian THC Vault (helicopters, pilots, flights).
 # Run before deploy: bash generate.sh && git add -A && git commit -m "Update from Obsidian" && git push
 
 set -euo pipefail
@@ -9,6 +9,7 @@ set -euo pipefail
 VAULT="/Users/willlawrence/Library/Mobile Documents/iCloud~md~obsidian/Documents/THC Vault"
 HELIS_DIR="$VAULT/Helicopters"
 PILOTS_DIR="$VAULT/Pilots"
+FLIGHTS_FILE="$VAULT/Flights Schedule.md"
 HTML="$(dirname "$0")/index.html"
 
 TODAY_DISPLAY=$(date "+%-d %b %Y")
@@ -184,7 +185,54 @@ if [ -z "$rems_this_list" ] && [ -z "$rems_next_list" ] && [ -z "$rems_overdue_l
 fi
 
 ###############################################################################
-# 4. APPLY TO HTML
+# 4. FLIGHT SCHEDULE
+###############################################################################
+flights_html=""
+report_period=""
+
+if [ -f "$FLIGHTS_FILE" ]; then
+  # Extract report period from frontmatter
+  report_period=$(grep "^report_period:" "$FLIGHTS_FILE" | sed 's/^report_period:[[:space:]]*//')
+
+  # Parse the file: section headers become h4, flight lines become rows
+  current_section=""
+  while IFS= read -r line; do
+    # Skip frontmatter, comments, blank lines
+    [[ "$line" =~ ^---$ ]] && continue
+    [[ "$line" =~ ^report_period: ]] && continue
+    [[ "$line" =~ ^#\ Flights ]] && continue
+    [[ "$line" =~ ^\<\!-- ]] && continue
+    [[ -z "$line" ]] && continue
+
+    # Section header (## Title)
+    if [[ "$line" =~ ^##\  ]]; then
+      current_section="${line#\#\# }"
+      flights_html+="  <h4>${current_section}</h4>\n"
+      continue
+    fi
+
+    # Flight line: DATE | REG | MISSION | PILOT | FLAGS
+    if [[ "$line" =~ \| ]]; then
+      IFS='|' read -ra parts <<< "$line"
+      reg=$(echo "${parts[1]:-}" | xargs)
+      mission=$(echo "${parts[2]:-}" | xargs)
+      pilot=$(echo "${parts[3]:-}" | xargs)
+      flags=$(echo "${parts[4]:-}" | xargs | tr '[:upper:]' '[:lower:]')
+
+      row_class=""
+      [[ "$flags" == *today* ]] && row_class=" today"
+
+      flights_html+="  <div class=\"flight-row${row_class}\"><span class=\"reg\">${reg}</span><span class=\"info\">${mission}</span><span class=\"pilot\">${pilot}</span></div>\n"
+    fi
+  done < "$FLIGHTS_FILE"
+
+  echo "✅ Flight schedule parsed from Obsidian"
+else
+  echo "⚠️  No Flights Schedule.md found — skipping flight schedule"
+fi
+
+###############################################################################
+# 5. APPLY TO HTML
 ###############################################################################
 
 # Fleet array
@@ -205,6 +253,22 @@ if grep -q "<!-- LEGEND_DATE -->" "$HTML"; then
   echo "✅ Legend date updated (fleet: S:${count_parked} F:${count_flying} M:${count_maint})"
 else
   echo "⚠️  Missing <!-- LEGEND_DATE --> marker"
+fi
+
+# Flight schedule
+if [ -n "$flights_html" ] && grep -q "<!-- FLIGHTS_START -->" "$HTML"; then
+  awk -v new="$flights_html" '
+    /<!-- FLIGHTS_START -->/ { print; printf "%s", new; skip=1; next }
+    /<!-- FLIGHTS_END -->/ { skip=0 }
+    !skip { print }
+  ' "$HTML" > "${HTML}.tmp" && mv "${HTML}.tmp" "$HTML"
+  echo "✅ Flight schedule updated"
+fi
+
+# Report period
+if [ -n "$report_period" ] && grep -q "<!-- REPORT_PERIOD -->" "$HTML"; then
+  sed -i '' "s|<!-- REPORT_PERIOD -->.*<!-- /REPORT_PERIOD -->|<!-- REPORT_PERIOD -->${report_period}<!-- /REPORT_PERIOD -->|" "$HTML"
+  echo "✅ Report period: ${report_period}"
 fi
 
 # Currency

@@ -175,6 +175,13 @@ else
   echo "⚠️  Missing <!-- CURRENCY_START --> marker"
 fi
 
+# Last updated timestamp
+UPDATED_STAMP=$(date "+%-d %b %Y %H:%M")
+if grep -q "<!-- LAST_UPDATED -->" "$HTML"; then
+  sed -i '' "s|<!-- LAST_UPDATED -->.*<!-- /LAST_UPDATED -->|<!-- LAST_UPDATED -->${UPDATED_STAMP}<!-- /LAST_UPDATED -->|" "$HTML"
+  echo "✅ Last updated: ${UPDATED_STAMP}"
+fi
+
 # Title tag
 sed -i '' "s|<title>Fleet Map — .*</title>|<title>Fleet Map — ${TODAY_DISPLAY}</title>|" "$HTML"
 echo "✅ Page title updated"

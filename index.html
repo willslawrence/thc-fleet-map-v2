@@ -77,10 +77,19 @@
   #briefing-panel .alert.ok { background: rgba(76,175,80,0.15); border-left: 2px solid #4caf50; }
   #briefing-panel .alert.warn { background: rgba(255,193,7,0.12); border-left: 2px solid #ffc107; }
   #briefing-panel .alert.danger { background: rgba(255,82,82,0.12); border-left: 2px solid #ff5252; }
+
+  #last-updated {
+    position: fixed; top: 12px; right: 52px; z-index: 1000;
+    background: rgba(15,15,30,0.75); backdrop-filter: blur(12px);
+    color: #888; font-size: 11px;
+    padding: 6px 12px; border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
 </style>
 </head>
 <body>
 <div id="map"></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->28 Jan 2026 11:25<!-- /LAST_UPDATED --></div>
 
 <div id="briefing-tab">
   <div class="tab-title">📋 Ops Brief</div>

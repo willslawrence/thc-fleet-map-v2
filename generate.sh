@@ -77,8 +77,13 @@ fsr_note=""
 ###############################################################################
 # 3. PILOT CURRENCY
 ###############################################################################
-overdue_rems="" due_now_rems="" due_soon_rems=""
-comp_overdue="" comp_this_month="" comp_next_month=""
+# Month names
+THIS_MONTH_NAME=$(date "+%B")
+NEXT_MONTH_NAME=$(date -v+1m "+%B" 2>/dev/null || date -d "+1 month" "+%B")
+
+# Collect per-pilot data into arrays
+comp_overdue_names="" comp_this_names="" comp_next_names=""
+rems_overdue_list="" rems_this_list="" rems_next_list=""
 
 for dir in "$PILOTS_DIR"/*/; do
   name=$(basename "$dir")
@@ -87,67 +92,94 @@ for dir in "$PILOTS_DIR"/*/; do
 
   rems=$(grep "^30 Mins REMS:" "$md" | head -1 | sed 's/^30 Mins REMS:[[:space:]]*//')
   comp=$(grep "^Last Competency Check:" "$md" | head -1 | sed 's/^Last Competency Check:[[:space:]]*//')
+  base_month=$(grep "^Base Month:" "$md" | head -1 | sed 's/^Base Month:[[:space:]]*//')
 
-  last=$(echo "$name" | awk '{print $NF}')
+  # Use full name for display
+  fullname="$name"
 
-  # REMS
+  # REMS — expiry date is stored directly
   if [ -n "$rems" ] && [ "$rems" != "NA" ] && [ "$rems" != "N/A" ]; then
     rems_ym="${rems:0:7}"
-    rems_fmt=$(date -jf "%Y-%m-%d" "${rems_ym}-01" "+%b %Y" 2>/dev/null || echo "$rems_ym")
+    # Figure out last flew month (REMS is 6 month cycle, so last flew = rems - 6 months)
+    last_flew=$(date -jf "%Y-%m-%d" -v-6m "${rems_ym}-01" "+%B" 2>/dev/null || echo "")
     if [[ "$rems_ym" < "$THIS_YM" ]]; then
-      overdue_rems="${overdue_rems}${last} (${rems_fmt}), "
+      rems_overdue_list="${rems_overdue_list}${fullname} (${base_month:-})|"
     elif [[ "$rems_ym" == "$THIS_YM" ]]; then
-      due_now_rems="${due_now_rems}${last} (${rems_fmt}), "
+      rems_this_list="${rems_this_list}${fullname} — last flew ${last_flew:-?}|"
     elif [[ "$rems_ym" == "$NEXT_YM" ]]; then
-      due_soon_rems="${due_soon_rems}${last} (${rems_fmt}), "
+      rems_next_list="${rems_next_list}${fullname} — last flew ${last_flew:-?}|"
     fi
   fi
 
-  # Competency (annual)
+  # Competency (annual from last check)
   if [ -n "$comp" ]; then
     comp_year=$(echo "$comp" | cut -d- -f1)
     comp_month=$(echo "$comp" | cut -d- -f2)
     next_due="${comp_year}-${comp_month}-01"
     next_due=$(date -jf "%Y-%m-%d" -v+1y "$next_due" "+%Y-%m-%d" 2>/dev/null || echo "$((comp_year+1))-${comp_month}-01")
-    next_due_fmt=$(date -jf "%Y-%m-%d" "$next_due" "+%b %Y" 2>/dev/null || echo "$next_due")
     next_due_ym="${next_due:0:7}"
     if [[ "$next_due_ym" < "$THIS_YM" ]]; then
-      comp_overdue="${comp_overdue}${last} (${next_due_fmt}), "
+      comp_overdue_names="${comp_overdue_names}${fullname}|"
     elif [[ "$next_due_ym" == "$THIS_YM" ]]; then
-      comp_this_month="${comp_this_month}${last} (${next_due_fmt}), "
+      comp_this_names="${comp_this_names}${fullname}|"
     elif [[ "$next_due_ym" == "$NEXT_YM" ]]; then
-      comp_next_month="${comp_next_month}${last} (${next_due_fmt}), "
+      comp_next_names="${comp_next_names}${fullname}|"
     fi
   fi
 done
 
-# Build currency HTML
+# Build currency HTML — month-by-month style
 currency=""
-currency+="  <h4>Pilot Currency</h4>\n"
-if [ -n "$comp_overdue" ]; then
-  currency+="  <div class=\"alert danger\">🔴 Competency overdue: ${comp_overdue%, }</div>\n"
-fi
-if [ -n "$comp_this_month" ]; then
-  currency+="  <div class=\"alert warn\">⚠️ Competency due this month: ${comp_this_month%, }</div>\n"
-fi
-if [ -n "$comp_next_month" ]; then
-  currency+="  <div class=\"alert warn\">⚠️ Competency due next month: ${comp_next_month%, }</div>\n"
-fi
-if [ -z "$comp_overdue" ] && [ -z "$comp_this_month" ] && [ -z "$comp_next_month" ]; then
-  currency+="  <div class=\"alert ok\">✅ Competency — all current</div>\n"
+currency+="  <h4>Competency Checks</h4>\n"
+
+# This month
+if [ -n "$comp_this_names" ]; then
+  names=$(echo "${comp_this_names%|}" | tr '|' ', ')
+  currency+="  <div class=\"alert warn\">⚠️ ${THIS_MONTH_NAME} — ${names}</div>\n"
+else
+  currency+="  <div class=\"alert ok\">✅ ${THIS_MONTH_NAME} — nobody due</div>\n"
 fi
 
-currency+="  <h4>30-Min REMS (Instrument Currency)</h4>\n"
-if [ -n "$overdue_rems" ]; then
-  currency+="  <div class=\"alert danger\">🔴 Overdue: ${overdue_rems%, }</div>\n"
+# Next month
+if [ -n "$comp_next_names" ]; then
+  names=$(echo "${comp_next_names%|}" | tr '|' ', ')
+  currency+="  <div class=\"alert warn\">⚠️ ${NEXT_MONTH_NAME} — ${names}</div>\n"
+else
+  currency+="  <div class=\"alert ok\">✅ ${NEXT_MONTH_NAME} — nobody due</div>\n"
 fi
-if [ -n "$due_now_rems" ]; then
-  currency+="  <div class=\"alert warn\">⚠️ Due this month: ${due_now_rems%, }</div>\n"
+
+# Overdue
+if [ -n "$comp_overdue_names" ]; then
+  names=$(echo "${comp_overdue_names%|}" | tr '|' ', ')
+  currency+="  <div class=\"alert danger\">🔴 Overdue: ${names}</div>\n"
 fi
-if [ -n "$due_soon_rems" ]; then
-  currency+="  <div class=\"alert warn\">⚠️ Due next month: ${due_soon_rems%, }</div>\n"
+
+currency+="  <h4>30-Min REMS (Instrument Currency — 6 month cycle)</h4>\n"
+
+# REMS this month
+if [ -n "$rems_this_list" ]; then
+  IFS='|' read -ra items <<< "${rems_this_list%|}"
+  for item in "${items[@]}"; do
+    currency+="  <div class=\"alert warn\">⚠️ Due now (${THIS_MONTH_NAME:0:3}): ${item}</div>\n"
+  done
 fi
-if [ -z "$overdue_rems" ] && [ -z "$due_now_rems" ] && [ -z "$due_soon_rems" ]; then
+
+# REMS next month
+if [ -n "$rems_next_list" ]; then
+  IFS='|' read -ra items <<< "${rems_next_list%|}"
+  for item in "${items[@]}"; do
+    currency+="  <div class=\"alert warn\">⚠️ Due next month (${NEXT_MONTH_NAME:0:3}): ${item}</div>\n"
+  done
+fi
+
+# REMS overdue
+if [ -n "$rems_overdue_list" ]; then
+  names=$(echo "${rems_overdue_list%|}" | tr '|' ' · ')
+  currency+="  <div class=\"alert danger\">🔴 Overdue: ${names}</div>\n"
+fi
+
+# All clear
+if [ -z "$rems_this_list" ] && [ -z "$rems_next_list" ] && [ -z "$rems_overdue_list" ]; then
   currency+="  <div class=\"alert ok\">✅ All REMS current</div>\n"
 fi
 

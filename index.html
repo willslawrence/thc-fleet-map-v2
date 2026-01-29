@@ -37,14 +37,14 @@
   .legend {
     background: rgba(15,15,30,0.75); backdrop-filter: blur(12px); color: #ddd; padding: 14px 18px;
     border-radius: 8px; font-size: 12px; line-height: 2.2;
-    border: 1px solid rgba(255,255,255,0.12); width: 310px;
+    border: 1px solid rgba(255,255,255,0.12); width: 400px;
   }
   .legend h4 { margin: 0 0 6px; font-size: 14px; color: #fff; }
   .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; vertical-align: middle; }
 
   .left-panels {
     position: fixed; top: 12px; left: 12px; z-index: 1000;
-    width: 310px; max-height: calc(100vh - 24px); overflow-y: auto;
+    width: 400px; max-height: calc(100vh - 24px); overflow-y: auto;
     display: flex; flex-direction: column; gap: 8px;
     scrollbar-width: thin; scrollbar-color: #333 transparent;
   }
@@ -336,7 +336,7 @@
 
 <div class="left-panels">
 
-<div id="briefing-panel">
+<div id="briefing-panel" class="collapsed">
   <div class="panel-header" onclick="this.parentElement.classList.toggle('collapsed')">
     <div class="panel-title">📋 Ops Brief ▾</div>
     <div class="panel-date">OPS PLAN REPORT / <!-- REPORT_PERIOD -->29 Jan – 04 Feb 2026<!-- /REPORT_PERIOD --></div>
@@ -620,7 +620,7 @@ map.fitBounds(L.latLngBounds(pts).pad(0.15));
 
 const legend = L.control({ position: 'bottomleft' });
 legend.onAdd = () => {
-  const d = L.DomUtil.create('div', 'legend');
+  const d = L.DomUtil.create('div', 'legend collapsed');
   d.onclick = () => d.classList.toggle('collapsed');
   d.innerHTML = `
     <!-- LEGEND_START -->

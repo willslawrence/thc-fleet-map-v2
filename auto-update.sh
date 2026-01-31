@@ -19,7 +19,7 @@ echo ""
 
 # 1. Run the generator
 echo "📊 Generating fleet map..."
-bash generate.sh
+python3 generate.py
 
 # 2. Check for changes
 if git diff --quiet && git diff --cached --quiet; then

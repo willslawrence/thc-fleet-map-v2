@@ -120,96 +120,147 @@ def build_flights_html():
 
 def build_currency_html(curr):
     L = []
-    next_mo = (TODAY.replace(day=1) + timedelta(days=32)).replace(day=1)
+    this_mo = TODAY.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    this_mo_end = (this_mo + timedelta(days=32)).replace(day=1)
+    next_mo = this_mo_end
     next_mo_end = (next_mo + timedelta(days=32)).replace(day=1)
     
-    # Competency - 12 months from last check, show due next month
-    comp_due = []
+    # Competency - 12 months from last check
+    comp_this = []
+    comp_next = []
     for c in curr:
         cp = c.get('competency','')
         if cp:
             try:
                 cd = datetime.strptime(cp, "%Y-%m-%d")
                 exp = cd.replace(year=cd.year+1)
-                if next_mo <= exp < next_mo_end:
-                    comp_due.append((c['name'], exp.strftime("%d %b")))
+                first_name = c['name'].split()[0]
+                if this_mo <= exp < this_mo_end:
+                    comp_this.append((first_name, exp.strftime("%b %y")))
+                elif next_mo <= exp < next_mo_end:
+                    comp_next.append((first_name, exp.strftime("%b %y")))
             except: pass
     L.append('  <h4>Competency Checks</h4>')
-    if comp_due:
-        for n, d in comp_due:
-            L.append(f'  <div class="alert warn">⚠️ {next_mo.strftime("%B")} — {n} (due {d})</div>')
-    else:
-        L.append(f'  <div class="alert ok">✅ {next_mo.strftime("%B")} — nobody due</div>')
+    if comp_this:
+        for n, d in comp_this:
+            L.append(f'  <div class="alert warn">⚠️ {n} - due {d}</div>')
+    if comp_next:
+        for n, d in comp_next:
+            L.append(f'  <div class="alert info">📅 {n} - due {d}</div>')
+    if not comp_this and not comp_next:
+        L.append(f'  <div class="alert ok">✅ Nobody due this or next month</div>')
     
-    # REMS - 6 months, only if they have a date
+    # REMS 30 - 6 calendar months from last flight date
+    # Flight in Aug = valid Aug,Sep,Oct,Nov,Dec,Jan = expires end of Jan (5 months after flight month)
     rems_issues = []
     for c in curr:
         r = c.get('rems','')
         if r:
             try:
                 rd = datetime.strptime(r, "%Y-%m")
-                mo = (TODAY.year-rd.year)*12 + (TODAY.month-rd.month)
-                if mo > 6: rems_issues.append((c['name'], rd.strftime("%B %Y"), 'danger'))
-                elif mo >= 5: rems_issues.append((c['name'], rd.strftime("%B %Y"), 'warn'))
+                # Expires 5 months after flight month (flight month + 5 more = 6 total)
+                exp_month = rd.month + 5
+                exp_year = rd.year + (exp_month - 1) // 12
+                exp_month = ((exp_month - 1) % 12) + 1
+                exp = datetime(exp_year, exp_month, 1)
+                exp_end = (exp + timedelta(days=32)).replace(day=1)  # First of next month
+                first_name = c['name'].split()[0]
+                if TODAY >= exp_end:
+                    # Expired (we're past the expiry month)
+                    rems_issues.append((first_name, exp.strftime("%b %y"), 'danger', 'expired'))
+                elif this_mo <= exp < this_mo_end:
+                    # Expires this month
+                    rems_issues.append((first_name, exp.strftime("%b %y"), 'warn', 'expires'))
             except: pass
     if rems_issues:
-        L.append('  <h4>30-Min REMS (6 month cycle)</h4>')
-        for n,d,lv in sorted(rems_issues, key=lambda x: x[2]!='danger'):
-            L.append(f'  <div class="alert {lv}">{"🔴" if lv=="danger" else "⚠️"} {n} — expired {d}</div>')
+        L.append('  <h4>30-Min REMS (6 month validity)</h4>')
+        for n,d,lv,status in sorted(rems_issues, key=lambda x: x[2]!='danger'):
+            L.append(f'  <div class="alert {lv}">{"🔴" if lv=="danger" else "⚠️"} {n} - {status} {d}</div>')
     
     # Medical - 12 months from check date
     med_issues = []
+    this_month_start = TODAY.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    this_month_end = (this_month_start + timedelta(days=32)).replace(day=1)
     for c in curr:
         m = c.get('medical','')
         if m:
             try:
                 md = datetime.strptime(m, "%Y-%m-%d")
                 exp = md.replace(year=md.year+1)
-                days = (exp - TODAY).days
-                if days < 0: med_issues.append((c['name'], exp.strftime("%B %Y"), 'danger'))
-                elif days < 60: med_issues.append((c['name'], exp.strftime("%B"), 'warn'))
+                first_name = c['name'].split()[0]
+                if exp < this_month_start:
+                    # Overdue
+                    med_issues.append((first_name, exp.strftime("%b %y"), 'danger', 'overdue since'))
+                elif this_month_start <= exp < this_month_end:
+                    # Due this month
+                    med_issues.append((first_name, exp.strftime("%b %y"), 'warn', 'due'))
+                # Future months: don't show
             except: pass
     if med_issues:
         L.append('  <h4>Medical Certificate (12 month validity)</h4>')
-        for n,d,lv in sorted(med_issues, key=lambda x: x[2]!='danger'):
-            L.append(f'  <div class="alert {lv}">{"🔴" if lv=="danger" else "⚠️"} {n} — {d}</div>')
+        for n,d,lv,status in sorted(med_issues, key=lambda x: x[2]!='danger'):
+            L.append(f'  <div class="alert {lv}">{"🔴" if lv=="danger" else "⚠️"} {n} - {status} {d}</div>')
     
     return '\n'.join(L)
+
 
 def build_timeline(missions):
     tbd = [m for m in missions if not m['date']]
     dated = [m for m in missions if m['date']]
     if not dated: return "<!-- No missions -->"
+    
     def pdt(d):
         try: return datetime.strptime(d, "%Y-%m-%d")
         except: return None
+    
     for m in dated: m['s'], m['e'] = pdt(m['date']), pdt(m['endDate']) or pdt(m['date'])
     dated = [m for m in dated if m['s']]
     dated.sort(key=lambda x: x['s'])
-    mn, mx, td = datetime(2025,10,1), datetime(2026,12,31), 0
+    
+    # Jan-Dec 2026 only
+    mn, mx = datetime(2026,1,1), datetime(2026,12,31)
     td = (mx-mn).days
-    def pos(s,e): return round(((max(s,mn)-mn).days/td)*100,1), max(round(((min(e,mx)-max(s,mn)).days/td)*100,1), 1.2)
+    
+    # Filter to only missions that overlap with 2026
+    dated = [m for m in dated if m['e'] >= mn and m['s'] <= mx]
+    
+    def pos(s,e): 
+        s_clamped = max(s, mn)
+        e_clamped = min(e, mx)
+        return round(((s_clamped-mn).days/td)*100,1), max(round(((e_clamped-s_clamped).days/td)*100,1), 1.2)
+    
     def fdt(s,e):
         if s==e: return s.strftime("%-d %b")
         elif s.month==e.month: return f"{s.day}-{e.strftime('%-d %b')}"
         return f"{s.strftime('%-d %b')} - {e.strftime('%-d %b')}"
+    
     def ovl(a,b): return not (a['e']+timedelta(days=2) < b['s'] or b['e']+timedelta(days=2) < a['s'])
-    def pack(evs):
-        lanes = []
+    
+    # Pack into exactly 3 lanes above, 3 below (6 total)
+    def pack_limited(evs, max_lanes=6):
+        lanes = [[] for _ in range(max_lanes)]
         for ev in evs:
             placed = False
             for lane in lanes:
-                if not any(ovl(ev,e) for e in lane): lane.append(ev); placed=True; break
-            if not placed: lanes.append([ev])
+                if not any(ovl(ev,e) for e in lane): 
+                    lane.append(ev)
+                    placed = True
+                    break
+            if not placed:
+                lanes[0].append(ev)
         return lanes
-    lanes = pack(dated)
-    above, below = lanes[::2], lanes[1::2]
+    
+    lanes = pack_limited(dated, 6)
+    above = lanes[:3]
+    below = lanes[3:]
+    
     L = ['    <div class="timeline-wrapper">']
     if tbd:
         L.append('    <div class="tbd-sidebar">')
         L.append('      <div class="tbd-header">📋 Dates TBD</div>')
         for m in tbd: L.append(f'      <div class="tbd-item" data-name="{m["title"]}" data-status="pending" data-dates="TBD" data-aircraft="TBD" data-pilots="TBD" onclick="showEventPopup(this,event)">\n        {m["title"]}\n      </div>')
         L.append('    </div>')
+    
     def bar(m):
         l,w = pos(m['s'],m['e'])
         t,st,dt = m['title'], m['status'], fdt(m['s'],m['e'])
@@ -217,20 +268,34 @@ def build_timeline(missions):
         dp = (t[:10]+"...") if len(t)>12 and sh else t
         h,p = m.get('helicopters') or 'TBD', m.get('pilots') or 'TBD'
         return f'          <div class="event-bar {st} {sh}" style="left:{l}%;width:{w}%;" data-name="{t}" data-status="{st}" data-dates="{dt}" data-aircraft="{h}" data-pilots="{p}" onclick="showEventPopup(this,event)" title="{t} ({dt})">\n            <span class="event-title">{dp}</span>' + (f'\n            <span class="event-dates">{dt}</span>' if not sh else '') + '\n          </div>'
+    
     L.append('    <div class="timeline-body">')
     L.append('      <div class="lanes-above">')
-    for lane in above:
+    for lane in reversed(above):
         L.append('        <div class="lane">')
         for m in sorted(lane, key=lambda x: x['s']): L.append(bar(m))
         L.append('        </div>')
     L.append('      </div>')
     L.append('      <div class="timeline-axis">')
     L.append('        <div class="axis-line"></div>')
+    
+    # Month ticks (larger) with labels
+    for month in range(1, 13):
+        d = datetime(2026, month, 1)
+        pct = round(((d-mn).days/td)*100,1)
+        L.append(f'        <div class="month-tick" style="left:{pct}%;"><span class="tick-label">{d.strftime("%b")}</span></div>')
+    
+    # Week ticks (smaller) - every Monday
     c = mn
     while c <= mx:
-        L.append(f'        <div class="month-marker" style="left:{round(((c-mn).days/td)*100,1)}%;">{c.strftime("%b %Y")}</div>')
-        c = (c.replace(day=1)+timedelta(days=32)).replace(day=1)
-    if mn <= TODAY <= mx: L.append(f'      <div class="today-marker" style="left:{round(((TODAY-mn).days/td)*100,1)}%;"><span>Today</span></div>')
+        if c.weekday() == 0 and c.day != 1:
+            pct = round(((c-mn).days/td)*100,1)
+            L.append(f'        <div class="week-tick" style="left:{pct}%;"></div>')
+        c += timedelta(days=1)
+    
+    if mn <= TODAY <= mx: 
+        L.append(f'        <div class="today-marker" style="left:{round(((TODAY-mn).days/td)*100,1)}%;"><span>Today</span></div>')
+    
     L.append('      </div>')
     L.append('      <div class="lanes-below">')
     for lane in below:

@@ -16,6 +16,7 @@ HELIS_DIR = f"{VAULT}/Helicopters"
 PILOTS_DIR = f"{VAULT}/Pilots"
 FLIGHTS_FILE = f"{VAULT}/Flights Schedule.md"
 MISSIONS_DIR = f"{VAULT}/Missions"
+TEMPLATE_FILE = os.path.join(os.path.dirname(__file__), "Fleet-Map-Draft.html")
 HTML_FILE = os.path.join(os.path.dirname(__file__), "index.html")
 
 TODAY = datetime.now()
@@ -431,7 +432,7 @@ def main():
     timeline_html = build_timeline_html(missions)
     
     # Read HTML
-    with open(HTML_FILE, 'r') as f:
+    with open(TEMPLATE_FILE, "r") as f:
         html_content = f.read()
     
     # Update HTML

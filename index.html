@@ -11,7 +11,7 @@
   * { box-sizing: border-box; }
   body { margin: 0; font-family: 'Inter', -apple-system, sans-serif; }
   #map { width: 100vw; height: 100vh; transition: height 0.3s ease; }
-  body.timeline-open #map { height: calc(100vh - 160px); }
+  body.timeline-open #map { height: 60vh; }
   
   .heli-pin {
     background: rgba(0,0,0,0.85); color: #7eb8ff; padding: 1px 4px;
@@ -48,7 +48,7 @@
     display: flex; flex-direction: column; gap: 8px;
     scrollbar-width: thin; scrollbar-color: #333 transparent;
   }
-  body.timeline-open .left-panels { max-height: calc(100vh - 184px); }
+  body.timeline-open .left-panels { max-height: 58vh; }
   .left-panels > div {
     background: rgba(15,15,30,0.75); backdrop-filter: blur(12px); color: #ddd;
     border-radius: 10px; border: 1px solid rgba(255,255,255,0.15);
@@ -81,6 +81,7 @@
   #briefing-panel .alert.ok, #currency-panel .alert.ok { background: rgba(76,175,80,0.15); border-left: 2px solid #4caf50; }
   #briefing-panel .alert.warn, #currency-panel .alert.warn { background: rgba(255,193,7,0.12); border-left: 2px solid #ffc107; }
   #briefing-panel .alert.danger, #currency-panel .alert.danger { background: rgba(255,82,82,0.12); border-left: 2px solid #ff5252; }
+  #briefing-panel .alert.info, #currency-panel .alert.info { background: rgba(52,152,219,0.15); border-left: 2px solid #3498db; }
   #currency-panel h4 { font-size: 12px; color: #7eb8ff; margin: 12px 0 5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 3px; }
 
   #last-updated {
@@ -97,7 +98,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    height: 160px;
+    height: 40vh;
     background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
     border-top: 2px solid rgba(46, 204, 113, 0.5);
     transform: translateY(100%);
@@ -123,7 +124,7 @@
     z-index: 1001;
     transition: all 0.3s ease;
   }
-  body.timeline-open .timeline-toggle { bottom: 170px; }
+  body.timeline-open .timeline-toggle { bottom: calc(40vh + 10px); }
   .timeline-toggle:hover { background: rgba(46, 204, 113, 0.3); border-color: rgba(46, 204, 113, 0.5); }
 
   /* Timeline Content */
@@ -329,7 +330,7 @@
 </head>
 <body>
 <div id="map"></div>
-<div id="last-updated">Last updated: <!-- LAST_UPDATED -->31 Jan 2026 13:13<!-- /LAST_UPDATED --></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->31 Jan 2026 20:21<!-- /LAST_UPDATED --></div>
 
 <!-- Timeline Toggle Button -->
 <button class="timeline-toggle" onclick="toggleTimeline()">📅 Missions</button>
@@ -594,6 +595,31 @@ legend.addTo(map);
     }
   };
 })();
+
+function showEventPopup(el, e) {
+  e.stopPropagation();
+  const popup = document.getElementById('eventPopup');
+  const data = el.dataset;
+  const statusLabel = data.status === 'current' ? 'Current' : data.status === 'future' ? 'Upcoming' : 'Pending';
+  
+  popup.innerHTML = `
+    <h3>${data.name} <span class="status-badge ${data.status}">${statusLabel}</span></h3>
+    <div class="detail-row"><span class="detail-label">Dates</span><span class="detail-value">${data.dates}</span></div>
+    <div class="detail-row"><span class="detail-label">Aircraft</span><span class="detail-value">${data.aircraft}</span></div>
+    <div class="detail-row"><span class="detail-label">Pilots</span><span class="detail-value">${data.pilots}</span></div>
+  `;
+  
+  const rect = el.getBoundingClientRect();
+  popup.style.left = Math.min(rect.left, window.innerWidth - 290) + 'px';
+  popup.style.top = (rect.top - 160) + 'px';
+  popup.classList.add('show');
+}
+
+document.body.addEventListener('click', function(e) {
+  if (!e.target.closest('.event-bar') && !e.target.closest('.event-popup')) {
+    document.getElementById('eventPopup').classList.remove('show');
+  }
+});
 </script>
 </body>
 </html>

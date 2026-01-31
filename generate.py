@@ -46,11 +46,21 @@ def load_helicopters():
     helicopters = []
     for f in sorted(glob.glob(f"{HELIS_DIR}/HZHC*.md")):
         data = parse_frontmatter(f)
+        status_raw = data.get('status', 'parked').lower()
+        # Map status values
+        if 'serviceable' in status_raw or 'parked' in status_raw:
+            status = 'parked'
+        elif 'maint' in status_raw or 'aog' in status_raw:
+            status = 'maint'
+        elif 'flying' in status_raw:
+            status = 'flying'
+        else:
+            status = 'parked'
         helicopters.append({
             'reg': data.get('registration', os.path.basename(f).replace('.md', '')),
             'loc': data.get('location', 'UNK'),
-            'status': data.get('status', 'parked'),
-            'mission': data.get('mission', ''),
+            'status': status,
+            'mission': data.get('current_mission', ''),
             'note': data.get('note', '')
         })
     print(f"✅ Loaded {len(helicopters)} helicopters")
@@ -62,21 +72,19 @@ def load_flights():
         with open(FLIGHTS_FILE, 'r') as f:
             content = f.read()
         today_str = TODAY.strftime("%Y-%m-%d")
-        in_today = False
         for line in content.split('\n'):
-            if today_str in line:
-                in_today = True
-            elif in_today:
-                if line.startswith('## ') or line.startswith('# '):
-                    break
-                if '|' in line and 'HC' in line:
-                    parts = [p.strip() for p in line.split('|')]
-                    if len(parts) >= 4:
-                        reg = 'HZHC' + parts[1].replace('HC', '') if 'HC' in parts[1] else parts[1]
-                        flights.append({'reg': reg, 'mission': parts[2], 'pilot': parts[3]})
-                        today_flying[reg] = parts[3]
+            if line.startswith(today_str) and '|' in line:
+                parts = [p.strip() for p in line.split('|')]
+                if len(parts) >= 4:
+                    reg = parts[1].strip()
+                    if not reg.startswith('HZ'):
+                        reg = 'HZHC' + reg.replace('HC', '')
+                    mission = parts[2].strip()
+                    pilot = parts[3].strip()
+                    flights.append({'reg': reg, 'mission': mission, 'pilot': pilot})
+                    today_flying[reg] = pilot
     except Exception as e:
-        print(f"  Warning: {e}")
+        print(f"  Warning loading flights: {e}")
     print(f"✅ Loaded {len(flights)} flights for today")
     return flights, today_flying
 
@@ -84,10 +92,22 @@ def load_currency():
     currency = []
     for pilot_dir in glob.glob(f"{PILOTS_DIR}/*/"):
         name = os.path.basename(pilot_dir.rstrip('/'))
-        cfile = os.path.join(pilot_dir, "Currency.md")
-        if os.path.exists(cfile):
-            data = parse_frontmatter(cfile)
-            currency.append({'name': name, 'medical': data.get('medical', ''), 'rems': data.get('rems', '')})
+        # Find the main pilot file (same name as folder)
+        pilot_file = os.path.join(pilot_dir, f"{name}.md")
+        if os.path.exists(pilot_file):
+            try:
+                with open(pilot_file, 'r') as f:
+                    content = f.read()
+                medical = rems = ""
+                for line in content.split('\n'):
+                    if 'Medical Certificate Date:' in line:
+                        medical = line.split(':', 1)[1].strip()
+                    if '30 Mins REMS:' in line:
+                        rems = line.split(':', 1)[1].strip()
+                if medical or rems:
+                    currency.append({'name': name, 'medical': medical, 'rems': rems})
+            except:
+                pass
     print(f"✅ Loaded {len(currency)} pilot currency records")
     return currency
 
@@ -123,10 +143,11 @@ def build_fleet_js(helicopters, today_flying):
     return '\n'.join(lines)
 
 def build_flights_html(flights):
-    if not flights: return '<div class="no-flights">No flights today</div>'
+    if not flights: return '<div class="no-flights">No flights scheduled today</div>'
     return '\n'.join([f'  <div class="flight-row today"><span class="reg">{f["reg"].replace("HZHC","HC")}</span><span class="info">{f["mission"]}</span><span class="pilot">{f["pilot"]}</span></div>' for f in flights])
 
 def build_currency_html(currency):
+    if not currency: return '<div class="no-currency">No currency data</div>'
     return '\n'.join([f'  <div class="currency-row"><span class="pilot-name">{c["name"]}</span><span class="medical">{c["medical"]}</span><span class="rems">{c["rems"]}</span></div>' for c in currency])
 
 def build_timeline_html(missions):
@@ -231,6 +252,8 @@ def update_html(content, fleet_js, flights_html, currency_html, timeline_html):
     content = re.sub(r'<!-- CURRENCY_START -->.*?<!-- CURRENCY_END -->', f'<!-- CURRENCY_START -->\n{currency_html}\n  <!-- CURRENCY_END -->', content, flags=re.DOTALL)
     content = re.sub(r'<!-- TIMELINE_START -->.*?<!-- TIMELINE_END -->', f'<!-- TIMELINE_START -->\n{timeline_html}\n    <!-- TIMELINE_END -->', content, flags=re.DOTALL)
     content = re.sub(r'<title>THC Fleet Map.*?</title>', f'<title>THC Fleet Map — {TODAY.strftime("%-d %b %Y")}</title>', content)
+    # Update last updated timestamp
+    content = re.sub(r'<!-- LAST_UPDATED -->.*?<!-- /LAST_UPDATED -->', f'<!-- LAST_UPDATED -->{TODAY.strftime("%-d %b %Y %H:%M")}<!-- /LAST_UPDATED -->', content)
     return content
 
 def main():

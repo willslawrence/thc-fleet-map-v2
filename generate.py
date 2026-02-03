@@ -8,7 +8,7 @@ HELIS_DIR = f"{VAULT}/Helicopters"
 PILOTS_DIR = f"{VAULT}/Pilots"
 FLIGHTS_FILE = f"{VAULT}/Flights Schedule.md"
 MISSIONS_DIR = f"{VAULT}/Missions"
-HTML_FILE = os.path.join(os.path.dirname(__file__), "index.html")
+HTML_FILE = os.path.expanduser("~/Desktop/Willy/FleetMapAndTimeline/index.html")
 # Use Saudi Arabia timezone, then strip tz for naive comparisons
 _now = datetime.now(ZoneInfo("Asia/Riyadh"))
 TODAY = datetime(_now.year, _now.month, _now.day, _now.hour, _now.minute, _now.second)
@@ -21,15 +21,50 @@ def parse_fm(fp):
             p = t.split('---', 2)
             if len(p) >= 3:
                 k, lst = None, []
+                nested_key = None
+                nested_dict = {}
                 for ln in p[1].strip().split('\n'):
-                    if ln.strip().startswith('- '):
-                        if k: lst.append(ln.strip()[2:].strip())
-                    elif ':' in ln:
-                        if k and lst: d[k] = lst[0] if len(lst)==1 else ', '.join(lst); lst = []
-                        kk, v = ln.split(':', 1)
-                        k = kk.strip(); v = v.strip().strip('"').strip("'")
-                        if v: d[k] = v; k = None
-                if k and lst: d[k] = lst[0] if len(lst)==1 else ', '.join(lst)
+                    stripped = ln.strip()
+                    indent = len(ln) - len(ln.lstrip())
+                    if indent >= 2 and nested_key:
+                        # Inside a nested block
+                        if stripped.startswith('- '):
+                            lst.append(stripped[2:].strip())
+                        elif ':' in stripped:
+                            nk, nv = stripped.split(':', 1)
+                            nv = nv.strip().strip('"').strip("'")
+                            if nv:
+                                nested_dict[nk.strip()] = nv
+                        continue
+                    # Top-level line - flush previous
+                    if nested_key and nested_dict:
+                        d[nested_key] = nested_dict
+                        nested_dict = {}
+                        nested_key = None
+                    if k and lst:
+                        d[k] = lst[0] if len(lst)==1 else ', '.join(lst)
+                        lst = []
+                        k = None
+                    if stripped.startswith('- '):
+                        if k: lst.append(stripped[2:].strip())
+                    elif ':' in stripped:
+                        kk, v = stripped.split(':', 1)
+                        kk = kk.strip()
+                        v = v.strip().strip('"').strip("'")
+                        if v:
+                            d[kk] = v
+                            k = None
+                        else:
+                            # Could be start of nested block or list
+                            nested_key = kk
+                            nested_dict = {}
+                            k = kk
+                            lst = []
+                # Flush final
+                if nested_key and nested_dict:
+                    d[nested_key] = nested_dict
+                elif k and lst:
+                    d[k] = lst[0] if len(lst)==1 else ', '.join(lst)
     except: pass
     return d
 
@@ -37,13 +72,37 @@ def load_helis():
     h = []
     for f in sorted(glob.glob(f"{HELIS_DIR}/HZHC*.md")):
         d = parse_fm(f)
-        st = d.get('status', 'parked').lower()
-        if 'serviceable' in st: st = 'parked'
-        elif 'maint' in st or 'aog' in st: st = 'maint'
-        else: st = 'parked'
-        h.append({'reg': d.get('registration', os.path.basename(f).replace('.md','')), 'loc': d.get('location','UNK'), 'status': st, 'mission': d.get('current_mission',''), 'note': d.get('note','')})
-    print(f"✅ Loaded {len(h)} helicopters")
+        raw_status = d.get('status', 'Parked')
+        st = raw_status.lower()
+        if 'serviceable' in st: pin_st = 'parked'
+        elif 'maint' in st or 'aog' in st: pin_st = 'maint'
+        else: pin_st = 'parked'
+        h.append({
+            'reg': d.get('registration', os.path.basename(f).replace('.md','')),
+            'loc': d.get('location','UNK'),
+            'status': pin_st,
+            'fullStatus': raw_status,
+            'mission': d.get('current_mission',''),
+            'note': d.get('notes', d.get('note','')),
+            'ert': d.get('ert',''),
+            'total_fh': d.get('total_fh',''),
+            '150hr_rem_fh': d.get('150hr_rem_fh',''),
+            '12mo_due': d.get('12mo_due',''),
+            'mel_ref': d.get('mel_ref',''),
+            'mel_expiry': d.get('mel_expiry',''),
+            'mel_rem_days': d.get('mel_rem_days',''),
+        })
+    print(f"\u2705 Loaded {len(h)} helicopters")
     return h
+
+def is_h125(reg_field):
+    """Check if registration is in HC50-HC70 range (H125 only)"""
+    # Extract number from reg like HC55, HZHC55, etc.
+    m = re.search(r'HC(\d+)', reg_field)
+    if m:
+        num = int(m.group(1))
+        return 50 <= num <= 70
+    return False
 
 def load_flights():
     fl, fy, fr = [], {}, {}  # fr = flight routes
@@ -54,6 +113,8 @@ def load_flights():
             if ln.startswith(ts) and '|' in ln:
                 p = [x.strip() for x in ln.split('|')]
                 if len(p) >= 4:
+                    if not is_h125(p[1]):
+                        continue  # Skip non-H125 aircraft
                     r = 'HZHC' + p[1].replace('HC','') if not p[1].startswith('HZ') else p[1]
                     mission = p[2]
                     fl.append({'reg': r, 'mission': mission, 'pilot': p[3]})
@@ -91,7 +152,38 @@ def load_missions():
         for f in glob.glob(pat):
             d = parse_fm(f)
             t = d.get('title', os.path.basename(f).replace('.md',''))
-            m.append({'title': t, 'date': d.get('date',''), 'endDate': d.get('endDate', d.get('date','')), 'status': d.get('status','pending'), 'helicopters': d.get('Helicopter',''), 'pilots': d.get('Pilots','')})
+            # Format helicopter roles
+            helis = d.get('helicopters', d.get('Helicopter', ''))
+            if isinstance(helis, dict):
+                # New role-based format: {Film: HZHC55, EMS 1: HZHC57, ...}
+                heli_str = ' | '.join(f"{reg.replace('HZHC','HC')} ({role})" for role, reg in helis.items())
+            elif isinstance(helis, str):
+                heli_str = helis.replace('HZHC','HC') if helis else 'TBD'
+            else:
+                heli_str = 'TBD'
+            pilots = d.get('Pilots', '')
+            # Auto-determine status from dates
+            # past = ended before today (grey)
+            # active = happening now (green)
+            # pending = future, unconfirmed (red)
+            # confirmed = future, confirmed (blue)
+            raw_status = d.get('status','pending')
+            start = d.get('date','')
+            end = d.get('endDate', start)
+            if raw_status in ('past', 'complete'):
+                auto_status = raw_status
+            elif start:
+                ts = TODAY.strftime("%Y-%m-%d")
+                if end and end < ts:
+                    auto_status = 'past'
+                elif start <= ts and (not end or end >= ts):
+                    auto_status = 'active'
+                else:
+                    # Future mission — use frontmatter status
+                    auto_status = raw_status if raw_status in ('confirmed', 'pending') else 'pending'
+            else:
+                auto_status = raw_status
+            m.append({'title': t, 'date': start, 'endDate': end, 'status': auto_status, 'helicopters': heli_str, 'pilots': pilots})
     m.sort(key=lambda x: x['date'] if x['date'] else 'zzzz')
     print(f"✅ Loaded {len(m)} missions")
     return m
@@ -102,9 +194,16 @@ def build_fleet_js(helis, fy, fr):
     for h in helis:
         st = 'flying' if h['reg'] in fy else h['status']
         cnt[st] = cnt.get(st,0) + 1
-        e = f'  {{ reg: "{h["reg"]}", loc: "{h["loc"]}", status: "{st}"'
+        e = f'  {{ reg: "{h["reg"]}", loc: "{h["loc"]}", status: "{st}", fullStatus: "{h["fullStatus"]}"'
         if h['note']: e += f', note: "{h["note"]}"'
         if h['mission']: e += f', mission: "{h["mission"]}"'
+        if h['ert']: e += f', ert: "{h["ert"]}"'
+        if h['total_fh']: e += f', totalFH: "{h["total_fh"]}"'
+        if h['150hr_rem_fh']: e += f', remFH: "{h["150hr_rem_fh"]}"'
+        if h['12mo_due']: e += f', next12mo: "{h["12mo_due"]}"'
+        if h['mel_ref']: e += f', melRef: "{h["mel_ref"]}"'
+        if h['mel_expiry']: e += f', melExpiry: "{h["mel_expiry"]}"'
+        if h['mel_rem_days']: e += f', melRemDays: "{h["mel_rem_days"]}"'
         if h['reg'] in fy: e += f', pilot: "{fy[h["reg"]]}"'
         # Add route info for flying helicopters
         if h['reg'] in fr:
@@ -117,19 +216,37 @@ def build_fleet_js(helis, fy, fr):
 
 def build_flights_html():
     L = []
+    ts = TODAY.strftime("%Y-%m-%d")
+    current_section_is_past = False
     try:
         t = open(FLIGHTS_FILE).read()
-        ts = TODAY.strftime("%Y-%m-%d")
         for ln in t.split('\n'):
-            if ln.startswith('## '): L.append(f'  <h4>{ln[3:].strip()}</h4>')
-            elif '|' in ln and 'HC' in ln and not ln.startswith('#'):
+            if ln.startswith('## '):
+                # Check if this section header is for a past date
+                # Parse date from section flights below, or check header text
+                section_title = ln[3:].strip()
+                current_section_is_past = False  # Reset, will determine from flight dates
+                pending_header = f'  <h4>{section_title}</h4>'
+                header_added = False
+            elif '|' in ln and not ln.startswith('#'):
                 p = [x.strip() for x in ln.split('|')]
                 if len(p) >= 4:
+                    # Skip past flights
+                    flight_date = p[0]
+                    if flight_date < ts:
+                        continue
+                    # Skip non-H125 aircraft
+                    if not is_h125(p[1]):
+                        continue
+                    # Add section header if not yet added
+                    if not header_added and pending_header:
+                        L.append(pending_header)
+                        header_added = True
                     r = p[1].replace('HZHC','HC') if 'HZ' in p[1] else p[1]
                     cl = "flight-row today" if p[0]==ts else "flight-row"
                     L.append(f'  <div class="{cl}"><span class="reg">{r}</span><span class="info">{p[2]}</span><span class="pilot">{p[3]}</span></div>')
     except: pass
-    return '\n'.join(L) if L else '  <div>No flights</div>'
+    return '\n'.join(L) if L else '  <div>No flights scheduled</div>'
 
 def build_currency_html(curr):
     L = []
@@ -183,7 +300,7 @@ def build_currency_html(curr):
                     rems_issues.append((first_name, exp.strftime("%b %Y"), 'danger', 'expired'))
                 elif this_mo <= exp < this_mo_end:
                     # Expires this month
-                    rems_issues.append((first_name, exp.strftime("%b %Y"), 'warn', 'expires'))
+                    rems_issues.append((first_name, exp.strftime("%b %Y"), "warn", "expires"))
             except: pass
     if rems_issues:
         L.append('  <h4>30-Min REMS (6 month validity)</h4>')
@@ -272,7 +389,7 @@ def build_timeline(missions):
     if tbd:
         L.append('    <div class="tbd-sidebar">')
         L.append('      <div class="tbd-header">📋 Dates TBD</div>')
-        for m in tbd: L.append(f'      <div class="tbd-item" data-name="{m["title"]}" data-status="pending" data-dates="TBD" data-aircraft="TBD" data-pilots="TBD" onclick="showEventPopup(this,event)">\n        {m["title"]}\n      </div>')
+        for m in tbd: L.append(f'      <div class="tbd-item" data-name="{m["title"]}" data-status="pending" data-dates="TBD" data-aircraft="{m.get("helicopters","TBD")}" data-pilots="{m.get("pilots","TBD")}" onclick="showEventPopup(this,event)">\n        {m["title"]}\n      </div>')
         L.append('    </div>')
     
     def bar(m):
@@ -308,7 +425,7 @@ def build_timeline(missions):
         c += timedelta(days=1)
     
     if mn <= TODAY <= mx: 
-        L.append(f'        <div class="today-marker" style="left:{round(((TODAY-mn).days/td)*100,1)}%;"><span>Today</span></div>')
+        L.append(f'        <div class="today-marker" style="left:{round(((TODAY-mn).days/td)*100,1)}%;"></div>')
     
     L.append('      </div>')
     L.append('      <div class="lanes-below">')

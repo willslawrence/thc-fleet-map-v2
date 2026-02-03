@@ -72,22 +72,27 @@ def load_helis():
     h = []
     for f in sorted(glob.glob(f"{HELIS_DIR}/HZHC*.md")):
         d = parse_fm(f)
-        st = d.get('status', 'parked').lower()
-        if 'serviceable' in st: st = 'parked'
-        elif 'maint' in st or 'aog' in st: st = 'maint'
-        else: st = 'parked'
+        raw_status = d.get('status', 'Parked')
+        st = raw_status.lower()
+        if 'serviceable' in st: pin_st = 'parked'
+        elif 'maint' in st or 'aog' in st: pin_st = 'maint'
+        else: pin_st = 'parked'
         h.append({
             'reg': d.get('registration', os.path.basename(f).replace('.md','')),
             'loc': d.get('location','UNK'),
-            'status': st,
+            'status': pin_st,
+            'fullStatus': raw_status,
             'mission': d.get('current_mission',''),
             'note': d.get('notes', d.get('note','')),
             'ert': d.get('ert',''),
             'total_fh': d.get('total_fh',''),
             '150hr_rem_fh': d.get('150hr_rem_fh',''),
             '12mo_due': d.get('12mo_due',''),
+            'mel_ref': d.get('mel_ref',''),
+            'mel_expiry': d.get('mel_expiry',''),
+            'mel_rem_days': d.get('mel_rem_days',''),
         })
-    print(f"✅ Loaded {len(h)} helicopters")
+    print(f"\u2705 Loaded {len(h)} helicopters")
     return h
 
 def is_h125(reg_field):
@@ -189,13 +194,16 @@ def build_fleet_js(helis, fy, fr):
     for h in helis:
         st = 'flying' if h['reg'] in fy else h['status']
         cnt[st] = cnt.get(st,0) + 1
-        e = f'  {{ reg: "{h["reg"]}", loc: "{h["loc"]}", status: "{st}"'
+        e = f'  {{ reg: "{h["reg"]}", loc: "{h["loc"]}", status: "{st}", fullStatus: "{h["fullStatus"]}"'
         if h['note']: e += f', note: "{h["note"]}"'
         if h['mission']: e += f', mission: "{h["mission"]}"'
         if h['ert']: e += f', ert: "{h["ert"]}"'
         if h['total_fh']: e += f', totalFH: "{h["total_fh"]}"'
         if h['150hr_rem_fh']: e += f', remFH: "{h["150hr_rem_fh"]}"'
         if h['12mo_due']: e += f', next12mo: "{h["12mo_due"]}"'
+        if h['mel_ref']: e += f', melRef: "{h["mel_ref"]}"'
+        if h['mel_expiry']: e += f', melExpiry: "{h["mel_expiry"]}"'
+        if h['mel_rem_days']: e += f', melRemDays: "{h["mel_rem_days"]}"'
         if h['reg'] in fy: e += f', pilot: "{fy[h["reg"]]}"'
         # Add route info for flying helicopters
         if h['reg'] in fr:

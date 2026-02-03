@@ -156,7 +156,7 @@ def load_missions():
             helis = d.get('helicopters', d.get('Helicopter', ''))
             if isinstance(helis, dict):
                 # New role-based format: {Film: HZHC55, EMS 1: HZHC57, ...}
-                heli_str = ' | '.join(f"{role}: {reg.replace('HZHC','HC')}" for role, reg in helis.items())
+                heli_str = ' | '.join(f"{reg.replace('HZHC','HC')} ({role})" for role, reg in helis.items())
             elif isinstance(helis, str):
                 heli_str = helis.replace('HZHC','HC') if helis else 'TBD'
             else:

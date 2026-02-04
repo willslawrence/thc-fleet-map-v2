@@ -3,7 +3,7 @@ import os, re, glob
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-VAULT = os.path.expanduser("~/Library/Mobile Documents/iCloud~md~obsidian/Documents/THC Vault")
+VAULT = os.path.expanduser("~/Library/Mobile Documents/com~apple~CloudDocs/THC Vault")
 HELIS_DIR = f"{VAULT}/Helicopters"
 PILOTS_DIR = f"{VAULT}/Pilots"
 FLIGHTS_FILE = f"{VAULT}/Flights Schedule.md"

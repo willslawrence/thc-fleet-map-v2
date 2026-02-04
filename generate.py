@@ -3,7 +3,10 @@ import os, re, glob
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-VAULT = os.path.expanduser("~/Library/Mobile Documents/com~apple~CloudDocs/THC Vault")
+# Prefer Obsidian's iCloud container; fall back to iCloud Drive
+_VAULT_OBSIDIAN = os.path.expanduser("~/Library/Mobile Documents/iCloud~md~obsidian/Documents/THC Vault")
+_VAULT_ICLOUD   = os.path.expanduser("~/Library/Mobile Documents/com~apple~CloudDocs/THC Vault")
+VAULT = _VAULT_OBSIDIAN if os.path.isdir(_VAULT_OBSIDIAN) else _VAULT_ICLOUD
 HELIS_DIR = f"{VAULT}/Helicopters"
 PILOTS_DIR = f"{VAULT}/Pilots"
 FLIGHTS_FILE = f"{VAULT}/Flights Schedule.md"

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>THC Fleet Map — 4 Feb 2026</title>
+<title>THC Fleet Map — 5 Feb 2026</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -401,7 +401,7 @@
 </head>
 <body class="timeline-open">
 <div id="map"></div>
-<div id="last-updated">Last updated: <!-- LAST_UPDATED -->4 Feb 2026 16:27<!-- /LAST_UPDATED --></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->5 Feb 2026 10:27<!-- /LAST_UPDATED --></div>
 
 <!-- Timeline Toggle Button -->
 <button class="timeline-toggle" onclick="toggleTimeline()">📅 Missions</button>
@@ -417,7 +417,7 @@
 
   <!-- FLIGHTS_START -->
   <h4>05 Feb</h4>
-  <div class="flight-row"><span class="reg">HC55</span><span class="info">Op Repo OEAO-XURC - AURORA</span><span class="pilot">Unassigned</span></div>
+  <div class="flight-row today"><span class="reg">HC55</span><span class="info">Op Repo OEAO-XURC - AURORA</span><span class="pilot">Unassigned</span></div>
   <h4>06 Feb</h4>
   <div class="flight-row"><span class="reg">HC55</span><span class="info">Filming -133 XURC - AURORA</span><span class="pilot">Unassigned</span></div>
   <h4>07 Feb</h4>
@@ -474,7 +474,7 @@
           </div>
         </div>
         <div class="lane">
-          <div class="event-bar confirmed short" style="left:9.6%;width:1.2%;" data-name="Al Fursan Cup" data-status="confirmed" data-dates="5-8 Feb" data-aircraft="HC55 (Film)" data-pilots="Lisa" onclick="showEventPopup(this,event)" title="Al Fursan Cup (5-8 Feb)">
+          <div class="event-bar active short" style="left:9.6%;width:1.2%;" data-name="Al Fursan Cup" data-status="active" data-dates="5-8 Feb" data-aircraft="HC55 (Film)" data-pilots="Lisa" onclick="showEventPopup(this,event)" title="Al Fursan Cup (5-8 Feb)">
             <span class="event-title">Al Fursan ...</span>
           </div>
           <div class="event-bar pending " style="left:16.2%;width:16.5%;" data-name="GeoTech" data-status="pending" data-dates="1 Mar - 30 Apr" data-aircraft="HC64 (Survey 1) | HC63 (Survey 2)" data-pilots="TBD" onclick="showEventPopup(this,event)" title="GeoTech (1 Mar - 30 Apr)">
@@ -492,9 +492,18 @@
           <div class="event-bar complete short" style="left:7.7%;width:1.2%;" data-name="Rally Hail 2026" data-status="complete" data-dates="29 Jan - 1 Feb" data-aircraft="TBD" data-pilots="TBD" onclick="showEventPopup(this,event)" title="Rally Hail 2026 (29 Jan - 1 Feb)">
             <span class="event-title">Rally Hail...</span>
           </div>
-          <div class="event-bar confirmed " style="left:12.4%;width:87.6%;" data-name="Riyadh UAM" data-status="confirmed" data-dates="15 Feb - 31 Dec" data-aircraft="HC66 (Main) | HC67 (Backup)" data-pilots="Rohit Kaundinya, Will Lawrence, Lisa le Roux, David Leipsig, David Schicht" onclick="showEventPopup(this,event)" title="Riyadh UAM (15 Feb - 31 Dec)">
-            <span class="event-title">Riyadh UAM</span>
-            <span class="event-dates">15 Feb - 31 Dec</span>
+          <div class="event-bar pending short" style="left:10.7%;width:1.2%;" data-name="Edge of the World Tour" data-status="pending" data-dates="9 Feb" data-aircraft="TBD (Main)" data-pilots="TBD" onclick="showEventPopup(this,event)" title="Edge of the World Tour (9 Feb)">
+            <span class="event-title">Edge of th...</span>
+          </div>
+          <div class="event-bar pending " style="left:15.1%;width:13.5%;" data-name="Argas" data-status="pending" data-dates="25 Feb - 15 Apr" data-aircraft="HC59 (Survey) | HC54 (Backup)" data-pilots="TBD" onclick="showEventPopup(this,event)" title="Argas (25 Feb - 15 Apr)">
+            <span class="event-title">Argas</span>
+            <span class="event-dates">25 Feb - 15 Apr</span>
+          </div>
+          <div class="event-bar pending short" style="left:34.9%;width:1.2%;" data-name="Rally Qassim 2026" data-status="pending" data-dates="8-9 May" data-aircraft="TBD (Film) | TBD (EMS 1/Sling) | TBD (EMS 2) | TBD (VIP)" data-pilots="TBD" onclick="showEventPopup(this,event)" title="Rally Qassim 2026 (8-9 May)">
+            <span class="event-title">Rally Qass...</span>
+          </div>
+          <div class="event-bar pending short" style="left:91.8%;width:1.2%;" data-name="WRC 2026" data-status="pending" data-dates="1-2 Dec" data-aircraft="TBD (Film) | TBD (EMS 1/Sling) | TBD (EMS 2) | TBD (VIP)" data-pilots="Will (VIP)" onclick="showEventPopup(this,event)" title="WRC 2026 (1-2 Dec)">
+            <span class="event-title">WRC 2026</span>
           </div>
         </div>
       </div>
@@ -563,22 +572,16 @@
         <div class="week-tick" style="left:95.3%;"></div>
         <div class="week-tick" style="left:97.3%;"></div>
         <div class="week-tick" style="left:99.2%;"></div>
-        <div class="today-marker" style="left:9.3%;"></div>
+        <div class="today-marker" style="left:9.6%;"></div>
       </div>
       <div class="lanes-below">
         <div class="lane">
           <div class="event-bar complete short" style="left:6.6%;width:1.9%;" data-name="AlUla Tour 2026" data-status="complete" data-dates="25 Jan - 1 Feb" data-aircraft="TBD" data-pilots="TBD" onclick="showEventPopup(this,event)" title="AlUla Tour 2026 (25 Jan - 1 Feb)">
             <span class="event-title">AlUla Tour...</span>
           </div>
-          <div class="event-bar pending " style="left:15.1%;width:13.5%;" data-name="Argas" data-status="pending" data-dates="25 Feb - 15 Apr" data-aircraft="HC59 (Survey) | HC54 (Backup)" data-pilots="TBD" onclick="showEventPopup(this,event)" title="Argas (25 Feb - 15 Apr)">
-            <span class="event-title">Argas</span>
-            <span class="event-dates">25 Feb - 15 Apr</span>
-          </div>
-          <div class="event-bar pending short" style="left:34.9%;width:1.2%;" data-name="Rally Qassim 2026" data-status="pending" data-dates="8-9 May" data-aircraft="TBD (Film) | TBD (EMS 1/Sling) | TBD (EMS 2) | TBD (VIP)" data-pilots="TBD" onclick="showEventPopup(this,event)" title="Rally Qassim 2026 (8-9 May)">
-            <span class="event-title">Rally Qass...</span>
-          </div>
-          <div class="event-bar pending short" style="left:91.8%;width:1.2%;" data-name="WRC 2026" data-status="pending" data-dates="1-2 Dec" data-aircraft="TBD (Film) | TBD (EMS 1/Sling) | TBD (EMS 2) | TBD (VIP)" data-pilots="Will (VIP)" onclick="showEventPopup(this,event)" title="WRC 2026 (1-2 Dec)">
-            <span class="event-title">WRC 2026</span>
+          <div class="event-bar confirmed " style="left:12.4%;width:87.6%;" data-name="Riyadh UAM" data-status="confirmed" data-dates="15 Feb - 31 Dec" data-aircraft="HC66 (Main) | HC67 (Backup)" data-pilots="Rohit Kaundinya, Will Lawrence, Lisa le Roux, David Leipsig, David Schicht" onclick="showEventPopup(this,event)" title="Riyadh UAM (15 Feb - 31 Dec)">
+            <span class="event-title">Riyadh UAM</span>
+            <span class="event-dates">15 Feb - 31 Dec</span>
           </div>
         </div>
         <div class="lane">
@@ -618,7 +621,7 @@ const bases = {
 const fleet = [
   { reg: "HZHC52", loc: "RUH", status: "parked", fullStatus: "Serviceable - For Sale", note: "Aircraft Under Process for Sale. Export C of A issued by GACA. Short Term storage.", mission: "Short Term Storage", remFH: "117:05" },
   { reg: "HZHC54", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "Available", remFH: "76:46" },
-  { reg: "HZHC55", loc: "OEAO", status: "parked", fullStatus: "Serviceable", mission: "Aurora Filming (repo OEAO→XURC 05 Feb, filming 06-07 Feb, repo OETH 08 Feb)", remFH: "42:56" },
+  { reg: "HZHC55", loc: "OEAO", status: "flying", fullStatus: "Serviceable", mission: "Aurora Filming (repo OEAO→XURC 05 Feb, filming 06-07 Feb, repo OETH 08 Feb)", remFH: "42:56", pilot: "Unassigned" },
   { reg: "HZHC57", loc: "RUH", status: "maint", fullStatus: "Maintenance - Post Dakar", note: "Aircraft under Post Dakar maintenance.", ert: "2026-02-06", remFH: "80:33" },
   { reg: "HZHC58", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "66:47" },
   { reg: "HZHC59", loc: "RUH", status: "maint", fullStatus: "Maintenance", note: "Aircraft under Post Dakar maintenance.", ert: "2026-02-14", remFH: "91:35" },

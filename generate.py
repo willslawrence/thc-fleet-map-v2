@@ -164,9 +164,16 @@ def load_missions():
             d = parse_fm(f)
             # Use filename as title (matches what user sees in Obsidian)
             t = os.path.basename(f).replace('.md','')
-            # Add 🏁 emoji to rally missions
-            if 'rally' in t.lower():
+            # Add emoji prefixes based on mission type
+            tl = t.lower()
+            if 'rally' in tl:
                 t = '🏁 ' + t
+            elif 'survey' in tl:
+                t = '🔍 ' + t
+            elif 'skybridge' in tl:
+                t = '🌉 ' + t
+            elif 'uam' in tl:
+                t = '🌆 ' + t
             # Format helicopter roles
             helis = d.get('helicopters', d.get('Helicopter', ''))
             if isinstance(helis, dict):

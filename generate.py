@@ -139,6 +139,14 @@ def load_currency():
         if os.path.exists(pf):
             try:
                 t = open(pf).read()
+                # Only include H125 pilots in currency box
+                helicopter = ""
+                for ln in t.split('\n'):
+                    if ln.strip().startswith('Helicopter:'):
+                        helicopter = ln.split(':',1)[1].strip()
+                        break
+                if 'H125' not in helicopter:
+                    continue  # Skip non-H125 pilots
                 med = rems = comp = ""
                 for ln in t.split('\n'):
                     if 'Medical Certificate Date:' in ln: med = ln.split(':',1)[1].strip()
@@ -146,7 +154,7 @@ def load_currency():
                     if 'Last Competency Check:' in ln: comp = ln.split(':',1)[1].strip()
                 c.append({'name': nm, 'medical': med, 'rems': rems, 'competency': comp})
             except: pass
-    print(f"✅ Loaded {len(c)} currency records")
+    print(f"✅ Loaded {len(c)} H125 pilot currency records")
     return c
 
 def load_missions():

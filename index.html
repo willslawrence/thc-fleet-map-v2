@@ -678,7 +678,7 @@ function drawHelicopters() {
     const n = g.length;
     
     // Radial layout: arrange helicopters in a semicircle
-    // OETH → north half only, RUH/Alsalam/OERK → south half only (to avoid overlap)
+    // OETH → north half only, RUH/Alsalam/OERK → south 90° arc
     // Angle 0° = North, 90° = East, 180° = South, -90° = West
     const northBases = ['OETH'];
     const southBases = ['RUH', 'XRSC', 'OERK'];
@@ -687,7 +687,7 @@ function drawHelicopters() {
     if (northBases.includes(h.loc)) {
       startAngle = -90; spread = 180; // West through North to East
     } else if (southBases.includes(h.loc)) {
-      startAngle = 90; spread = 180; // East through South to West
+      startAngle = 135; spread = 90; // SE through South to SW (90° arc)
     } else {
       startAngle = 0; spread = 360; // Full circle for other bases
     }

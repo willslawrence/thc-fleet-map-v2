@@ -162,7 +162,11 @@ def load_missions():
     for pat in [f"{MISSIONS_DIR}/*.md", f"{MISSIONS_DIR}/Past Missions/*.md"]:
         for f in glob.glob(pat):
             d = parse_fm(f)
-            t = d.get('title', os.path.basename(f).replace('.md',''))
+            # Use filename as title (matches what user sees in Obsidian)
+            t = os.path.basename(f).replace('.md','')
+            # Add 🏁 emoji to rally missions
+            if 'rally' in t.lower():
+                t = '🏁 ' + t
             # Format helicopter roles
             helis = d.get('helicopters', d.get('Helicopter', ''))
             if isinstance(helis, dict):

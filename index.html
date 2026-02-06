@@ -401,7 +401,7 @@
 </head>
 <body class="timeline-open">
 <div id="map"></div>
-<div id="last-updated">Last updated: <!-- LAST_UPDATED -->6 Feb 2026 22:26<!-- /LAST_UPDATED --></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->6 Feb 2026 22:48<!-- /LAST_UPDATED --></div>
 
 <!-- Timeline Toggle Button -->
 <button class="timeline-toggle" onclick="toggleTimeline()">📅 Missions</button>
@@ -573,10 +573,10 @@
       </div>
       <div class="lanes-below">
         <div class="lane">
-          <div class="event-bar complete short" style="left:6.6%;width:1.9%;" data-name="🏜️ AlUla Tour 2026" data-status="complete" data-dates="25 Jan - 1 Feb" data-aircraft="TBD" data-pilots="TBD" onclick="showEventPopup(this,event)" title="🏜️ AlUla Tour 2026 (25 Jan - 1 Feb)">
+          <div class="event-bar complete short" style="left:6.6%;width:1.9%;" data-name="🏜️ AlUla Tour 2026" data-status="complete" data-dates="25 Jan - 1 Feb" data-aircraft="TBD" data-pilots="Julio" onclick="showEventPopup(this,event)" title="🏜️ AlUla Tour 2026 (25 Jan - 1 Feb)">
             <span class="event-title">🏜️ AlUla T...</span>
           </div>
-          <div class="event-bar confirmed " style="left:12.4%;width:87.6%;" data-name="🌆 Riyadh UAM" data-status="confirmed" data-dates="15 Feb - 31 Dec" data-aircraft="HC66 (Main) | HC67 (Backup)" data-pilots="Rohit Kaundinya, Will Lawrence, Lisa le Roux, David Leipsig, David Schicht" onclick="showEventPopup(this,event)" title="🌆 Riyadh UAM (15 Feb - 31 Dec)">
+          <div class="event-bar confirmed " style="left:12.4%;width:87.6%;" data-name="🌆 Riyadh UAM" data-status="confirmed" data-dates="15 Feb - 31 Dec" data-aircraft="HC66 (Main) | HC67 (Backup)" data-pilots="Rohit Kaundinya, Will Lawrence, Lisa le Roux, David Leipsig, David Schicht, Nathan P, Stephan, Ivona" onclick="showEventPopup(this,event)" title="🌆 Riyadh UAM (15 Feb - 31 Dec)">
             <span class="event-title">🌆 Riyadh UAM</span>
             <span class="event-dates">15 Feb - 31 Dec</span>
           </div>
@@ -585,7 +585,7 @@
           <div class="event-bar pending short" style="left:10.4%;width:1.2%;" data-name="🎬 Promo Filming" data-status="pending" data-dates="8-9 Feb" data-aircraft="HC68 (Film)" data-pilots="David Liepsig (Film)" onclick="showEventPopup(this,event)" title="🎬 Promo Filming (8-9 Feb)">
             <span class="event-title">🎬 Promo Fi...</span>
           </div>
-          <div class="event-bar pending " style="left:20.1%;width:79.9%;" data-name="🌉 Bahrain Skybridge" data-status="pending" data-dates="15 Mar - 31 Dec" data-aircraft="HC68 (EMS 1) | HC67 (Backup)" data-pilots="TBD" onclick="showEventPopup(this,event)" title="🌉 Bahrain Skybridge (15 Mar - 31 Dec)">
+          <div class="event-bar pending " style="left:20.1%;width:79.9%;" data-name="🌉 Bahrain Skybridge" data-status="pending" data-dates="15 Mar - 31 Dec" data-aircraft="HC68 (EMS 1) | HC67 (Backup)" data-pilots="UAM Pilots" onclick="showEventPopup(this,event)" title="🌉 Bahrain Skybridge (15 Mar - 31 Dec)">
             <span class="event-title">🌉 Bahrain Skybridge</span>
             <span class="event-dates">15 Mar - 31 Dec</span>
           </div>
@@ -658,14 +658,23 @@ fleet.forEach(h => {
   if (!b) return;
   const g = groups[h.loc];
   const i = g.indexOf(h);
-  const cols = Math.min(g.length, 3);
-  const row = Math.floor(i / cols);
-  const col = i % cols;
-  const totalRows = Math.ceil(g.length / cols);
-  const latOff = (row - (totalRows - 1) / 2) * 0.15;
-  const lngOff = (col - (cols - 1) / 2) * 0.35;
+  const n = g.length;
+  
+  // Radial layout: arrange helicopters in a circle around the base
+  const radius = 0.08; // Distance from center (degrees)
+  const startAngle = -90; // Start from top (north)
+  const angle = (startAngle + (i * 360 / n)) * Math.PI / 180;
+  const latOff = n > 1 ? radius * Math.cos(angle) : 0;
+  const lngOff = n > 1 ? radius * 1.2 * Math.sin(angle) : 0; // 1.2 stretches for lng
   const lat = b.lat + latOff;
   const lng = b.lng + lngOff;
+  
+  // Draw radial line from base to helicopter
+  if (n > 1) {
+    L.polyline([[b.lat, b.lng], [lat, lng]], {
+      color: 'rgba(255,255,255,0.25)', weight: 1, dashArray: '2 4'
+    }).addTo(map);
+  }
 
   const cls = h.status === 'flying' ? 'flying' : h.status === 'aog' ? 'aog' : h.status === 'maint' ? 'aog' : '';
   let label = h.reg.replace('HZHC','HC');

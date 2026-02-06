@@ -677,9 +677,21 @@ function drawHelicopters() {
     const i = g.indexOf(h);
     const n = g.length;
     
-    // Radial layout: arrange helicopters in a circle around the base
-    const startAngle = -90; // Start from top (north)
-    const angle = (startAngle + (i * 360 / n)) * Math.PI / 180;
+    // Radial layout: arrange helicopters in a semicircle
+    // OETH → north half only, RUH/Alsalam/OERK → south half only (to avoid overlap)
+    const northBases = ['OETH'];
+    const southBases = ['RUH', 'XRSC', 'OERK'];
+    
+    let startAngle, spread;
+    if (northBases.includes(h.loc)) {
+      startAngle = -180; spread = 180; // West to East through North
+    } else if (southBases.includes(h.loc)) {
+      startAngle = 0; spread = 180; // East to West through South
+    } else {
+      startAngle = -90; spread = 360; // Full circle for other bases
+    }
+    
+    const angle = (startAngle + (i * spread / Math.max(n - 1, 1))) * Math.PI / 180;
     const latOff = n > 1 ? radius * Math.cos(angle) : 0;
     const lngOff = n > 1 ? radius * 1.3 * Math.sin(angle) : 0;
     const lat = b.lat + latOff;

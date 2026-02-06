@@ -659,10 +659,10 @@ const heliLayer = L.layerGroup().addTo(map);
 // Calculate radius based on zoom (larger when zoomed out)
 function getRadius(zoom) {
   // Zoom 6 = very far out (whole country), zoom 12 = close
-  // Scale: zoom 6 → 0.5°, zoom 10 → 0.15°, zoom 12+ → 0.05°
-  const baseRadius = 0.5;
+  // Increased separation for better readability
+  const baseRadius = 1.5;
   const scale = Math.pow(2, 10 - zoom);
-  return Math.max(0.03, Math.min(0.6, baseRadius * scale / 16));
+  return Math.max(0.08, Math.min(2.0, baseRadius * scale / 16));
 }
 
 function drawHelicopters() {

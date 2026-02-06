@@ -462,6 +462,16 @@ def build_timeline(missions):
     L.append('    </div>')
     return '\n'.join(L)
 
+def get_report_period():
+    """Read report_period from Flights Schedule frontmatter."""
+    try:
+        t = open(FLIGHTS_FILE).read()
+        for ln in t.split('\n'):
+            if ln.strip().startswith('report_period:'):
+                return ln.split(':', 1)[1].strip()
+    except: pass
+    return None
+
 def update(html, fleet, flights, curr, timeline):
     html = re.sub(r'const fleet = \[.*?\];', fleet, html, flags=re.DOTALL)
     html = re.sub(r'<!-- FLIGHTS_START -->.*?<!-- FLIGHTS_END -->', f'<!-- FLIGHTS_START -->\n{flights}\n  <!-- FLIGHTS_END -->', html, flags=re.DOTALL)
@@ -469,6 +479,10 @@ def update(html, fleet, flights, curr, timeline):
     html = re.sub(r'<!-- TIMELINE_START -->.*?<!-- TIMELINE_END -->', f'<!-- TIMELINE_START -->\n{timeline}\n    <!-- TIMELINE_END -->', html, flags=re.DOTALL)
     html = re.sub(r'<title>THC Fleet Map.*?</title>', f'<title>THC Fleet Map — {TODAY.strftime("%-d %b %Y")}</title>', html)
     html = re.sub(r'<!-- LAST_UPDATED -->.*?<!-- /LAST_UPDATED -->', f'<!-- LAST_UPDATED -->{TODAY.strftime("%-d %b %Y %H:%M")}<!-- /LAST_UPDATED -->', html)
+    # Update report period from Flights Schedule
+    rp = get_report_period()
+    if rp:
+        html = re.sub(r'<!-- REPORT_PERIOD -->.*?<!-- /REPORT_PERIOD -->', f'<!-- REPORT_PERIOD -->{rp}<!-- /REPORT_PERIOD -->', html)
     return html
 
 def main():

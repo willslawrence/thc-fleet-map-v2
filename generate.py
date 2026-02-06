@@ -176,6 +176,8 @@ def load_missions():
                 t = '🌆 ' + t
             elif 'tour' in tl:
                 t = '🏜️ ' + t
+            elif 'film' in tl:
+                t = '🎬 ' + t
             # Format helicopter roles
             helis = d.get('helicopters', d.get('Helicopter', ''))
             if isinstance(helis, dict):

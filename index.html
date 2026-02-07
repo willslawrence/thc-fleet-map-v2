@@ -401,7 +401,7 @@
 </head>
 <body class="timeline-open">
 <div id="map"></div>
-<div id="last-updated">Last updated: <!-- LAST_UPDATED -->7 Feb 2026 15:07<!-- /LAST_UPDATED --></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->7 Feb 2026 15:09<!-- /LAST_UPDATED --></div>
 
 <!-- Timeline Toggle Button -->
 <button class="timeline-toggle" onclick="toggleTimeline()">📅 Missions</button>
@@ -417,14 +417,14 @@
 
   <!-- FLIGHTS_START -->
   <h4>07 Feb — Today</h4>
-  <div class="flight-row today"><span class="reg">HC55</span><span class="info">Filming -133 XUFR</span><span class="pilot">le Roux / TBA</span></div>
-  <div class="flight-row today"><span class="reg">HC57</span><span class="info">Maint Check Flight XRSC</span><span class="pilot">Schicht / TBA</span></div>
+  <div class="flight-row today"><span class="reg">HC55</span><span class="info">Filming -133 XUFR</span><span class="pilot">le Roux</span></div>
+  <div class="flight-row today"><span class="reg">HC57</span><span class="info">Maint Check Flight XRSC</span><span class="pilot">Schicht</span></div>
   <h4>08 Feb</h4>
-  <div class="flight-row"><span class="reg">HC55</span><span class="info">Op Repo XURC-OEHL-OEGS-OETH</span><span class="pilot">le Roux / Lieven (TS)</span></div>
-  <div class="flight-row"><span class="reg">HC58</span><span class="info">Tech Repo OETH-XRSC</span><span class="pilot">TBA / TBA</span></div>
+  <div class="flight-row"><span class="reg">HC55</span><span class="info">Op Repo XURC-OEHL-OEGS-OETH</span><span class="pilot">le Roux</span></div>
+  <div class="flight-row"><span class="reg">HC58</span><span class="info">Tech Repo OETH-XRSC</span><span class="pilot">TBA</span></div>
   <h4>09 Feb</h4>
-  <div class="flight-row"><span class="reg">HC68</span><span class="info">PAX135 OETH</span><span class="pilot">Leipsig / TBA (REQUESTED)</span></div>
-  <div class="flight-row"><span class="reg">HC66</span><span class="info">PAX135 XRSC-OERK</span><span class="pilot">TBA / TBA (REQUESTED)</span></div>
+  <div class="flight-row"><span class="reg">HC68</span><span class="info">PAX135 OETH</span><span class="pilot">Leipsig</span></div>
+  <div class="flight-row"><span class="reg">HC66</span><span class="info">PAX135 XRSC-OERK</span><span class="pilot">TBA</span></div>
   <!-- FLIGHTS_END -->
 
   </div>
@@ -620,8 +620,8 @@ const bases = {
 const fleet = [
   { reg: "HZHC52", loc: "RUH", status: "parked", fullStatus: "Serviceable - For Sale", note: "Aircraft Under Process for Sale. Export C of A issued by GACA. Short Term storage.", mission: "Short Term Storage", remFH: "117:05" },
   { reg: "HZHC54", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "Available", remFH: "76:46" },
-  { reg: "HZHC55", loc: "OEAO", status: "flying", fullStatus: "Serviceable", mission: "Aurora Filming (repo OEAO→XURC 05 Feb, filming 06-07 Feb, repo OETH 08 Feb)", remFH: "42:56", pilot: "le Roux / TBA" },
-  { reg: "HZHC57", loc: "RUH", status: "flying", fullStatus: "Maintenance - Post Dakar", note: "Aircraft under Post Dakar maintenance.", ert: "2026-02-08", remFH: "80:33", pilot: "Schicht / TBA" },
+  { reg: "HZHC55", loc: "OEAO", status: "flying", fullStatus: "Serviceable", mission: "Aurora Filming (repo OEAO→XURC 05 Feb, filming 06-07 Feb, repo OETH 08 Feb)", remFH: "42:56", pilot: "le Roux" },
+  { reg: "HZHC57", loc: "RUH", status: "flying", fullStatus: "Maintenance - Post Dakar", note: "Aircraft under Post Dakar maintenance.", ert: "2026-02-08", remFH: "80:33", pilot: "Schicht" },
   { reg: "HZHC58", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "66:47" },
   { reg: "HZHC59", loc: "RUH", status: "maint", fullStatus: "Maintenance", note: "Aircraft under Post Dakar maintenance.", ert: "2026-02-14", remFH: "91:35" },
   { reg: "HZHC62", loc: "OETH", status: "maint", fullStatus: "Maintenance", note: "Accumulator not charged. Troubleshooting in progress.", ert: "2026-02-05", remFH: "41:24" },

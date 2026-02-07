@@ -120,8 +120,9 @@ def load_flights():
                         continue  # Skip non-H125 aircraft
                     r = 'HZHC' + p[1].replace('HC','') if not p[1].startswith('HZ') else p[1]
                     mission = p[2]
-                    fl.append({'reg': r, 'mission': mission, 'pilot': p[3]})
-                    fy[r] = p[3]
+                    pilot = p[4] if len(p) > 4 else p[3]  # Pilot is col 5, client is col 4
+                    fl.append({'reg': r, 'mission': mission, 'pilot': pilot})
+                    fy[r] = pilot
                     # Parse route for repositions (dest is 4-letter ICAO code)
                     if 'reposition' in mission.lower() and ' - ' in mission:
                         dest = mission.split(' - ')[-1].strip()
@@ -268,7 +269,8 @@ def build_flights_html():
                         header_added = True
                     r = p[1].replace('HZHC','HC') if 'HZ' in p[1] else p[1]
                     cl = "flight-row today" if p[0]==ts else "flight-row"
-                    L.append(f'  <div class="{cl}"><span class="reg">{r}</span><span class="info">{p[2]}</span><span class="pilot">{p[3]}</span></div>')
+                    pilot = p[4] if len(p) > 4 else p[3]
+                    L.append(f'  <div class="{cl}"><span class="reg">{r}</span><span class="info">{p[2]}</span><span class="pilot">{pilot}</span></div>')
     except: pass
     return '\n'.join(L) if L else '  <div>No flights scheduled</div>'
 

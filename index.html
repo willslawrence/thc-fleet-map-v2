@@ -401,7 +401,7 @@
 </head>
 <body class="timeline-open">
 <div id="map"></div>
-<div id="last-updated">Last updated: <!-- LAST_UPDATED -->7 Feb 2026 15:09<!-- /LAST_UPDATED --></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->7 Feb 2026 15:42<!-- /LAST_UPDATED --></div>
 
 <!-- Timeline Toggle Button -->
 <button class="timeline-toggle" onclick="toggleTimeline()">📅 Missions</button>
@@ -465,6 +465,12 @@
     </div>
     <!-- TIMELINE_START -->
     <div class="timeline-wrapper">
+    <div class="tbd-sidebar">
+      <div class="tbd-header">📋 Dates TBD</div>
+      <div class="tbd-item" data-name="SELA Company" data-status="pending" data-dates="TBD" data-aircraft="HC67 (Main)" data-pilots="" onclick="showEventPopup(this,event)">
+        SELA Company
+      </div>
+    </div>
     <div class="timeline-body">
       <div class="lanes-above">
         <div class="lane">
@@ -584,7 +590,7 @@
           </div>
         </div>
         <div class="lane">
-          <div class="event-bar pending short" style="left:10.4%;width:1.2%;" data-name="🎬 Promo Filming" data-status="pending" data-dates="8-9 Feb" data-aircraft="HC68 (Film)" data-pilots="David Liepsig (Film)" onclick="showEventPopup(this,event)" title="🎬 Promo Filming (8-9 Feb)">
+          <div class="event-bar confirmed short" style="left:10.4%;width:1.2%;" data-name="🎬 Promo Filming" data-status="confirmed" data-dates="8-9 Feb" data-aircraft="HC68 (Film)" data-pilots="David Liepsig (Film)" onclick="showEventPopup(this,event)" title="🎬 Promo Filming (8-9 Feb)">
             <span class="event-title">🎬 Promo Fi...</span>
           </div>
           <div class="event-bar pending " style="left:20.1%;width:79.9%;" data-name="🌉 Bahrain Skybridge" data-status="pending" data-dates="15 Mar - 31 Dec" data-aircraft="HC68 (EMS 1) | HC67 (Backup)" data-pilots="UAM Pilots" onclick="showEventPopup(this,event)" title="🌉 Bahrain Skybridge (15 Mar - 31 Dec)">

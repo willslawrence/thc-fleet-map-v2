@@ -115,18 +115,20 @@ def load_flights():
         for ln in t.split('\n'):
             if ln.startswith(ts) and '|' in ln:
                 p = [x.strip() for x in ln.split('|')]
-                if len(p) >= 4:
+                # Format: Date | Aircraft | Route | Mission | PIC
+                if len(p) >= 5:
                     if not is_h125(p[1]):
                         continue  # Skip non-H125 aircraft
-                    r = 'HZHC' + p[1].replace('HC','') if not p[1].startswith('HZ') else p[1]
-                    mission = p[2]
-                    pilot = p[4] if len(p) > 4 else p[3]  # Pilot is col 5, client is col 4
-                    pilot = pilot.split('/')[0].strip()  # H125 is single-pilot, drop "/ TBA"
-                    fl.append({'reg': r, 'mission': mission, 'pilot': pilot})
+                    r = 'HZHC' + p[1].replace('HC','').replace('HZHC','') if not p[1].startswith('HZHC') else p[1]
+                    route = p[2]
+                    mission = p[3]
+                    pilot = p[4]
+                    pilot = pilot.split('/')[0].strip()
+                    fl.append({'reg': r, 'route': route, 'mission': mission, 'pilot': pilot})
                     fy[r] = pilot
-                    # Parse route for repositions (dest is 4-letter ICAO code)
-                    if 'reposition' in mission.lower() and ' - ' in mission:
-                        dest = mission.split(' - ')[-1].strip()
+                    # Parse route for repositions (last waypoint is destination)
+                    if 'reposition' in mission.lower() and '→' in route:
+                        dest = route.split('→')[-1].strip()
                         if len(dest) == 4 and dest.isupper():  # ICAO code
                             fr[r] = {'mission': mission, 'dest': dest}
     except: pass
@@ -256,7 +258,8 @@ def build_flights_html():
                 header_added = False
             elif '|' in ln and not ln.startswith('#'):
                 p = [x.strip() for x in ln.split('|')]
-                if len(p) >= 4:
+                # Format: Date | Aircraft | Route | Mission | PIC
+                if len(p) >= 5:
                     # Skip past flights
                     flight_date = p[0]
                     if flight_date < ts:
@@ -270,9 +273,12 @@ def build_flights_html():
                         header_added = True
                     r = p[1].replace('HZHC','HC') if 'HZ' in p[1] else p[1]
                     cl = "flight-row today" if p[0]==ts else "flight-row"
-                    pilot = p[4] if len(p) > 4 else p[3]
-                    pilot = pilot.split('/')[0].strip()  # H125 single-pilot
-                    L.append(f'  <div class="{cl}"><span class="reg">{r}</span><span class="info">{p[2]}</span><span class="pilot">{pilot}</span></div>')
+                    route = p[2]
+                    mission = p[3]
+                    pilot = p[4].split('/')[0].strip()
+                    # Display: Reg | Route | Mission | Pilot
+                    info = f"{route} · {mission}" if route else mission
+                    L.append(f'  <div class="{cl}"><span class="reg">{r}</span><span class="info">{info}</span><span class="pilot">{pilot}</span></div>')
     except: pass
     return '\n'.join(L) if L else '  <div>No flights scheduled</div>'
 

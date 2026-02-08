@@ -160,7 +160,7 @@
   .tl-dot.future, .tl-dot.confirmed { background: #3498db; }
   .tl-dot.active { background: #2ecc71; }
   .tl-dot.pending { background: #e74c3c; }
-  .tl-dot.past, .tl-dot.complete { background: #666; opacity: 0.5; }
+  .tl-dot.past, .tl-dot.complete, .tl-dot.canceled, .tl-dot.cancelled { background: #666; opacity: 0.5; }
 
   
   .timeline-wrapper {
@@ -301,16 +301,16 @@
   }
   
   
-  .event-bar.past {
+  .event-bar.past, .event-bar.complete, .event-bar.canceled, .event-bar.cancelled {
     background: linear-gradient(135deg, rgba(100, 100, 100, 0.3), rgba(80, 80, 80, 0.2));
     border: 1px dashed rgba(150, 150, 150, 0.4);
     opacity: 0.5;
   }
-  .event-bar.past:hover {
+  .event-bar.past:hover, .event-bar.complete:hover, .event-bar.canceled:hover, .event-bar.cancelled:hover {
     opacity: 0.7;
   }
-  .event-bar.past .event-title,
-  .event-bar.past .event-dates {
+  .event-bar.past .event-title, .event-bar.complete .event-title, .event-bar.canceled .event-title, .event-bar.cancelled .event-title,
+  .event-bar.past .event-dates, .event-bar.complete .event-dates, .event-bar.canceled .event-dates, .event-bar.cancelled .event-dates {
     color: rgba(255, 255, 255, 0.6);
   }
   .event-bar.short {
@@ -401,7 +401,7 @@
 </head>
 <body class="timeline-open">
 <div id="map"></div>
-<div id="last-updated">Last updated: <!-- LAST_UPDATED -->8 Feb 2026 08:11<!-- /LAST_UPDATED --></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->8 Feb 2026 08:18<!-- /LAST_UPDATED --></div>
 
 <!-- Timeline Toggle Button -->
 <button class="timeline-toggle" onclick="toggleTimeline()">📅 Missions</button>
@@ -466,9 +466,6 @@
       <div class="tbd-item" data-name="SELA Company" data-status="pending" data-dates="TBD" data-aircraft="HC67 (Main)" data-pilots="" onclick="showEventPopup(this,event)">
         SELA Company
       </div>
-      <div class="tbd-item" data-name="Missions" data-status="pending" data-dates="TBD" data-aircraft="TBD" data-pilots="" onclick="showEventPopup(this,event)">
-        Missions
-      </div>
     </div>
     <div class="timeline-body">
       <div class="lanes-above">
@@ -490,13 +487,13 @@
           </div>
         </div>
         <div class="lane">
-          <div class="event-bar past short" style="left:0.0%;width:4.7%;" data-name="🏁 Rally Dakar 2026" data-status="past" data-dates="27 Dec - 18 Jan" data-aircraft="TBD" data-pilots="Gilles, Ivona, Lindsay, Matt, Nathan, Stephan, Will" onclick="showEventPopup(this,event)" title="🏁 Rally Dakar 2026 (27 Dec - 18 Jan)">
+          <div class="event-bar complete short" style="left:0.0%;width:4.7%;" data-name="🏁 Rally Dakar 2026" data-status="complete" data-dates="27 Dec - 18 Jan" data-aircraft="TBD" data-pilots="Gilles, Ivona, Lindsay, Matt, Nathan, Stephan, Will" onclick="showEventPopup(this,event)" title="🏁 Rally Dakar 2026 (27 Dec - 18 Jan)">
             <span class="event-title">🏁 Rally Da...</span>
           </div>
           <div class="event-bar complete short" style="left:7.7%;width:1.2%;" data-name="🏁 Rally Hail 2026" data-status="complete" data-dates="29 Jan - 1 Feb" data-aircraft="TBD" data-pilots="TBD" onclick="showEventPopup(this,event)" title="🏁 Rally Hail 2026 (29 Jan - 1 Feb)">
             <span class="event-title">🏁 Rally Ha...</span>
           </div>
-          <div class="event-bar pending short" style="left:10.7%;width:1.2%;" data-name="🏜️ Edge of the World Tour" data-status="pending" data-dates="9 Feb" data-aircraft="HC66 (Main)" data-pilots="Rohit Kaundinya" onclick="showEventPopup(this,event)" title="🏜️ Edge of the World Tour (9 Feb)">
+          <div class="event-bar canceled short" style="left:10.7%;width:1.2%;" data-name="🏜️ Edge of the World Tour" data-status="canceled" data-dates="9 Feb" data-aircraft="HC66 (Main)" data-pilots="Rohit Kaundinya" onclick="showEventPopup(this,event)" title="🏜️ Edge of the World Tour (9 Feb)">
             <span class="event-title">🏜️ Edge of...</span>
           </div>
           <div class="event-bar pending " style="left:15.1%;width:13.5%;" data-name="🔍 Argas Survey" data-status="pending" data-dates="25 Feb - 15 Apr" data-aircraft="HC59 (Survey) | HC54 (Backup)" data-pilots="TBD" onclick="showEventPopup(this,event)" title="🔍 Argas Survey (25 Feb - 15 Apr)">

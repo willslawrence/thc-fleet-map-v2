@@ -165,9 +165,13 @@ def load_missions():
     m = []
     for pat in [f"{MISSIONS_DIR}/*.md", f"{MISSIONS_DIR}/Past Missions/*.md"]:
         for f in glob.glob(pat):
+            # Skip folder notes (Missions.md is the folder note, not a mission)
+            fname = os.path.basename(f).replace('.md','')
+            if fname.lower() == 'missions':
+                continue
             d = parse_fm(f)
             # Use filename as title (matches what user sees in Obsidian)
-            t = os.path.basename(f).replace('.md','')
+            t = fname
             # Add emoji prefixes based on mission type
             tl = t.lower()
             if 'rally' in tl:
@@ -193,19 +197,19 @@ def load_missions():
                 heli_str = 'TBD'
             pilots = d.get('Pilots', '')
             # Auto-determine status from dates
-            # past = ended before today (grey)
+            # complete/canceled = done or cancelled (grey)
             # active = happening now (green)
             # pending = future, unconfirmed (red)
             # confirmed = future, confirmed (blue)
-            raw_status = d.get('status','pending')
+            raw_status = d.get('status','pending').lower()
             start = d.get('date','')
             end = d.get('endDate', start)
-            if raw_status in ('past', 'complete'):
+            if raw_status in ('complete', 'canceled', 'cancelled'):
                 auto_status = raw_status
             elif start:
                 ts = TODAY.strftime("%Y-%m-%d")
                 if end and end < ts:
-                    auto_status = 'past'
+                    auto_status = 'complete'
                 elif start <= ts and (not end or end >= ts):
                     auto_status = 'active'
                 else:

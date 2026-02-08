@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>THC Fleet Map — 7 Feb 2026</title>
+<title>THC Fleet Map — 8 Feb 2026</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -401,7 +401,7 @@
 </head>
 <body class="timeline-open">
 <div id="map"></div>
-<div id="last-updated">Last updated: <!-- LAST_UPDATED -->7 Feb 2026 15:55<!-- /LAST_UPDATED --></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->8 Feb 2026 04:30<!-- /LAST_UPDATED --></div>
 
 <!-- Timeline Toggle Button -->
 <button class="timeline-toggle" onclick="toggleTimeline()">📅 Missions</button>
@@ -416,15 +416,7 @@
   <div class="panel-body">
 
   <!-- FLIGHTS_START -->
-  <h4>07 Feb — Today</h4>
-  <div class="flight-row today"><span class="reg">HC55</span><span class="info">Filming -133 XUFR</span><span class="pilot">le Roux</span></div>
-  <div class="flight-row today"><span class="reg">HC57</span><span class="info">Maint Check Flight XRSC</span><span class="pilot">Schicht</span></div>
-  <h4>08 Feb</h4>
-  <div class="flight-row"><span class="reg">HC55</span><span class="info">Op Repo XURC-OEHL-OEGS-OETH</span><span class="pilot">le Roux</span></div>
-  <div class="flight-row"><span class="reg">HC58</span><span class="info">Tech Repo OETH-XRSC</span><span class="pilot">Rohit</span></div>
-  <h4>09 Feb</h4>
-  <div class="flight-row"><span class="reg">HC68</span><span class="info">PAX135 OETH</span><span class="pilot">Leipsig</span></div>
-  <div class="flight-row"><span class="reg">HC66</span><span class="info">PAX135 XRSC-OERK</span><span class="pilot">TBA</span></div>
+  <div>No flights scheduled</div>
   <!-- FLIGHTS_END -->
 
   </div>
@@ -577,7 +569,7 @@
         <div class="week-tick" style="left:95.3%;"></div>
         <div class="week-tick" style="left:97.3%;"></div>
         <div class="week-tick" style="left:99.2%;"></div>
-        <div class="today-marker" style="left:10.2%;"></div>
+        <div class="today-marker" style="left:10.4%;"></div>
       </div>
       <div class="lanes-below">
         <div class="lane">
@@ -590,7 +582,7 @@
           </div>
         </div>
         <div class="lane">
-          <div class="event-bar confirmed short" style="left:10.4%;width:1.2%;" data-name="🎬 Promo Filming" data-status="confirmed" data-dates="8-9 Feb" data-aircraft="HC68 (Film)" data-pilots="David Liepsig (Film)" onclick="showEventPopup(this,event)" title="🎬 Promo Filming (8-9 Feb)">
+          <div class="event-bar active short" style="left:10.4%;width:1.2%;" data-name="🎬 Promo Filming" data-status="active" data-dates="8-9 Feb" data-aircraft="HC68 (Film)" data-pilots="David Liepsig (Film)" onclick="showEventPopup(this,event)" title="🎬 Promo Filming (8-9 Feb)">
             <span class="event-title">🎬 Promo Fi...</span>
           </div>
           <div class="event-bar pending " style="left:20.1%;width:79.9%;" data-name="🌉 Bahrain Skybridge" data-status="pending" data-dates="15 Mar - 31 Dec" data-aircraft="HC68 (EMS 1) | HC67 (Backup)" data-pilots="UAM Pilots" onclick="showEventPopup(this,event)" title="🌉 Bahrain Skybridge (15 Mar - 31 Dec)">
@@ -626,8 +618,8 @@ const bases = {
 const fleet = [
   { reg: "HZHC52", loc: "RUH", status: "parked", fullStatus: "Serviceable - For Sale", note: "Aircraft Under Process for Sale. Export C of A issued by GACA. Short Term storage.", mission: "Short Term Storage", remFH: "117:05" },
   { reg: "HZHC54", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "Available", remFH: "76:46" },
-  { reg: "HZHC55", loc: "OEAO", status: "flying", fullStatus: "Serviceable", mission: "Aurora Filming (repo OEAO→XURC 05 Feb, filming 06-07 Feb, repo OETH 08 Feb)", remFH: "42:56", pilot: "le Roux" },
-  { reg: "HZHC57", loc: "RUH", status: "flying", fullStatus: "Maintenance - Post Dakar", note: "Aircraft under Post Dakar maintenance.", ert: "2026-02-08", remFH: "80:33", pilot: "Schicht" },
+  { reg: "HZHC55", loc: "OEAO", status: "parked", fullStatus: "Serviceable", mission: "Aurora Filming (repo OEAO→XURC 05 Feb, filming 06-07 Feb, repo OETH 08 Feb)", remFH: "42:56" },
+  { reg: "HZHC57", loc: "RUH", status: "maint", fullStatus: "Maintenance - Post Dakar", note: "Aircraft under Post Dakar maintenance.", ert: "2026-02-08", remFH: "80:33" },
   { reg: "HZHC58", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "66:47" },
   { reg: "HZHC59", loc: "RUH", status: "maint", fullStatus: "Maintenance", note: "Aircraft under Post Dakar maintenance.", ert: "2026-02-14", remFH: "91:35" },
   { reg: "HZHC62", loc: "OETH", status: "maint", fullStatus: "Maintenance", note: "Accumulator not charged. Troubleshooting in progress.", ert: "2026-02-05", remFH: "41:24" },

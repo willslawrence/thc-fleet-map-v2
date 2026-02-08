@@ -107,6 +107,14 @@ def is_h125(reg_field):
         return 50 <= num <= 70
     return False
 
+def normalize_reg(raw):
+    """Normalize any reg variant (HZHC55, HZ-HC55, HZHC-55, HC55, HZ-HC-55) to HZHC55"""
+    s = raw.strip().upper().replace('-', '')
+    m = re.search(r'HC(\d+)', s)
+    if m:
+        return 'HZHC' + m.group(1)
+    return s
+
 def load_flights():
     fl, fy, fr = [], {}, {}  # fr = flight routes
     try:
@@ -119,7 +127,7 @@ def load_flights():
                 if len(p) >= 5:
                     if not is_h125(p[1]):
                         continue  # Skip non-H125 aircraft
-                    r = 'HZHC' + p[1].replace('HC','').replace('HZHC','') if not p[1].startswith('HZHC') else p[1]
+                    r = normalize_reg(p[1])
                     route = p[2]
                     mission = p[3]
                     pilot = p[4]
@@ -272,7 +280,7 @@ def build_flights_html():
                     if not header_added and pending_header:
                         L.append(pending_header)
                         header_added = True
-                    r = p[1].replace('HZHC','HC') if 'HZ' in p[1] else p[1]
+                    r = normalize_reg(p[1]).replace('HZHC','HC')
                     cl = "flight-row today" if p[0]==ts else "flight-row"
                     route = p[2]
                     mission = p[3]

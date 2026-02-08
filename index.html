@@ -401,7 +401,7 @@
 </head>
 <body class="timeline-open">
 <div id="map"></div>
-<div id="last-updated">Last updated: <!-- LAST_UPDATED -->8 Feb 2026 12:06<!-- /LAST_UPDATED --></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->8 Feb 2026 12:23<!-- /LAST_UPDATED --></div>
 
 <!-- Timeline Toggle Button -->
 <button class="timeline-toggle" onclick="toggleTimeline()">📅 Missions</button>
@@ -793,23 +793,7 @@ fleet.filter(h => h.route && h.status === 'flying').forEach(h => {
 const pts = fleet.filter(h => bases[h.loc]).map(h => [bases[h.loc].lat, bases[h.loc].lng]);
 map.fitBounds(L.latLngBounds(pts).pad(0.15));
 
-const legend = L.control({ position: 'bottomleft' });
-legend.onAdd = () => {
-  const d = L.DomUtil.create('div', 'legend collapsed');
-  d.onclick = () => d.classList.toggle('collapsed');
-  d.innerHTML = `
-    <!-- LEGEND_START -->
-    <h4>🚁 H125 Fleet — <!-- LEGEND_DATE -->31 Jan 2026<!-- /LEGEND_DATE --> ▾</h4>
-    <div class="legend-body">
-      <div><span class="dot" style="background:#7eb8ff"></span>Serviceable (${fleet.filter(h=>h.status==='parked').length})</div>
-      <div><span class="dot" style="background:#4caf50"></span>Flying today (${fleet.filter(h=>h.status==='flying').length})</div>
-      <div><span class="dot" style="background:#ff9800"></span>Maintenance (${fleet.filter(h=>h.status==='maint').length})</div>
-    </div>
-    <!-- LEGEND_END -->
-  `;
-  return d;
-};
-legend.addTo(map);
+// Legend removed per Will's request (2026-02-08)
 
 // Event popup handling (runs immediately - DOM already loaded)
 (function() {

@@ -126,11 +126,9 @@ def load_flights():
                     pilot = pilot.split('/')[0].strip()
                     fl.append({'reg': r, 'route': route, 'mission': mission, 'pilot': pilot})
                     fy[r] = pilot
-                    # Parse route for repositions (last waypoint is destination)
-                    if 'reposition' in mission.lower() and '→' in route:
-                        dest = route.split('→')[-1].strip()
-                        if len(dest) == 4 and dest.isupper():  # ICAO code
-                            fr[r] = {'mission': mission, 'dest': dest}
+                    # Store full route for flight path drawing
+                    if '→' in route:
+                        fr[r] = {'route': route}
     except: pass
     print(f"✅ Loaded {len(fl)} flights")
     return fl, fy, fr
@@ -239,8 +237,7 @@ def build_fleet_js(helis, fy, fr):
         if h['reg'] in fy: e += f', pilot: "{fy[h["reg"]]}"'
         # Add route info for flying helicopters
         if h['reg'] in fr:
-            route = fr[h['reg']]
-            e += f', route: "{h["loc"]} → {route["dest"]}"'
+            e += f', route: "{fr[h["reg"]]["route"]}"'
         L.append(e + ' },')
     L.append("];")
     print(f"✅ Fleet: {cnt['parked']} serviceable, {cnt['flying']} flying, {cnt['maint']} maint")

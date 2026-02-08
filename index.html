@@ -401,7 +401,7 @@
 </head>
 <body class="timeline-open">
 <div id="map"></div>
-<div id="last-updated">Last updated: <!-- LAST_UPDATED -->8 Feb 2026 08:19<!-- /LAST_UPDATED --></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->8 Feb 2026 08:25<!-- /LAST_UPDATED --></div>
 
 <!-- Timeline Toggle Button -->
 <button class="timeline-toggle" onclick="toggleTimeline()">📅 Missions</button>
@@ -612,19 +612,44 @@ function toggleTimeline() {
 }
 
 const bases = {
+  // Main bases
   OETH:  { lat: 25.213, lng: 46.640, name: "THUMAMAH" },
   RUH:   { lat: 24.680, lng: 46.820, name: "ALSALAM (RUH)" },
+  XRSC:  { lat: 24.680, lng: 46.820, name: "ALSALAM (XRSC)" },
+  OERK:  { lat: 24.958, lng: 46.699, name: "KING KHALID" },
+  // Regional airports
   OEHL:  { lat: 27.438, lng: 41.686, name: "HA'IL" },
+  OEGS:  { lat: 26.303, lng: 43.774, name: "GASSIM" },
   OEAO:  { lat: 26.485, lng: 38.126, name: "AL ULA" },
+  OEGN:  { lat: 16.901, lng: 42.586, name: "JIZAN" },
+  OEJN:  { lat: 21.680, lng: 39.157, name: "JEDDAH" },
+  OEJF:  { lat: 21.348, lng: 39.173, name: "JEDDAH NAVAL" },
+  // Red Sea
+  OERS:  { lat: 22.072, lng: 39.110, name: "RED SEA INTL" },
+  XSCV:  { lat: 22.450, lng: 39.100, name: "RED SEA CAMP" },
+  XSSB:  { lat: 22.380, lng: 39.050, name: "SHURA BAY" },
+  XSTH:  { lat: 22.320, lng: 39.020, name: "TURTLE HUB" },
+  XSDR:  { lat: 22.250, lng: 38.980, name: "DISCOVERY" },
+  XSUH:  { lat: 22.400, lng: 39.080, name: "UMMAHAT" },
+  XSU3:  { lat: 22.350, lng: 39.040, name: "U3 HELIPAD" },
+  // NEOM
+  OENN:  { lat: 28.024, lng: 35.147, name: "NEOM BAY" },
+  XNC1:  { lat: 28.100, lng: 35.200, name: "NEOM CAMP 1" },
+  XNCH:  { lat: 28.050, lng: 35.180, name: "NEOM HELIPAD" },
+  XNNH:  { lat: 28.080, lng: 35.160, name: "NEOM NORTH" },
+  XNPI:  { lat: 28.000, lng: 35.100, name: "NEOM PIER" },
+  // Al Ula / XURC area
+  XUFR:  { lat: 26.600, lng: 37.900, name: "AL ULA FBO" },
+  XURC:  { lat: 26.550, lng: 37.850, name: "AL ULA RC" },
 };
 
 // FLEET_START
 const fleet = [
   { reg: "HZHC52", loc: "RUH", status: "parked", fullStatus: "Serviceable - For Sale", note: "Aircraft Under Process for Sale. Export C of A issued by GACA. Short Term storage.", mission: "Short Term Storage", remFH: "117:05" },
   { reg: "HZHC54", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "Available", remFH: "76:46" },
-  { reg: "HZHC55", loc: "OEAO", status: "flying", fullStatus: "Serviceable", mission: "Aurora Filming (repo OEAO→XURC 05 Feb, filming 06-07 Feb, repo OETH 08 Feb)", remFH: "42:56", pilot: "le Roux, Lisa", route: "OEAO → OETH" },
+  { reg: "HZHC55", loc: "OEAO", status: "flying", fullStatus: "Serviceable", mission: "Aurora Filming (repo OEAO→XURC 05 Feb, filming 06-07 Feb, repo OETH 08 Feb)", remFH: "42:56", pilot: "le Roux, Lisa", route: "XUFR→OEHL→OEGS→OETH" },
   { reg: "HZHC57", loc: "RUH", status: "maint", fullStatus: "Maintenance - Post Dakar", note: "Aircraft under Post Dakar maintenance.", ert: "2026-02-08", remFH: "80:33" },
-  { reg: "HZHC58", loc: "OETH", status: "flying", fullStatus: "Serviceable", remFH: "66:47", pilot: "Kaundinya, Rohit", route: "OETH → XRSC" },
+  { reg: "HZHC58", loc: "OETH", status: "flying", fullStatus: "Serviceable", remFH: "66:47", pilot: "Kaundinya, Rohit", route: "OETH→XRSC" },
   { reg: "HZHC59", loc: "RUH", status: "maint", fullStatus: "Maintenance", note: "Aircraft under Post Dakar maintenance.", ert: "2026-02-14", remFH: "91:35" },
   { reg: "HZHC62", loc: "OETH", status: "maint", fullStatus: "Maintenance", note: "Accumulator not charged. Troubleshooting in progress.", ert: "2026-02-05", remFH: "41:24" },
   { reg: "HZHC63", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "Available", remFH: "102:10" },
@@ -747,15 +772,21 @@ map.on('zoomend', drawHelicopters);
 
 // Draw flight path lines for helicopters with routes
 fleet.filter(h => h.route && h.status === 'flying').forEach(h => {
-  const parts = h.route.split(' → ');
-  if (parts.length === 2) {
-    const origin = bases[parts[0]];
-    const dest = bases[parts[1]];
-    if (origin && dest && parts[0] !== parts[1]) {
-      L.polyline([[origin.lat, origin.lng], [dest.lat, dest.lng]], {
-        color: '#4caf50', weight: 2.5, opacity: 0.5, dashArray: '10 8'
-      }).addTo(map).bindPopup(`<b>${h.reg}</b><br>${h.route}<br>PIC: ${h.pilot || 'TBD'}`);
-    }
+  const parts = h.route.split('→').map(p => p.trim());
+  const coords = parts.map(p => bases[p]).filter(b => b);
+  if (coords.length >= 2) {
+    const latlngs = coords.map(c => [c.lat, c.lng]);
+    L.polyline(latlngs, {
+      color: '#4caf50', weight: 2.5, opacity: 0.6, dashArray: '10 8'
+    }).addTo(map).bindPopup(`<b>${h.reg}</b><br>${h.route}<br>PIC: ${h.pilot || 'TBD'}`);
+    // Add waypoint markers
+    coords.forEach((c, i) => {
+      if (i > 0 && i < coords.length - 1) {
+        L.circleMarker([c.lat, c.lng], {
+          radius: 4, fillColor: '#4caf50', color: '#fff', weight: 1, fillOpacity: 0.8
+        }).addTo(map);
+      }
+    });
   }
 });
 

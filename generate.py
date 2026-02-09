@@ -7,10 +7,10 @@ from zoneinfo import ZoneInfo
 _VAULT_OBSIDIAN = os.path.expanduser("~/Library/Mobile Documents/iCloud~md~obsidian/Documents/THC Vault")
 _VAULT_ICLOUD   = os.path.expanduser("~/Library/Mobile Documents/com~apple~CloudDocs/THC Vault")
 VAULT = _VAULT_OBSIDIAN if os.path.isdir(_VAULT_OBSIDIAN) else _VAULT_ICLOUD
-HELIS_DIR = f"{VAULT}/Helicopters"
-PILOTS_DIR = f"{VAULT}/Pilots"
-FLIGHTS_FILE = f"{VAULT}/Flights Schedule.md"
-MISSIONS_DIR = f"{VAULT}/Missions"
+HELIS_DIR = f"{VAULT}/THC/Helicopters"
+PILOTS_DIR = f"{VAULT}/THC/Pilots"
+FLIGHTS_FILE = f"{VAULT}/THC/Helicopters/Flights Schedule.md"
+MISSIONS_DIR = f"{VAULT}/THC/Missions"
 HTML_FILE = os.path.expanduser("~/Desktop/Willy/FleetMapAndTimeline/index.html")
 # Use Saudi Arabia timezone, then strip tz for naive comparisons
 _now = datetime.now(ZoneInfo("Asia/Riyadh"))

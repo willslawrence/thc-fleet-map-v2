@@ -88,7 +88,30 @@
   #briefing-panel .alert.info, #currency-panel .alert.info { background: rgba(52,152,219,0.15); border-left: 2px solid #3498db; }
   #currency-panel h4 { font-size: 12px; color: #7eb8ff; margin: 12px 0 5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 3px; }
 
-  #last-updated { display: none; }
+  #last-updated {
+    position: fixed; top: 12px; right: 12px; z-index: 1000;
+    color: #666; font-size: 10px;
+    padding: 4px 8px;
+  }
+  .duty-roster-btn {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(15,15,30,0.85);
+    backdrop-filter: blur(12px);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 1001;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+  .duty-roster-btn:hover { background: rgba(52,152,219,0.3); border-color: rgba(52,152,219,0.5); }
+  body.timeline-open .duty-roster-btn { bottom: calc(28vh + 10px); }
 
   /* Timeline Panel */
   .timeline-panel {
@@ -399,7 +422,8 @@
 </head>
 <body class="timeline-open">
 <div id="map"></div>
-<div id="last-updated">Last updated: <!-- LAST_UPDATED -->9 Feb 2026 11:06<!-- /LAST_UPDATED --> · <a href="https://willslawrence.github.io/thc-duty-roster/" style="color:#7eb8ff;text-decoration:none;">Duty Roster →</a></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->9 Feb 2026 11:11<!-- /LAST_UPDATED --></div>
+<a class="duty-roster-btn" href="https://willslawrence.github.io/thc-duty-roster/">📋 Duty Roster</a>
 
 <!-- Timeline Toggle Button -->
 <button class="timeline-toggle" onclick="toggleTimeline()">📅 Missions</button>
@@ -410,7 +434,6 @@
   <div class="panel-header" onclick="this.parentElement.classList.toggle('collapsed')">
     <div class="panel-title">📋 Ops Brief ▾</div>
     <div class="panel-date">OPS PLAN REPORT / <!-- REPORT_PERIOD -->8 Feb – 15 Feb 2026<!-- /REPORT_PERIOD --></div>
-    <div style="font-size:10px;color:#666;margin-top:2px;">Updated: <!-- LAST_UPDATED2 -->9 Feb 2026 11:06<!-- /LAST_UPDATED2 --> · <a href="https://willslawrence.github.io/thc-duty-roster/" style="color:#7eb8ff;text-decoration:none;">Duty Roster →</a></div>
   </div>
   <div class="panel-body">
 

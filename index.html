@@ -88,13 +88,7 @@
   #briefing-panel .alert.info, #currency-panel .alert.info { background: rgba(52,152,219,0.15); border-left: 2px solid #3498db; }
   #currency-panel h4 { font-size: 12px; color: #7eb8ff; margin: 12px 0 5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 3px; }
 
-  #last-updated {
-    position: fixed; top: 12px; right: 52px; z-index: 1000;
-    background: rgba(15,15,30,0.75); backdrop-filter: blur(12px);
-    color: #888; font-size: 11px;
-    padding: 6px 12px; border-radius: 6px;
-    border: 1px solid rgba(255,255,255,0.1);
-  }
+  #last-updated { display: none; }
 
   /* Timeline Panel */
   .timeline-panel {
@@ -416,6 +410,7 @@
   <div class="panel-header" onclick="this.parentElement.classList.toggle('collapsed')">
     <div class="panel-title">📋 Ops Brief ▾</div>
     <div class="panel-date">OPS PLAN REPORT / <!-- REPORT_PERIOD -->8 Feb – 15 Feb 2026<!-- /REPORT_PERIOD --></div>
+    <div style="font-size:10px;color:#666;margin-top:2px;">Updated: <!-- LAST_UPDATED2 -->9 Feb 2026 11:06<!-- /LAST_UPDATED2 --> · <a href="https://willslawrence.github.io/thc-duty-roster/" style="color:#7eb8ff;text-decoration:none;">Duty Roster →</a></div>
   </div>
   <div class="panel-body">
 

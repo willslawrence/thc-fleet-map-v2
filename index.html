@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>THC Fleet Map — 8 Feb 2026</title>
+<title>THC Fleet Map — 9 Feb 2026</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -401,7 +401,7 @@
 </head>
 <body class="timeline-open">
 <div id="map"></div>
-<div id="last-updated">Last updated: <!-- LAST_UPDATED -->8 Feb 2026 12:23<!-- /LAST_UPDATED --></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->9 Feb 2026 05:33<!-- /LAST_UPDATED --></div>
 
 <!-- Timeline Toggle Button -->
 <button class="timeline-toggle" onclick="toggleTimeline()">📅 Missions</button>
@@ -411,16 +411,13 @@
 <div id="briefing-panel" class="collapsed">
   <div class="panel-header" onclick="this.parentElement.classList.toggle('collapsed')">
     <div class="panel-title">📋 Ops Brief ▾</div>
-    <div class="panel-date">OPS PLAN REPORT / <!-- REPORT_PERIOD -->8 Feb – 14 Feb 2026<!-- /REPORT_PERIOD --></div>
+    <div class="panel-date">OPS PLAN REPORT / <!-- REPORT_PERIOD -->8 Feb – 15 Feb 2026<!-- /REPORT_PERIOD --></div>
   </div>
   <div class="panel-body">
 
   <!-- FLIGHTS_START -->
-  <h4>Sun 8 Feb</h4>
-  <div class="flight-row today"><span class="reg">HC55</span><span class="info">XUFR→OEHL→OEGS→OETH · Operational Reposition</span><span class="pilot">le Roux, Lisa kate</span></div>
-  <div class="flight-row today"><span class="reg">HC58</span><span class="info">OETH→XRSC · Technical Reposition</span><span class="pilot">Kaundinya, Rohit</span></div>
   <h4>Mon 9 Feb</h4>
-  <div class="flight-row"><span class="reg">HC68</span><span class="info">OETH→OETH→OETH→OETH · PAX135</span><span class="pilot">Leipsig, David Joshua</span></div>
+  <div class="flight-row today"><span class="reg">HC68</span><span class="info">OETH→OETH→OETH · PAX135</span><span class="pilot">Leipsig, David Joshua</span></div>
   <!-- FLIGHTS_END -->
 
   </div>
@@ -475,7 +472,7 @@
           </div>
         </div>
         <div class="lane">
-          <div class="event-bar active short" style="left:9.6%;width:1.2%;" data-name="Al Fursan Cup" data-status="active" data-dates="5-8 Feb" data-aircraft="HC55 (Film)" data-pilots="Lisa" onclick="showEventPopup(this,event)" title="Al Fursan Cup (5-8 Feb)">
+          <div class="event-bar complete short" style="left:9.6%;width:1.2%;" data-name="Al Fursan Cup" data-status="complete" data-dates="5-8 Feb" data-aircraft="HC55 (Film)" data-pilots="Lisa" onclick="showEventPopup(this,event)" title="Al Fursan Cup (5-8 Feb)">
             <span class="event-title">Al Fursan ...</span>
           </div>
           <div class="event-bar pending " style="left:16.2%;width:16.5%;" data-name="🔍 GeoTech Survey" data-status="pending" data-dates="1 Mar - 30 Apr" data-aircraft="HC64 (Survey 1) | HC63 (Survey 2)" data-pilots="TBD" onclick="showEventPopup(this,event)" title="🔍 GeoTech Survey (1 Mar - 30 Apr)">
@@ -573,7 +570,7 @@
         <div class="week-tick" style="left:95.3%;"></div>
         <div class="week-tick" style="left:97.3%;"></div>
         <div class="week-tick" style="left:99.2%;"></div>
-        <div class="today-marker" style="left:10.4%;"></div>
+        <div class="today-marker" style="left:10.7%;"></div>
       </div>
       <div class="lanes-below">
         <div class="lane">
@@ -586,7 +583,7 @@
           </div>
         </div>
         <div class="lane">
-          <div class="event-bar active short" style="left:10.4%;width:1.2%;" data-name="🎬 Promo Filming" data-status="active" data-dates="8-9 Feb" data-aircraft="HC68 (Film)" data-pilots="David Liepsig (Film)" onclick="showEventPopup(this,event)" title="🎬 Promo Filming (8-9 Feb)">
+          <div class="event-bar active short" style="left:10.4%;width:1.2%;" data-name="🎬 Promo Filming" data-status="active" data-dates="8-9 Feb" data-aircraft="HC68 (Film)" data-pilots="David Liepsig (Pax)" onclick="showEventPopup(this,event)" title="🎬 Promo Filming (8-9 Feb)">
             <span class="event-title">🎬 Promo Fi...</span>
           </div>
           <div class="event-bar pending " style="left:20.1%;width:79.9%;" data-name="🌉 Bahrain Skybridge" data-status="pending" data-dates="15 Mar - 31 Dec" data-aircraft="HC68 (EMS 1) | HC67 (Backup)" data-pilots="UAM Pilots" onclick="showEventPopup(this,event)" title="🌉 Bahrain Skybridge (15 Mar - 31 Dec)">
@@ -647,17 +644,17 @@ const bases = {
 const fleet = [
   { reg: "HZHC52", loc: "RUH", status: "parked", fullStatus: "Serviceable", note: "Aircraft Under Process for Sale, Export C of A issued by GACA. Aircraft under Short Term storage.", mission: "Short Term Storage", remFH: "117:05" },
   { reg: "HZHC54", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "Available", remFH: "76:46" },
-  { reg: "HZHC55", loc: "OEAO", status: "flying", fullStatus: "Serviceable", mission: "Aurora Filming (repo OEAO→XURC 05 Feb, filming 06-07 Feb, repo OETH 08 Feb)", remFH: "42:44", pilot: "le Roux, Lisa kate", route: "XUFR→OEHL→OEGS→OETH" },
-  { reg: "HZHC57", loc: "RUH", status: "parked", fullStatus: "Serviceable", note: "Aircraft under Post Dakar maintenance.", ert: "2026-02-08", remFH: "80:33" },
-  { reg: "HZHC58", loc: "OETH", status: "flying", fullStatus: "Serviceable", remFH: "66:47", pilot: "Kaundinya, Rohit", route: "OETH→XRSC" },
+  { reg: "HZHC55", loc: "Al Ula", status: "parked", fullStatus: "Serviceable", remFH: "42:44" },
+  { reg: "HZHC57", loc: "RUH", status: "parked", fullStatus: "Serviceable", remFH: "80:33" },
+  { reg: "HZHC58", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "66:47" },
   { reg: "HZHC59", loc: "RUH", status: "maint", fullStatus: "Maintenance", note: "Aircraft under Post Dakar maintenance.", ert: "2026-02-14", remFH: "91:35" },
   { reg: "HZHC62", loc: "OETH", status: "maint", fullStatus: "Maintenance", note: "Accumulator not charged. Troubleshooting in progress.", ert: "2026-02-09", remFH: "41:24" },
-  { reg: "HZHC63", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "Available", remFH: "102:10" },
-  { reg: "HZHC64", loc: "OETH", status: "maint", fullStatus: "Maintenance", note: "Tail Rotor Blade requires balancing. EGR scheduled 08 Feb. Waiting for Air Conditioning charging.", ert: "2026-02-09", remFH: "96:08", melRef: "21-05", melExpiry: "2026-04-14", melRemDays: "65" },
+  { reg: "HZHC63", loc: "OETH", status: "parked", fullStatus: "Serviceable", note: "Tail Rotor Blade requires balancing and EGR scheduled for 08 Feb 2026.", mission: "Available", remFH: "102:10" },
+  { reg: "HZHC64", loc: "OETH", status: "maint", fullStatus: "Maintenance", note: "Aircraft under MEL, Waiting for Air Conditioning charging.", ert: "2026-02-09", remFH: "96:08", melRef: "21-05", melExpiry: "2026-04-14", melRemDays: "65" },
   { reg: "HZHC65", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "142:01" },
   { reg: "HZHC66", loc: "RUH", status: "parked", fullStatus: "Serviceable", note: "Primary Aircraft for UAMP Project.", mission: "UAM", remFH: "128:51" },
   { reg: "HZHC67", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "UAM backup", remFH: "142:42" },
-  { reg: "HZHC68", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "140:49" },
+  { reg: "HZHC68", loc: "OETH", status: "flying", fullStatus: "Serviceable", remFH: "140:49", pilot: "Leipsig, David Joshua", route: "OETH→OETH→OETH" },
   { reg: "HZHC69", loc: "OETH", status: "parked", fullStatus: "Serviceable", note: "Aircraft under MEL. GTN received 07 Feb 2026, waiting for installation.", remFH: "141:31", melRef: "34-19", melExpiry: "2026-06-01", melRemDays: "113" },
 ];
 // FLEET_END

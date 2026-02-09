@@ -88,11 +88,9 @@
   #briefing-panel .alert.info, #currency-panel .alert.info { background: rgba(52,152,219,0.15); border-left: 2px solid #3498db; }
   #currency-panel h4 { font-size: 12px; color: #7eb8ff; margin: 12px 0 5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 3px; }
 
-  #last-updated {
-    position: fixed; top: 12px; right: 12px; z-index: 1000;
-    color: #666; font-size: 10px;
-    padding: 4px 8px;
-  }
+  #last-updated { display: none; }
+  #briefing-panel .panel-header { position: relative; }
+  #briefing-panel .panel-updated { position: absolute; top: 0; right: 0; font-size: 10px; color: #666; }
   .duty-roster-btn {
     position: fixed;
     bottom: 10px;
@@ -434,6 +432,7 @@
   <div class="panel-header" onclick="this.parentElement.classList.toggle('collapsed')">
     <div class="panel-title">📋 Ops Brief ▾</div>
     <div class="panel-date">OPS PLAN REPORT / <!-- REPORT_PERIOD -->8 Feb – 15 Feb 2026<!-- /REPORT_PERIOD --></div>
+    <div class="panel-updated"><!-- LAST_UPDATED2 -->9 Feb 2026 11:11<!-- /LAST_UPDATED2 --></div>
   </div>
   <div class="panel-body">
 

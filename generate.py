@@ -569,6 +569,7 @@ def update(html, fleet, flights, curr, timeline):
     html = re.sub(r'<!-- TIMELINE_START -->.*?<!-- TIMELINE_END -->', f'<!-- TIMELINE_START -->\n{timeline}\n    <!-- TIMELINE_END -->', html, flags=re.DOTALL)
     html = re.sub(r'<title>THC Fleet Map.*?</title>', f'<title>THC Fleet Map — {TODAY.strftime("%-d %b %Y")}</title>', html)
     html = re.sub(r'<!-- LAST_UPDATED -->.*?<!-- /LAST_UPDATED -->', f'<!-- LAST_UPDATED -->{TODAY.strftime("%-d %b %Y %H:%M")}<!-- /LAST_UPDATED -->', html)
+    html = re.sub(r'<!-- LAST_UPDATED2 -->.*?<!-- /LAST_UPDATED2 -->', f'<!-- LAST_UPDATED2 -->{TODAY.strftime("%-d %b %Y %H:%M")}<!-- /LAST_UPDATED2 -->', html)
     # Update report period from Flights Schedule (always)
     rp = get_report_period()
     html = re.sub(r'<!-- REPORT_PERIOD -->.*?<!-- /REPORT_PERIOD -->', f'<!-- REPORT_PERIOD -->{rp}<!-- /REPORT_PERIOD -->', html)

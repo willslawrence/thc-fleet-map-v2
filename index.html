@@ -882,15 +882,14 @@ function showEventPopup(el, e) {
     }).join('');
   }
   
-  popup.innerHTML = `
-    <h3>${data.name} <span class="status-badge ${data.status}">${statusLabel}</span></h3>
-    <div class="detail-row"><span class="detail-label">Dates</span><span class="detail-value">${data.dates}</span></div>
-    ${data.location ? `<div class="detail-row"><span class="detail-label">Location</span><span class="detail-value">${data.location}</span></div>` : ''}
-    ${data.client ? `<div class="detail-row"><span class="detail-label">Client</span><span class="detail-value">${data.client}</span></div>` : ''}
-    <div class="detail-row"><span class="detail-label">Aircraft</span><span class="detail-value">${aircraftHtml}</span></div>
-    <div class="detail-row"><span class="detail-label">Pilots</span><span class="detail-value">${data.pilots}</span></div>
-    ${data.notes ? `<div class="detail-row"><span class="detail-label">Notes</span><span class="detail-value" style="font-size:0.7rem;color:#aaa">${data.notes}</span></div>` : ''}
-  `;
+  var html = '<h3>' + data.name + ' <span class="status-badge ' + data.status + '">' + statusLabel + '</span></h3>';
+  html += '<div class="detail-row"><span class="detail-label">Dates</span><span class="detail-value">' + data.dates + '</span></div>';
+  if (data.location) html += '<div class="detail-row"><span class="detail-label">Location</span><span class="detail-value">' + data.location + '</span></div>';
+  if (data.client) html += '<div class="detail-row"><span class="detail-label">Client</span><span class="detail-value">' + data.client + '</span></div>';
+  html += '<div class="detail-row"><span class="detail-label">Aircraft</span><span class="detail-value">' + aircraftHtml + '</span></div>';
+  html += '<div class="detail-row"><span class="detail-label">Pilots</span><span class="detail-value">' + data.pilots + '</span></div>';
+  if (data.notes) html += '<div class="detail-row"><span class="detail-label">Notes</span><span class="detail-value" style="font-size:0.7rem;color:#aaa">' + data.notes + '</span></div>';
+  popup.innerHTML = html;
   
   const rect = el.getBoundingClientRect();
   popup.style.left = Math.min(rect.left, window.innerWidth - 290) + 'px';

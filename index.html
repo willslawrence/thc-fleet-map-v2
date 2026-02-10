@@ -423,7 +423,7 @@
 </head>
 <body class="timeline-open">
 <div id="map"></div>
-<div id="last-updated">Last updated: <!-- LAST_UPDATED -->10 Feb 2026 14:42<!-- /LAST_UPDATED --></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->10 Feb 2026 15:13<!-- /LAST_UPDATED --></div>
 <a class="duty-roster-btn" href="https://willslawrence.github.io/thc-duty-roster/">📋 Duty Roster</a>
 
 <!-- Timeline Toggle Button -->
@@ -435,7 +435,7 @@
   <div class="panel-header" onclick="this.parentElement.classList.toggle('collapsed')">
     <div class="panel-title">📋 Ops Brief ▾</div>
     <div class="panel-date">OPS PLAN REPORT / <!-- REPORT_PERIOD -->8 Feb – 16 Feb 2026<!-- /REPORT_PERIOD --></div>
-    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->10 Feb 2026 14:42<!-- /LAST_UPDATED2 --></div>
+    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->10 Feb 2026 15:13<!-- /LAST_UPDATED2 --></div>
   </div>
   <div class="panel-body">
 
@@ -631,9 +631,10 @@ function toggleTimeline() {
 const bases = {
   // Main bases
   OETH:  { lat: 25.213, lng: 46.640, name: "THUMAMAH" },
-  RUH:   { lat: 24.680, lng: 46.820, name: "ALSALAM (RUH)" },
-  XRSC:  { lat: 24.680, lng: 46.820, name: "ALSALAM (XRSC)" },
-  OERK:  { lat: 24.958, lng: 46.699, name: "KING KHALID" },
+  RUH:   { lat: 24.680, lng: 46.820, name: "ALSALAM / RIYADH" },
+  XRSC:  { lat: 24.680, lng: 46.820, name: "ALSALAM / RIYADH" },
+  OERK:  { lat: 24.680, lng: 46.820, name: "ALSALAM / RIYADH" },
+  ALSALAM: { lat: 24.680, lng: 46.820, name: "ALSALAM / RIYADH" },
   // Regional airports
   OEHL:  { lat: 27.438, lng: 41.686, name: "HA'IL" },
   OEGS:  { lat: 26.303, lng: 43.774, name: "GASSIM" },
@@ -662,20 +663,20 @@ const bases = {
 
 // FLEET_START
 const fleet = [
-  { reg: "HZHC52", loc: "RUH", status: "parked", fullStatus: "Serviceable", note: "Aircraft Under Process for Sale, Export C of A issued by GACA. Aircraft under Short Term storage.", mission: "Short Term Storage", remFH: "117:05" },
-  { reg: "HZHC54", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "Available", remFH: "75:45" },
-  { reg: "HZHC55", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "42:44" },
-  { reg: "HZHC57", loc: "RUH", status: "parked", fullStatus: "Serviceable", remFH: "79:48" },
-  { reg: "HZHC58", loc: "RUH", status: "parked", fullStatus: "Serviceable", remFH: "66:47" },
-  { reg: "HZHC59", loc: "RUH", status: "maint", fullStatus: "Maintenance", note: "Aircraft under Post Dakar maintenance.", ert: "2026-02-14", remFH: "91:35" },
-  { reg: "HZHC62", loc: "OETH", status: "maint", fullStatus: "Maintenance", note: "Accumulator not charged. Troubleshooting in progress.", ert: "2026-02-12", remFH: "41:24" },
-  { reg: "HZHC63", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "Available", remFH: "102:10" },
-  { reg: "HZHC64", loc: "OETH", status: "parked", fullStatus: "Serviceable", note: "Aircraft under MEL, Waiting for Air Conditioning charging.", remFH: "96:08", melRef: "21-05", melExpiry: "2026-04-14", melRemDays: "64" },
-  { reg: "HZHC65", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "142:01" },
-  { reg: "HZHC66", loc: "RUH", status: "parked", fullStatus: "Serviceable", note: "Primary Aircraft for UAMP Project.", mission: "UAM", remFH: "128:51" },
-  { reg: "HZHC67", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "UAM backup", remFH: "142:42" },
-  { reg: "HZHC68", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "140:49" },
-  { reg: "HZHC69", loc: "OETH", status: "parked", fullStatus: "Serviceable", note: "Aircraft under MEL, GTN received on 07 Feb 2026 and waiting for the installation.", remFH: "141:31", melRef: "34-19", melExpiry: "2026-06-01", melRemDays: "112" },
+  { reg: "HZHC52", loc: "RUH", status: "parked", fullStatus: "serviceable", note: "Aircraft Under Process for Sale, Export C of A issued by GACA. Aircraft under Short Term storage.", mission: "Short Term Storage", remFH: "117:05" },
+  { reg: "HZHC54", loc: "OETH", status: "parked", fullStatus: "serviceable", mission: "Available", remFH: "76:46" },
+  { reg: "HZHC55", loc: "OETH", status: "parked", fullStatus: "serviceable", remFH: "42:44" },
+  { reg: "HZHC57", loc: "RUH", status: "parked", fullStatus: "serviceable", remFH: "79:48" },
+  { reg: "HZHC58", loc: "RUH", status: "maint", fullStatus: "maintenance", note: "Aircraft under maintenance for 24M/750FH and 72 Months.", ert: "2026-03-12", remFH: "66:47" },
+  { reg: "HZHC59", loc: "RUH", status: "maint", fullStatus: "maintenance", note: "Aircraft under Post Dakar maintenance.", ert: "2026-02-14", remFH: "91:35" },
+  { reg: "HZHC62", loc: "OETH", status: "parked", fullStatus: "serviceable", note: "Accumulator not charged. Troubleshooting in progress.", remFH: "41:24" },
+  { reg: "HZHC63", loc: "OETH", status: "parked", fullStatus: "serviceable", mission: "Available", remFH: "102:10" },
+  { reg: "HZHC64", loc: "OETH", status: "parked", fullStatus: "serviceable", note: "Aircraft under MEL, Waiting for Air Conditioning charging", remFH: "96:08", melRef: "15-Dec-25", melExpiry: "14-Apr-26", melRemDays: "63" },
+  { reg: "HZHC65", loc: "OETH", status: "parked", fullStatus: "serviceable", remFH: "142:01" },
+  { reg: "HZHC66", loc: "RUH", status: "parked", fullStatus: "serviceable", note: "Primary Aircraft for UAM Project.", mission: "UAM", remFH: "128:51" },
+  { reg: "HZHC67", loc: "OETH", status: "parked", fullStatus: "serviceable", mission: "UAM backup", remFH: "142:42" },
+  { reg: "HZHC68", loc: "OETH", status: "parked", fullStatus: "serviceable", remFH: "140:49" },
+  { reg: "HZHC69", loc: "OETH", status: "parked", fullStatus: "serviceable", note: "Aircraft under MEL, GTN received on 07 Feb 2026 and waiting for installation.", remFH: "141:31", melRef: "34-19", melExpiry: "01-Jun-26", melRemDays: "111" },
 ];
 // FLEET_END
 

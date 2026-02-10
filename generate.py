@@ -22,7 +22,7 @@ KNOWN_WAYPOINTS = {
     'OERS', 'XSCV', 'XSSB', 'XSTH', 'XSDR', 'XSUH', 'XSU3',
     'OENN', 'XNC1', 'XNCH', 'XNNH', 'XNPI',
     'XUFR', 'XURC',
-    'XRKF', 'XRNG',  # Riyadh area
+    'XRKF', 'XRNG', 'ALSALAM',  # Riyadh area (RUH/XRSC/OERK/ALSALAM = same location)
 }
 
 def validate_route_waypoints(route, reg=''):

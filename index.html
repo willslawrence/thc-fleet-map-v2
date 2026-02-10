@@ -818,49 +818,10 @@ map.fitBounds(L.latLngBounds(pts).pad(0.15));
 // Event popup handling (runs immediately - DOM already loaded)
 (function() {
   const eventPopup = document.getElementById('eventPopup');
-  const bars = document.querySelectorAll('.event-bar');
-  
-  bars.forEach(bar => {
-    bar.onclick = function(e) {
-      e.stopPropagation();
-      const data = this.dataset;
-      const statusLabel = {'active':'Active','current':'Active','confirmed':'Confirmed','future':'Confirmed','pending':'Pending','past':'Past','complete':'Complete'}[data.status] || data.status;
-      
-      eventPopup.innerHTML = `
-        <h3>
-          ${data.name}
-          <span class="status-badge ${data.status}">${statusLabel}</span>
-        </h3>
-        <div class="detail-row">
-          <span class="detail-label">Dates</span>
-          <span class="detail-value">${data.dates}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Aircraft</span>
-          <span class="detail-value">${data.aircraft}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Pilots</span>
-          <span class="detail-value">${data.pilots}</span>
-        </div>
-      `;
-      
-      // Position popup near click
-      const rect = this.getBoundingClientRect();
-      let left = rect.left;
-      let top = rect.bottom + 8;
-      if (left + 280 > window.innerWidth) left = window.innerWidth - 290;
-      if (top + 150 > window.innerHeight) top = rect.top - 150;
-      
-      eventPopup.style.left = left + 'px';
-      eventPopup.style.top = top + 'px';
-      eventPopup.classList.add('show');
-    };
-  });
 
   // Close popup when clicking elsewhere
   document.body.onclick = function(e) {
-    if (!e.target.closest('.event-bar')) {
+    if (!e.target.closest('.event-bar') && !e.target.closest('.tbd-item')) {
       eventPopup.classList.remove('show');
     }
   };

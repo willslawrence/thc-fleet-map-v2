@@ -275,7 +275,7 @@ def load_missions():
                     auto_status = raw_status if raw_status in ('confirmed', 'pending') else 'pending'
             else:
                 auto_status = raw_status
-            m.append({'title': t, 'date': start, 'endDate': end, 'status': auto_status, 'helicopters': heli_str, 'pilots': pilots})
+            m.append({'title': t, 'date': start, 'endDate': end, 'status': auto_status, 'helicopters': heli_str, 'pilots': pilots, 'location': d.get('location',''), 'client': d.get('client', d.get('customer','')), 'special_notes': d.get('special_notes','')})
     m.sort(key=lambda x: x['date'] if x['date'] else 'zzzz')
     print(f"✅ Loaded {len(m)} missions")
     return m
@@ -492,7 +492,9 @@ def build_timeline(missions):
     if tbd:
         L.append('    <div class="tbd-sidebar">')
         L.append('      <div class="tbd-header">📋 Dates TBD</div>')
-        for m in tbd: L.append(f'      <div class="tbd-item" data-name="{m["title"]}" data-status="pending" data-dates="TBD" data-aircraft="{m.get("helicopters","TBD")}" data-pilots="{m.get("pilots","TBD")}" onclick="showEventPopup(this,event)">\n        {m["title"]}\n      </div>')
+        for m in tbd:
+            safe_notes = m.get("special_notes","").replace('"','&quot;')
+            L.append(f'      <div class="tbd-item" data-name="{m["title"]}" data-status="pending" data-dates="TBD" data-aircraft="{m.get("helicopters","TBD")}" data-pilots="{m.get("pilots","TBD")}" data-location="{m.get("location","")}" data-client="{m.get("client","")}" data-notes="{safe_notes}" onclick="showEventPopup(this,event)">\n        {m["title"]}\n      </div>')
         L.append('    </div>')
     
     def bar(m):
@@ -501,7 +503,9 @@ def build_timeline(missions):
         sh = "short" if w<8 else ""
         dp = (t[:10]+"...") if len(t)>12 and sh else t
         h,p = m.get('helicopters') or 'TBD', m.get('pilots') or 'TBD'
-        return f'          <div class="event-bar {st} {sh}" style="left:{l}%;width:{w}%;" data-name="{t}" data-status="{st}" data-dates="{dt}" data-aircraft="{h}" data-pilots="{p}" onclick="showEventPopup(this,event)" title="{t} ({dt})">\n            <span class="event-title">{dp}</span>' + (f'\n            <span class="event-dates">{dt}</span>' if not sh else '') + '\n          </div>'
+        loc,cli = m.get('location',''), m.get('client','')
+        notes = m.get('special_notes','').replace('"','&quot;')
+        return f'          <div class="event-bar {st} {sh}" style="left:{l}%;width:{w}%;" data-name="{t}" data-status="{st}" data-dates="{dt}" data-aircraft="{h}" data-pilots="{p}" data-location="{loc}" data-client="{cli}" data-notes="{notes}" onclick="showEventPopup(this,event)" title="{t} ({dt})">\n            <span class="event-title">{dp}</span>' + (f'\n            <span class="event-dates">{dt}</span>' if not sh else '') + '\n          </div>'
     
     L.append('    <div class="timeline-body">')
     L.append('      <div class="lanes-above">')

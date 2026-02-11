@@ -273,15 +273,21 @@ def load_missions():
                 t = '🏜️ ' + t
             elif 'film' in tl:
                 t = '🎬 ' + t
-            # Format helicopter roles
+            # Format helicopter roles - support nested dict, flat helicopter_* fields, or plain string
             helis = d.get('helicopters', d.get('Helicopter', ''))
             if isinstance(helis, dict):
-                # New role-based format: {Film: HZHC55, EMS 1: HZHC57, ...}
+                # Old nested format: {Film: HZHC55, EMS 1: HZHC57, ...}
                 heli_str = ' | '.join(f"{reg.replace('HZHC','HC')} ({role})" for role, reg in helis.items())
-            elif isinstance(helis, str):
-                heli_str = helis.replace('HZHC','HC') if helis else 'TBD'
+            elif isinstance(helis, str) and helis:
+                heli_str = helis.replace('HZHC','HC')
             else:
-                heli_str = 'TBD'
+                # New flat format: helicopter_main, helicopter_backup, etc.
+                heli_parts = []
+                for k, v in d.items():
+                    if k.startswith('helicopter_') and v:
+                        role = k.replace('helicopter_', '').replace('_', ' ').title()
+                        heli_parts.append(f"{v.replace('HZHC','HC')} ({role})")
+                heli_str = ' | '.join(heli_parts) if heli_parts else 'TBD'
             pilots = d.get('Pilots', '')
             # Auto-determine status from dates
             # complete/canceled = done or cancelled (grey)

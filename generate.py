@@ -286,8 +286,9 @@ def load_missions():
                 for k, v in d.items():
                     if k.startswith('helicopter_') and v:
                         role = k.replace('helicopter_', '').replace('_', ' ').title()
-                        heli_parts.append(f"{v.replace('HZHC','HC')} ({role})")
-                heli_str = ' | '.join(heli_parts) if heli_parts else 'TBD'
+                        reg = v.replace('HZHC','HC') if v.upper() not in ('TBD','TBA') else 'TBA'
+                        heli_parts.append(f"{role}: {reg}")
+                heli_str = ' | '.join(heli_parts) if heli_parts else 'TBA'
             pilots = d.get('Pilots', '')
             # Auto-determine status from dates
             # complete/canceled = done or cancelled (grey)

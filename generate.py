@@ -42,6 +42,35 @@ def parse_fm(fp):
     d = {}
     try:
         t = open(fp).read()
+        if not t.startswith('---'):
+            # Plain "Key: Value" format (one per line)
+            # Map display labels back to internal keys
+            label_to_key = {
+                'Registration': 'registration', 'Type': 'type', 'MSN': 'msn',
+                'Location': 'location', 'Status': 'status', 'Current Mission': 'current_mission',
+                'ERT': 'ert', 'Date U/S': 'date_us', 'Total FH': 'total_fh',
+                '150hr Due': '150hr_due', '150hr Remaining': '150hr_rem_fh',
+                '12mo Due': '12mo_due', '12mo Remaining Days': '12mo_rem_days',
+                'MEL Ref': 'mel_ref', 'MEL Open': 'mel_open', 'MEL Expiry': 'mel_expiry',
+                'MEL Remaining Days': 'mel_rem_days', 'Cargo Swing': 'cargo_swing',
+                'Floor Window': 'floor_window', 'Hydraulics': 'hydraulics',
+                'Sliding Doors': 'sliding_doors', 'Utility Pole Belly Panel': 'utility_pole_belly_panel',
+                'Notes': 'notes', 'Last Updated': 'last_updated',
+                # Mission fields
+                'Name': 'name', 'Aircraft': 'aircraft', 'Pilots': 'pilots',
+                'Client': 'client', 'Dates': 'dates', 'Flight Hours': 'flight_hours',
+                'Helicopters': 'helicopters',
+            }
+            for ln in t.strip().split('\n'):
+                if ':' in ln:
+                    # Split on first colon only
+                    k, v = ln.split(':', 1)
+                    k = k.strip()
+                    v = v.strip().strip('"').strip("'")
+                    internal = label_to_key.get(k, k)
+                    if v:
+                        d[internal] = v
+            return d
         if t.startswith('---'):
             p = t.split('---', 2)
             if len(p) >= 3:

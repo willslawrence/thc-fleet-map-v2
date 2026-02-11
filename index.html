@@ -423,7 +423,7 @@
 </head>
 <body class="timeline-open">
 <div id="map"></div>
-<div id="last-updated">Last updated: <!-- LAST_UPDATED -->11 Feb 2026 09:04<!-- /LAST_UPDATED --></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->11 Feb 2026 23:41<!-- /LAST_UPDATED --></div>
 <a class="duty-roster-btn" href="https://willslawrence.github.io/thc-duty-roster/">📋 Duty Roster</a>
 
 <!-- Timeline Toggle Button -->
@@ -434,8 +434,8 @@
 <div id="briefing-panel" class="collapsed">
   <div class="panel-header" onclick="this.parentElement.classList.toggle('collapsed')">
     <div class="panel-title">📋 Ops Brief ▾</div>
-    <div class="panel-date">OPS PLAN REPORT / <!-- REPORT_PERIOD -->8 Feb – 17 Feb 2026<!-- /REPORT_PERIOD --></div>
-    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->11 Feb 2026 09:04<!-- /LAST_UPDATED2 --></div>
+    <div class="panel-date">OPS PLAN REPORT / <!-- REPORT_PERIOD -->10 Feb – 18 Feb 2026<!-- /REPORT_PERIOD --></div>
+    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->11 Feb 2026 23:41<!-- /LAST_UPDATED2 --></div>
   </div>
   <div class="panel-body">
 
@@ -592,7 +592,7 @@
           <div class="event-bar complete short" style="left:6.6%;width:1.9%;" data-name="🏜️ AlUla Tour 2026" data-status="complete" data-dates="25 Jan - 1 Feb" data-aircraft="TBD" data-pilots="Julio" data-location="" data-client="" data-notes="" data-flight-hours="" onclick="showEventPopup(this,event)" title="🏜️ AlUla Tour 2026 (25 Jan - 1 Feb)">
             <span class="event-title">🏜️ AlUla T...</span>
           </div>
-          <div class="event-bar confirmed short" style="left:12.1%;width:1.2%;" data-name="SELA Company" data-status="confirmed" data-dates="14-16 Feb" data-aircraft="HC67 (Main)" data-pilots="Rohit Kaundinya" data-location="Asfan, Jeddah" data-client="SELA" data-notes="Static display only | Stickers stay on HC67 | 1 technician on site | Arrive 15:00 depart 18:00 LT on 15 Feb" data-flight-hours="12" onclick="showEventPopup(this,event)" title="SELA Company (14-16 Feb)">
+          <div class="event-bar confirmed short" style="left:12.1%;width:1.2%;" data-name="SELA Company" data-status="confirmed" data-dates="14-16 Feb" data-aircraft="HC65 (Main)" data-pilots="Rohit Kaundinya" data-location="Asfan, Jeddah" data-client="SELA" data-notes="Static display + promo video | Stickers on HC65 | 1 technician on site | Arrive 15:00 depart 18:00 LT on 15 Feb" data-flight-hours="12" onclick="showEventPopup(this,event)" title="SELA Company (14-16 Feb)">
             <span class="event-title">SELA Company</span>
           </div>
           <div class="event-bar pending " style="left:16.2%;width:33.2%;" data-name="🔍 GeoTech Survey" data-status="pending" data-dates="1 Mar - 30 Jun" data-aircraft="HC64 (Survey 1) | HC63 (Survey 2) | HC58 (Additional) | HC54 (Backup)" data-pilots="Survey Pilots" data-location="Al Dawadmi, Abha" data-client="GeoTech" data-notes="Start date tentative (Mar 1)" data-flight-hours="450" onclick="showEventPopup(this,event)" title="🔍 GeoTech Survey (1 Mar - 30 Jun)">
@@ -663,10 +663,13 @@ const bases = {
 
 // FLEET_START
 const fleet = [
-  { reg: "HZHC52", loc: "RUH", status: "parked", fullStatus: "serviceable", note: "Aircraft Under Process for Sale, Export C of A issued by GACA.", mission: "Short Term Storage", remFH: "117:05" },
-  { reg: "HZHC54", loc: "OETH", status: "parked", fullStatus: "serviceable", mission: "Available", remFH: "76:46" },
-  { reg: "HZHC55", loc: "OETH", status: "parked", fullStatus: "serviceable", remFH: "42:44" },
-  { reg: "HZHC57", loc: "OETH", status: "parked", fullStatus: "serviceable", remFH: "79:48" },
+  { reg: "HZHC51", loc: "RIYADH", status: "parked", fullStatus: "In Service", note: "Batt", ert: "No Time", melRef: "LMI", melExpiry: "01-Mar-26" },
+  { reg: "HZHC52", loc: "RIYADH", status: "parked", fullStatus: "Export-Exp'd", note: "wind shield crack RH", mission: "Short Term Storage", ert: "No Time", melRef: "LMI" },
+  { reg: "HZHC53", loc: "RIYADH", status: "maint", fullStatus: "Maintenance", note: "post check inspection", ert: "No Time", melRef: "LMI" },
+  { reg: "HZHC54", loc: "RIYADH", status: "parked", fullStatus: "Export-Exp'd", note: "3 Year inspection", ert: "No Time", melRef: "LMI" },
+  { reg: "HZHC55", loc: "RIYADH", status: "parked", fullStatus: "Export-Exp'd", ert: "No Time", melRef: "LMI", melExpiry: "03-Feb-26" },
+  { reg: "HZHC56", loc: "ULJANAM", status: "parked", fullStatus: "Export-Exp'd", ert: "No Time", remFH: "43.51", melRef: "LMI" },
+  { reg: "HZHC57", loc: "ULJANAM", status: "parked", fullStatus: "In Service", ert: "No Time", remFH: "40.56", melRef: "LMI" },
   { reg: "HZHC58", loc: "RUH", status: "maint", fullStatus: "maintenance", note: "Aircraft under maintenance for 24M/750FH and 72 Months.", ert: "2026-03-12", remFH: "66:47" },
   { reg: "HZHC59", loc: "RUH", status: "maint", fullStatus: "maintenance", note: "Post Dakar maintenance.", ert: "2026-02-14", remFH: "91:35" },
   { reg: "HZHC62", loc: "OETH", status: "parked", fullStatus: "serviceable", note: "Accumulator not charged. Troubleshooting in progress.", remFH: "41:24" },

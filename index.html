@@ -392,6 +392,19 @@
     display: none;
   }
   .event-popup.show { display: block; }
+  .event-popup::after {
+    content: '';
+    position: absolute;
+    bottom: -30px;
+    left: 20px;
+    width: 1px;
+    height: 30px;
+    background: rgba(255,255,255,0.3);
+  }
+  .event-popup .popup-scroll {
+    max-height: 50vh;
+    overflow-y: auto;
+  }
   .event-popup h3 {
     margin: 0 0 8px;
     font-size: 14px;
@@ -841,7 +854,7 @@ function showEventPopup(el, e) {
     }).join('');
   }
   
-  var html = '<h3>' + data.name + ' <span class="status-badge ' + data.status + '">' + statusLabel + '</span></h3>';
+  var html = '<div class="popup-scroll"><h3>' + data.name + ' <span class="status-badge ' + data.status + '">' + statusLabel + '</span></h3>';
   html += '<div class="detail-row"><span class="detail-label">Dates</span><span class="detail-value">' + data.dates + '</span></div>';
   if (data.location) html += '<div class="detail-row"><span class="detail-label">Location</span><span class="detail-value">' + data.location + '</span></div>';
   if (data.client) html += '<div class="detail-row"><span class="detail-label">Client</span><span class="detail-value">' + data.client + '</span></div>';
@@ -849,11 +862,21 @@ function showEventPopup(el, e) {
   html += '<div class="detail-row"><span class="detail-label">Pilots</span><span class="detail-value">' + data.pilots + '</span></div>';
   if (data.flightHours) html += '<div class="detail-row"><span class="detail-label">Flight Hours</span><span class="detail-value">' + data.flightHours + ' hrs (est)</span></div>';
   if (data.notes) html += '<div class="detail-row"><span class="detail-label">Notes</span><span class="detail-value" style="font-size:0.7rem;color:#aaa">' + data.notes + '</span></div>';
+  html += '</div>'; // close popup-scroll
   popup.innerHTML = html;
   
   const rect = el.getBoundingClientRect();
+  // Position popup, then measure and adjust to stay on screen
+  popup.style.visibility = 'hidden';
+  popup.style.display = 'block';
   popup.style.left = Math.min(rect.left, window.innerWidth - 290) + 'px';
-  popup.style.top = (rect.top - 160) + 'px';
+  popup.style.top = '0px'; // temporary
+  const popupH = popup.offsetHeight;
+  // Place above the bar with a 30px connector gap
+  let top = rect.top - popupH - 30;
+  if (top < 8) top = 8; // don't go off top of screen
+  popup.style.top = top + 'px';
+  popup.style.visibility = '';
   popup.classList.add('show');
 }
 

@@ -375,6 +375,12 @@
   .event-bar.future .connector, .event-bar.confirmed .connector { background: #3498db; }
   .event-bar.pending .connector { background: #e74c3c; }
 
+  /* Event popup overlay (invisible click-catcher) */
+  .event-popup-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 1999;
+  }
   /* Event popup */
   .event-popup {
     position: fixed;
@@ -832,16 +838,11 @@ map.fitBounds(L.latLngBounds(pts).pad(0.15));
 // Legend removed per Will's request (2026-02-08)
 
 // Event popup handling (runs immediately - DOM already loaded)
-// Close mission popup when clicking anywhere outside it
-document.addEventListener('click', function(e) {
-  var popup = document.getElementById('eventPopup');
-  if (popup.classList.contains('show') &&
-      !e.target.closest('.event-bar') &&
-      !e.target.closest('.tbd-item') &&
-      !e.target.closest('.event-popup')) {
-    popup.classList.remove('show');
-  }
-}, true); // capture phase — fires before Leaflet eats the event
+function dismissEventPopup() {
+  document.getElementById('eventPopup').classList.remove('show');
+  var ov = document.querySelector('.event-popup-overlay');
+  if (ov) ov.remove();
+}
 
 function showEventPopup(el, e) {
   e.stopPropagation();
@@ -882,10 +883,16 @@ function showEventPopup(el, e) {
   if (top < 8) top = 8; // don't go off top of screen
   popup.style.top = top + 'px';
   popup.style.visibility = '';
+  // Remove any existing overlay
+  var oldOv = document.querySelector('.event-popup-overlay');
+  if (oldOv) oldOv.remove();
+  // Add invisible overlay behind popup to catch dismiss clicks
+  var ov = document.createElement('div');
+  ov.className = 'event-popup-overlay';
+  ov.addEventListener('click', dismissEventPopup);
+  document.body.appendChild(ov);
   popup.classList.add('show');
 }
-
-// duplicate handler removed — capture-phase handler above handles dismiss
 </script>
 </body>
 </html>

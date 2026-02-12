@@ -842,16 +842,9 @@ map.fitBounds(L.latLngBounds(pts).pad(0.15));
 
 // Event popup handling
 function dismissEventPopup() {
+  document.getElementById('eventPopup').style.display = 'none';
   document.getElementById('eventPopup').classList.remove('show');
 }
-
-// Dismiss popup on any mousedown outside popup/bar/tbd-item
-document.addEventListener('mousedown', function(e) {
-  var popup = document.getElementById('eventPopup');
-  if (!popup.classList.contains('show')) return;
-  if (e.target.closest('.event-popup') || e.target.closest('.event-bar') || e.target.closest('.tbd-item')) return;
-  dismissEventPopup();
-}, true);
 
 function showEventPopup(el, e) {
   const popup = document.getElementById('eventPopup');
@@ -877,14 +870,9 @@ function showEventPopup(el, e) {
   if (data.flightHours) html += '<div class="detail-row"><span class="detail-label">Flight Hours</span><span class="detail-value">' + data.flightHours + ' hrs (est)</span></div>';
   if (data.notes) html += '<div class="detail-row"><span class="detail-label">Notes</span><span class="detail-value" style="font-size:0.7rem;color:#aaa">' + data.notes + '</span></div>';
   html += '</div>'; // close popup-scroll
+  html = '<div style="text-align:right;margin:-4px -8px 4px 0"><a href="javascript:void(0)" id="eventPopupClose" style="color:#888;font-size:20px;text-decoration:none;padding:4px 8px">&times;</a></div>' + html;
   popup.innerHTML = html;
-  // Add close button
-  var closeBtn = document.createElement('span');
-  closeBtn.innerHTML = '&times;';
-  closeBtn.style.cssText = 'position:absolute;top:6px;right:8px;cursor:pointer;color:#888;font-size:20px;line-height:1;z-index:10';
-  closeBtn.addEventListener('mousedown', function(ev) { ev.stopPropagation(); });
-  closeBtn.addEventListener('click', function(ev) { ev.stopPropagation(); dismissEventPopup(); });
-  popup.appendChild(closeBtn);
+  document.getElementById('eventPopupClose').onclick = function() { dismissEventPopup(); return false; };
   
   const rect = el.getBoundingClientRect();
   // Position popup, then measure and adjust to stay on screen

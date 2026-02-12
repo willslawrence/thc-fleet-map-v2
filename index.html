@@ -832,7 +832,7 @@ map.fitBounds(L.latLngBounds(pts).pad(0.15));
 
   // Close popup when clicking elsewhere
   document.body.onclick = function(e) {
-    if (!e.target.closest('.event-bar') && !e.target.closest('.tbd-item')) {
+    if (!e.target.closest('.event-bar') && !e.target.closest('.tbd-item') && !e.target.closest('.event-popup')) {
       eventPopup.classList.remove('show');
     }
   };

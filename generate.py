@@ -18,7 +18,7 @@ TODAY = datetime(_now.year, _now.month, _now.day, _now.hour, _now.minute, _now.s
 
 # Known waypoint coordinates — must match bases dict in index.html
 KNOWN_WAYPOINTS = {
-    'OETH', 'RUH', 'XRSC', 'OERK', 'OEHL', 'OEGS', 'OEAO', 'OEGN', 'OEJN', 'OEJF',
+    'OETH', 'RUH', 'XRSC', 'OERK', 'OEHL', 'OEGS', 'OEAO', 'OEGN', 'OEJN', 'OEJF', 'OEMA',
     'OERS', 'XSCV', 'XSSB', 'XSTH', 'XSDR', 'XSUH', 'XSU3',
     'OENN', 'XNC1', 'XNCH', 'XNNH', 'XNPI',
     'XUFR', 'XURC',

@@ -227,6 +227,12 @@ def load_currency():
     for pd in glob.glob(f"{PILOTS_DIR}/*/"):
         nm = os.path.basename(pd.rstrip('/'))
         pf = os.path.join(pd, f"{nm}.md")
+        if not os.path.exists(pf):
+            # Try case-insensitive match
+            for fn in os.listdir(pd):
+                if fn.lower().endswith('.md') and fn.lower().replace('.md','') == nm.lower().replace('.md',''):
+                    pf = os.path.join(pd, fn)
+                    break
         if os.path.exists(pf):
             try:
                 t = open(pf).read()

@@ -304,8 +304,10 @@ def load_missions():
             raw_status = d.get('status','pending').lower()
             start = d.get('date','')
             end = d.get('endDate', start)
-            if raw_status in ('complete', 'canceled', 'cancelled'):
-                auto_status = raw_status
+            if raw_status in ('canceled', 'cancelled'):
+                continue  # Skip canceled missions entirely
+            if raw_status == 'complete':
+                auto_status = 'complete'
             elif start:
                 ts = TODAY.strftime("%Y-%m-%d")
                 if end and end < ts:

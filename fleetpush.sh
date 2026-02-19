@@ -1,6 +1,6 @@
 #!/bin/bash
 # THC Fleet Map — generate from vault and push to GitHub
-cd ~/Desktop/Willy/FleetMapAndTimeline
+cd ~/Projects/FleetMapAndTimeline
 echo "$(date '+%Y-%m-%d %H:%M:%S') — Fleet map generation started"
 python3 generate.py
 git add -A

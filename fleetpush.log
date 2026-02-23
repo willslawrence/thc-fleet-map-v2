@@ -1027,3 +1027,15 @@ To https://github.com/willslawrence/thc-fleet-map-v2.git
  2 files changed, 27 insertions(+), 6 deletions(-)
 fatal: unable to access 'https://github.com/willslawrence/thc-fleet-map-v2.git/': Failed to connect to github.com port 443 after 3309 ms: Couldn't connect to server
 2026-02-23 17:17:40 — Done
+2026-02-23 18:00:00 — Fleet map generation started
+
+🚁 THC Fleet Map Generator
+   2026-02-23 18:00:00
+
+✅ Loaded 14 helicopters
+✅ Loaded 0 flights
+✅ Loaded 16 H125 pilot currency records
+✅ Loaded 22 missions
+✅ Fleet: 13 serviceable, 0 flying, 1 maint
+
+✅ Done!

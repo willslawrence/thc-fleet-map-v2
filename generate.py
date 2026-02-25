@@ -370,6 +370,8 @@ def build_flights_html():
                 pending_header = f'  <h4>{section_title}</h4>'
                 header_added = False
                 continue
+            if not in_h125:
+                continue
             if not ('|' in ln and not ln.startswith('#')):
                 continue
             p = [x.strip() for x in ln.split('|')]

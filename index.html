@@ -727,9 +727,12 @@ Object.values(bases).forEach(b => {
 });
 
 const groups = {};
+// Group by actual coordinates (not loc name) so overlapping bases merge
+const coordKey = loc => { const b = bases[loc]; return b ? `${b.lat},${b.lng}` : loc; };
 fleet.forEach(h => {
-  if (!groups[h.loc]) groups[h.loc] = [];
-  groups[h.loc].push(h);
+  const k = coordKey(h.loc);
+  if (!groups[k]) groups[k] = [];
+  groups[k].push(h);
 });
 
 // Layer group for helicopters (so we can redraw on zoom)
@@ -752,7 +755,7 @@ function drawHelicopters() {
   fleet.forEach(h => {
     const b = bases[h.loc];
     if (!b) return;
-    const g = groups[h.loc];
+    const g = groups[coordKey(h.loc)];
     const i = g.indexOf(h);
     const n = g.length;
     

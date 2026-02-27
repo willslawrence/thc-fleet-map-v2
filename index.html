@@ -436,7 +436,7 @@
 </head>
 <body class="timeline-open">
 <div id="map"></div>
-<div id="last-updated">Last updated: <!-- LAST_UPDATED -->27 Feb 2026 10:51<!-- /LAST_UPDATED --></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->27 Feb 2026 11:00<!-- /LAST_UPDATED --></div>
 <a class="duty-roster-btn" href="https://willslawrence.github.io/thc-duty-roster/">📋 Duty Roster</a>
 
 <!-- Timeline Toggle Button -->
@@ -448,7 +448,7 @@
   <div class="panel-header" onclick="this.parentElement.classList.toggle('collapsed')">
     <div class="panel-title">📋 Flights <span style="font-size:0.5em">by OCC</span> ▾</div>
     <div class="panel-date">OPS PLAN REPORT / <!-- REPORT_PERIOD -->25 Feb – 4 Mar 2026<!-- /REPORT_PERIOD --></div>
-    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->27 Feb 2026 10:51<!-- /LAST_UPDATED2 --></div>
+    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->27 Feb 2026 11:00<!-- /LAST_UPDATED2 --></div>
   </div>
   <div class="panel-body">
 
@@ -532,7 +532,7 @@
           <div class="event-bar complete short" style="left:12.1%;width:1.2%;" data-name="SELA Company" data-status="complete" data-dates="14-16 Feb" data-aircraft="Main: HC65" data-pilots="Rohit Kaundinya" data-location="Asfan, Jeddah" data-client="SELA" data-notes="Static display + promo video | Stickers install on HC65 | 1 technician on site | Arrive 1100L depart 1745L on 15 Feb | Mohammed (Safety Dept) marshalling on ground" data-flight-hours="12" onclick="showEventPopup(this,event)" title="SELA Company (14-16 Feb)">
             <span class="event-title">SELA Company</span>
           </div>
-          <div class="event-bar active short" style="left:15.7%;width:1.2%;" data-name="🏜️ Edge of the World Tour" data-status="active" data-dates="27 Feb" data-aircraft="HC66 (Main) | HC67 (Backup)" data-pilots="Lisa" data-location="Edge of the World (Riyadh)" data-client="The Private Aviation" data-notes="The Private Aviation | HZ-HC66 | Tour flyover Edge of the World | dep 0800 LT | 4 PAX" data-flight-hours="<2" onclick="showEventPopup(this,event)" title="🏜️ Edge of the World Tour (27 Feb)">
+          <div class="event-bar active short" style="left:15.7%;width:1.2%;" data-name="🏜️ Edge of the World Tour" data-status="active" data-dates="27 Feb" data-aircraft="Main: HC66 | Backup: HC67" data-pilots="Lisa" data-location="Edge of the World (Riyadh)" data-client="The Private Aviation" data-notes="The Private Aviation | HZ-HC66 | Tour flyover Edge of the World | dep 0800 LT | 4 PAX" data-flight-hours="<2" onclick="showEventPopup(this,event)" title="🏜️ Edge of the World Tour (27 Feb)">
             <span class="event-title">🏜️ Edge of...</span>
           </div>
           <div class="event-bar pending " style="left:20.1%;width:21.2%;" data-name="Joby Red Sea" data-status="pending" data-dates="15 Mar - 31 May" data-aircraft="Main: HC55" data-pilots="1 Pilot, TBD" data-location="Red Sea" data-client="THC/Joby/Red Sea" data-notes="Filming & route overview flights. Floats + 6x life jackets required on helicopters. Mostly PR purposes. HC55 stays at Red Sea between phases." data-flight-hours="" onclick="showEventPopup(this,event)" title="Joby Red Sea (15 Mar - 31 May)">
@@ -695,19 +695,19 @@ const bases = {
 // FLEET_START
 const fleet = [
   { reg: "HZHC52", loc: "RUH", status: "parked", fullStatus: "Serviceable", note: "Aircraft Under Process for Sale, Export C of A issued by GACA.", mission: "Short Term Storage", remFH: "117:05" },
-  { reg: "HZHC54", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "Survey Argas (backup)", remFH: "76:46" },
-  { reg: "HZHC55", loc: "XRSC", status: "parked", fullStatus: "Serviceable", mission: "Joby Red Sea", remFH: "38:40" },
+  { reg: "HZHC54", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "Available", remFH: "76:46" },
+  { reg: "HZHC55", loc: "XRSC", status: "parked", fullStatus: "Serviceable", mission: "None", remFH: "38:40" },
   { reg: "HZHC57", loc: "OERK", status: "parked", fullStatus: "Serviceable", note: "Export C of A inspection by GACA completed on 18 Feb 2026, aircraft under preservation and waiting for the Export C of A to be issued by GACA", remFH: "79:48" },
-  { reg: "HZHC58", loc: "OERK", status: "maint", fullStatus: "Maintenance", mission: "Survey GeoTech (after maint)", note: "Aircraft under maintenance for 24M/750FH and 72 Months", ert: "2026-03-12", remFH: "66:47" },
-  { reg: "HZHC59", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "Survey Argas", remFH: "90:27" },
-  { reg: "HZHC62", loc: "XRSC", status: "parked", fullStatus: "Serviceable", mission: "Available", remFH: "41:24" },
-  { reg: "HZHC63", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "Survey Argas (backup) → GeoTech", remFH: "102:10" },
-  { reg: "HZHC64", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "Survey GeoTech", remFH: "96:08" },
+  { reg: "HZHC58", loc: "OERK", status: "maint", fullStatus: "Maintenance", note: "Aircraft under maintenance for 24M/750FH and 72 Months", ert: "2026-03-12", remFH: "66:47" },
+  { reg: "HZHC59", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "90:27" },
+  { reg: "HZHC62", loc: "XRSC", status: "parked", fullStatus: "Serviceable", remFH: "41:24" },
+  { reg: "HZHC63", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "Available", remFH: "102:10" },
+  { reg: "HZHC64", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "96:08" },
   { reg: "HZHC65", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "SELA", remFH: "129:51" },
-  { reg: "HZHC66", loc: "OERK", status: "flying", fullStatus: "Flying", note: "Primary Aircraft for UAM Project", mission: "[[Urban Air Mobility|Riyadh UAM]]", remFH: "127:21" },
-  { reg: "HZHC67", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "UAM Riyadh (backup) · Bahrain Skybridge (backup)", remFH: "142:42" },
-  { reg: "HZHC68", loc: "OETH", status: "parked", fullStatus: "Serviceable", note: "Aircraft under MEL, Aircondition inoperative", mission: "UAM Bahrain Skybridge", remFH: "140:32" },
-  { reg: "HZHC69", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "Available", note: "Aircraft under MEL, GTN received on 07 Feb 2026 and waiting for the installation", remFH: "141:31" },
+  { reg: "HZHC66", loc: "OERK", status: "parked", fullStatus: "Serviceable", note: "Primary Aircraft for UAM Project", mission: "[[Urban Air Mobility|Riyadh UAM]]", remFH: "127:21" },
+  { reg: "HZHC67", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "UAM backup", remFH: "142:42" },
+  { reg: "HZHC68", loc: "OETH", status: "parked", fullStatus: "Serviceable", note: "Aircraft under MEL, Aircondition inoperative", remFH: "140:32" },
+  { reg: "HZHC69", loc: "OETH", status: "parked", fullStatus: "Serviceable", note: "Aircraft under MEL, GTN received on 07 Feb 2026 and waiting for the installation", remFH: "141:31" },
 ];
 // FLEET_END
 

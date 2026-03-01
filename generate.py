@@ -124,7 +124,7 @@ def parse_fm(fp):
 
 def load_helis():
     h = []
-    for f in sorted(glob.glob(f"{HELIS_DIR}/HZHC*.md")):
+    for f in sorted(glob.glob(f"{HELIS_DIR}/HZHC*.md") + glob.glob(f"{HELIS_DIR}/HZTH*.md")):
         d = parse_fm(f)
         raw_status = d.get('status', 'Parked')
         st = raw_status.lower()
@@ -150,17 +150,23 @@ def load_helis():
     return h
 
 def is_h125(reg_field):
-    """Check if registration is in HC50-HC70 range (H125 only)"""
-    # Extract number from reg like HC55, HZHC55, etc.
-    m = re.search(r'HC(\d+)', reg_field)
+    """Check if registration is in HC52-HC69 range or TH56 (H125 only)"""
+    s = reg_field.strip().upper().replace('-', '')
+    # TH56 (HZTH56) is also H125
+    if re.search(r'TH56', s):
+        return True
+    m = re.search(r'HC(\d+)', s)
     if m:
         num = int(m.group(1))
-        return 50 <= num <= 70
+        return 52 <= num <= 69
     return False
 
 def normalize_reg(raw):
-    """Normalize any reg variant (HZHC55, HZ-HC55, HZHC-55, HC55, HZ-HC-55) to HZHC55"""
+    """Normalize any reg variant (HZHC55, HZ-HC55, HZHC-55, HC55, HZ-HC-55, HZTH56) to HZHC55/HZTH56"""
     s = raw.strip().upper().replace('-', '')
+    m = re.search(r'TH(\d+)', s)
+    if m:
+        return 'HZTH' + m.group(1)
     m = re.search(r'HC(\d+)', s)
     if m:
         return 'HZHC' + m.group(1)

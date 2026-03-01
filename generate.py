@@ -152,8 +152,9 @@ def load_helis():
 def is_h125(reg_field):
     """Check if registration is in HC52-HC69 range or TH56 (H125 only)"""
     s = reg_field.strip().upper().replace('-', '')
-    # TH56 (HZTH56) is also H125
-    if re.search(r'TH56', s):
+    # TH-prefix aircraft (HZTH56, etc.) are also H125
+    m = re.search(r'TH(\d+)', s)
+    if m:
         return True
     m = re.search(r'HC(\d+)', s)
     if m:

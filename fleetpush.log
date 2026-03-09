@@ -4481,3 +4481,25 @@ Traceback (most recent call last):
     html = open(HTML_FILE).read()
            ~~~~^^^^^^^^^^^
 FileNotFoundError: [Errno 2] No such file or directory: '/Users/willy/Desktop/Willy/FleetMapAndTimeline/index.html'
+[main 072484f] Fleet sync 2026-03-09 11:00
+ 1 file changed, 22 insertions(+)
+To https://github.com/willslawrence/thc-fleet-map-v2.git
+   c689735..072484f  main -> main
+2026-03-09 11:00:02 — Done
+2026-03-09 12:00:00 — Fleet map generation started
+
+🚁 THC Fleet Map Generator
+   2026-03-09 12:00:00
+
+✅ Loaded 15 helicopters
+✅ Loaded 2 flights
+✅ Loaded 16 H125 pilot currency records
+✅ Loaded 26 missions
+Traceback (most recent call last):
+  File "/Users/willy/Projects/FleetMapAndTimeline/generate.py", line 649, in <module>
+    if __name__ == "__main__": main()
+                               ~~~~^^
+  File "/Users/willy/Projects/FleetMapAndTimeline/generate.py", line 644, in main
+    html = open(HTML_FILE).read()
+           ~~~~^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/willy/Desktop/Willy/FleetMapAndTimeline/index.html'

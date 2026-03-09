@@ -4617,3 +4617,15 @@ FileNotFoundError: [Errno 2] No such file or directory: '/Users/willy/Desktop/Wi
 To https://github.com/willslawrence/thc-fleet-map-v2.git
    6338057..12bd84a  main -> main
 2026-03-09 17:00:02 — Done
+2026-03-09 18:00:00 — Fleet map generation started
+
+🚁 THC Fleet Map Generator
+   2026-03-09 18:00:00
+
+✅ Loaded 15 helicopters
+✅ Loaded 2 flights
+✅ Loaded 16 H125 pilot currency records
+✅ Loaded 25 missions
+✅ Fleet: 10 serviceable, 2 flying, 3 maint
+
+✅ Done!

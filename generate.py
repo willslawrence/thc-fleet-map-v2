@@ -11,7 +11,7 @@ HELIS_DIR = f"{VAULT}/THC/Helicopters"
 PILOTS_DIR = f"{VAULT}/THC/Pilots"
 FLIGHTS_FILE = f"{VAULT}/THC/Helicopters/Flights Schedule.md"
 MISSIONS_DIR = f"{VAULT}/THC/Missions"
-HTML_FILE = os.path.expanduser("~/Desktop/Willy/FleetMapAndTimeline/index.html")
+HTML_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "index.html")
 # Use Saudi Arabia timezone, then strip tz for naive comparisons
 _now = datetime.now(ZoneInfo("Asia/Riyadh"))
 TODAY = datetime(_now.year, _now.month, _now.day, _now.hour, _now.minute, _now.second)

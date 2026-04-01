@@ -324,7 +324,7 @@ def load_missions():
                     auto_status = 'active'
                 else:
                     # Future mission — use frontmatter status
-                    auto_status = raw_status if raw_status in ('confirmed', 'pending') else 'pending'
+                    auto_status = raw_status if raw_status in ('confirmed', 'pending', 'potential') else 'pending'
             else:
                 auto_status = raw_status
             m.append({'title': t, 'date': start, 'endDate': end, 'status': auto_status, 'helicopters': heli_str, 'pilots': pilots, 'location': d.get('location',''), 'client': d.get('client', d.get('customer','')), 'special_notes': d.get('special_notes',''), 'flight_hours': d.get('flight_hours','')})

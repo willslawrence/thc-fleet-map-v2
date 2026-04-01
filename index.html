@@ -181,7 +181,8 @@
   .tl-dot.current { background: #2ecc71; }
   .tl-dot.future, .tl-dot.confirmed { background: #3498db; }
   .tl-dot.active { background: #2ecc71; }
-  .tl-dot.pending { background: #e74c3c; }
+  .tl-dot.pending { background: #f1c40f; }
+  .tl-dot.potential { background: rgba(231, 76, 60, 0.45); }
   .tl-dot.past, .tl-dot.complete, .tl-dot.canceled, .tl-dot.cancelled { background: #666; opacity: 0.5; }
 
   
@@ -357,8 +358,12 @@
     border: 1px solid rgba(52, 152, 219, 0.6);
   }
   .event-bar.pending {
-    background: linear-gradient(135deg, rgba(231, 76, 60, 0.85), rgba(231, 76, 60, 0.65));
-    border: 1px solid rgba(231, 76, 60, 0.6);
+    background: linear-gradient(135deg, rgba(241, 196, 15, 0.85), rgba(241, 196, 15, 0.65));
+    border: 1px solid rgba(241, 196, 15, 0.6);
+  }
+  .event-bar.potential {
+    background: linear-gradient(135deg, rgba(231, 76, 60, 0.45), rgba(231, 76, 60, 0.3));
+    border: 1px dashed rgba(231, 76, 60, 0.4);
   }
   .event-icon { font-size: 0.65rem; margin-right: 4px; flex-shrink: 0; }
   .event-title { font-size: 0.55rem; font-weight: 600; white-space: nowrap; color: #fff; margin-right: 4px; }
@@ -373,7 +378,8 @@
   .lanes-below .connector { top: -6px; height: 6px; }
   .event-bar.current .connector, .event-bar.active .connector { background: #2ecc71; }
   .event-bar.future .connector, .event-bar.confirmed .connector { background: #3498db; }
-  .event-bar.pending .connector { background: #e74c3c; }
+  .event-bar.pending .connector { background: #f1c40f; }
+  .event-bar.potential .connector { background: rgba(231, 76, 60, 0.45); }
 
   /* Event popup */
   .event-popup {
@@ -422,7 +428,8 @@
   }
   .event-popup .status-badge.current, .event-popup .status-badge.active { background: rgba(46, 204, 113, 0.3); color: #2ecc71; }
   .event-popup .status-badge.future, .event-popup .status-badge.confirmed { background: rgba(52, 152, 219, 0.3); color: #3498db; }
-  .event-popup .status-badge.pending { background: rgba(231, 76, 60, 0.3); color: #e74c3c; }
+  .event-popup .status-badge.pending { background: rgba(241, 196, 15, 0.3); color: #f1c40f; }
+  .event-popup .status-badge.potential { background: rgba(231, 76, 60, 0.2); color: rgba(231, 76, 60, 0.6); }
   .event-popup .detail-row {
     display: flex;
     justify-content: space-between;
@@ -436,7 +443,7 @@
 </head>
 <body class="timeline-open">
 <div id="map"></div>
-<div id="last-updated">Last updated: <!-- LAST_UPDATED -->1 Apr 2026 11:33<!-- /LAST_UPDATED --></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->1 Apr 2026 11:52<!-- /LAST_UPDATED --></div>
 <a class="duty-roster-btn" href="https://willslawrence.github.io/thc-duty-roster/">📋 Duty Roster</a>
 
 <!-- Timeline Toggle Button -->
@@ -448,7 +455,7 @@
   <div class="panel-header" onclick="this.parentElement.classList.toggle('collapsed')">
     <div class="panel-title">📋 Flights <span style="font-size:0.5em">by OCC</span> ▾</div>
     <div class="panel-date">OPS PLAN REPORT / <!-- REPORT_PERIOD -->30 Mar – 6 Apr 2026<!-- /REPORT_PERIOD --></div>
-    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->1 Apr 2026 11:33<!-- /LAST_UPDATED2 --></div>
+    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->1 Apr 2026 11:52<!-- /LAST_UPDATED2 --></div>
   </div>
   <div class="panel-body">
 
@@ -498,6 +505,7 @@
         <span><div class="tl-dot current"></div>Current</span>
         <span><div class="tl-dot future"></div>Future</span>
         <span><div class="tl-dot pending"></div>Pending</span>
+        <span><div class="tl-dot potential"></div>Potential</span>
         <span><div class="tl-dot past"></div>Past</span>
       </div>
     </div>
@@ -524,7 +532,7 @@
           <div class="event-bar complete short" style="left:9.6%;width:1.2%;" data-name="Al Fursan Cup" data-status="complete" data-dates="5-8 Feb" data-aircraft="HC55 (Film)" data-pilots="Lisa" data-location="Riyadh" data-client="Aurora" data-notes="" data-flight-hours="" onclick="showEventPopup(this,event)" title="Al Fursan Cup (5-8 Feb)">
             <span class="event-title">Al Fursan ...</span>
           </div>
-          <div class="event-bar pending short" style="left:36.0%;width:1.2%;" data-name="Joby Aviation Visual" data-status="pending" data-dates="12-15 May" data-aircraft="Count: 1" data-pilots="[]" data-location="Red Sea (OERS)" data-client="Joby Aviation" data-notes="Visual survey — LTE/Starlink aerial survey + site familiarization for Joby S4 eVTOL." data-flight-hours="6" onclick="showEventPopup(this,event)" title="Joby Aviation Visual (12-15 May)">
+          <div class="event-bar potential short" style="left:36.0%;width:1.2%;" data-name="Joby Aviation Visual" data-status="potential" data-dates="12-15 May" data-aircraft="Count: 1" data-pilots="[]" data-location="Red Sea (OERS)" data-client="Joby Aviation" data-notes="Visual survey — LTE/Starlink aerial survey + site familiarization for Joby S4 eVTOL." data-flight-hours="6" onclick="showEventPopup(this,event)" title="Joby Aviation Visual (12-15 May)">
             <span class="event-title">Joby Aviat...</span>
           </div>
           <div class="event-bar pending " style="left:47.0%;width:53.0%;" data-name="🌉 UAM Bahrain Skybridge" data-status="pending" data-dates="21 Jun - 31 Mar" data-aircraft="Count: 1" data-pilots="UAM Pilots" data-location="DMM→BAH" data-client="THC" data-notes="Pilot apartment | DMM→BAH via VRP East Gate→LADNA | BAH→DMM via NARMI (min 6000ft) | Direct route pending SANS/BAH CAA/THC meeting | Need annual landing permit BAH | Floats + 6 life jackets req | Ground handling SPA (DMM) JETEX (BAH) | ~500kg payload one-way fuel" data-flight-hours="" onclick="showEventPopup(this,event)" title="🌉 UAM Bahrain Skybridge (21 Jun - 31 Mar)">
@@ -632,10 +640,10 @@
           <div class="event-bar pending short" style="left:34.6%;width:1.2%;" data-name="🏁 Rally Qassim 2026" data-status="pending" data-dates="7-10 May" data-aircraft="Count: 4" data-pilots="Will (VIP), Lisa (Film), David S(EMS 2), David L (EMS 1)" data-location="Qassim" data-client="SMC" data-notes="" data-flight-hours="14" onclick="showEventPopup(this,event)" title="🏁 Rally Qassim 2026 (7-10 May)">
             <span class="event-title">🏁 Rally Qa...</span>
           </div>
-          <div class="event-bar pending short" style="left:37.6%;width:1.2%;" data-name="Joby Aviation May-June" data-status="pending" data-dates="18-22 May" data-aircraft="Count: 1" data-pilots="Stephan, Roberto" data-location="Red Sea (OERS)" data-client="Joby Aviation" data-notes="Aerial filming for Joby S4 eVTOL launch. Camera by Air-to-Air, THC mount. Operator: Lieven Hermans." data-flight-hours="8" onclick="showEventPopup(this,event)" title="Joby Aviation May-June (18-22 May)">
+          <div class="event-bar potential short" style="left:37.6%;width:1.2%;" data-name="Joby Aviation May-June" data-status="potential" data-dates="18-22 May" data-aircraft="Count: 1" data-pilots="Stephan, Roberto" data-location="Red Sea (OERS)" data-client="Joby Aviation" data-notes="Aerial filming for Joby S4 eVTOL launch. Camera by Air-to-Air, THC mount. Operator: Lieven Hermans." data-flight-hours="8" onclick="showEventPopup(this,event)" title="Joby Aviation May-June (18-22 May)">
             <span class="event-title">Joby Aviat...</span>
           </div>
-          <div class="event-bar pending " style="left:41.5%;width:58.5%;" data-name="Grid" data-status="pending" data-dates="1 Jun - 31 May" data-aircraft="Count: 1" data-pilots="TBD" data-location="" data-client="" data-notes="Powerline thermal camera patrol. Part 133." data-flight-hours="" onclick="showEventPopup(this,event)" title="Grid (1 Jun - 31 May)">
+          <div class="event-bar potential " style="left:41.5%;width:58.5%;" data-name="Grid" data-status="potential" data-dates="1 Jun - 31 May" data-aircraft="Count: 1" data-pilots="TBD" data-location="" data-client="" data-notes="Powerline thermal camera patrol. Part 133." data-flight-hours="" onclick="showEventPopup(this,event)" title="Grid (1 Jun - 31 May)">
             <span class="event-title">Grid</span>
             <span class="event-dates">1 Jun - 31 May</span>
           </div>
@@ -888,7 +896,7 @@ function dismissEventPopup() {
 function showEventPopup(el, e) {
   const popup = document.getElementById('eventPopup');
   const data = el.dataset;
-  const statusLabel = {'active':'Active','current':'Active','confirmed':'Confirmed','future':'Confirmed','pending':'Pending','past':'Past','complete':'Complete'}[data.status] || data.status;
+  const statusLabel = {'active':'Active','current':'Active','confirmed':'Confirmed','future':'Confirmed','pending':'Pending','potential':'Potential','past':'Past','complete':'Complete'}[data.status] || data.status;
   
   // Format aircraft roles as individual lines
   let aircraftHtml = data.aircraft;

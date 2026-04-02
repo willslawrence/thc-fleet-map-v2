@@ -94,10 +94,17 @@
   #last-updated { display: none; }
   #briefing-panel .panel-header { position: relative; }
   #briefing-panel .panel-updated { position: absolute; top: 0; right: 0; font-size: 10px; color: #666; }
-  .duty-roster-btn {
+  .right-btn-group {
     position: fixed;
     bottom: 10px;
-    left: 10px;
+    right: 10px;
+    display: flex;
+    gap: 6px;
+    z-index: 1001;
+    transition: all 0.3s ease;
+  }
+  body.timeline-open .right-btn-group { bottom: calc(28vh + 10px); }
+  .right-btn-group a, .right-btn-group button {
     background: rgba(15,15,30,0.85);
     backdrop-filter: blur(12px);
     color: #fff;
@@ -107,12 +114,12 @@
     cursor: pointer;
     font-size: 12px;
     font-weight: 600;
-    z-index: 1001;
     text-decoration: none;
     transition: all 0.3s ease;
   }
-  .duty-roster-btn:hover { background: rgba(52,152,219,0.3); border-color: rgba(52,152,219,0.5); }
-  body.timeline-open .duty-roster-btn { bottom: calc(28vh + 10px); }
+  .right-btn-group a:hover { background: rgba(52,152,219,0.3); border-color: rgba(52,152,219,0.5); }
+  .right-btn-group button:hover { background: rgba(46,204,113,0.3); border-color: rgba(46,204,113,0.5); }
+  .right-btn-group .sfla-btn:hover { background: rgba(255,165,0,0.3); border-color: rgba(255,165,0,0.5); }
 
   /* Timeline Panel */
   .timeline-panel {
@@ -130,24 +137,7 @@
   }
   body.timeline-open .timeline-panel { transform: translateY(0); }
 
-  .timeline-toggle {
-    position: fixed;
-    bottom: 10px;
-    right: 10px;
-    background: rgba(15,15,30,0.85);
-    backdrop-filter: blur(12px);
-    color: #fff;
-    border: 1px solid rgba(255,255,255,0.2);
-    padding: 8px 14px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 600;
-    z-index: 1001;
-    transition: all 0.3s ease;
-  }
-  body.timeline-open .timeline-toggle { bottom: calc(28vh + 10px); }
-  .timeline-toggle:hover { background: rgba(46, 204, 113, 0.3); border-color: rgba(46, 204, 113, 0.5); }
+  /* timeline-toggle styles now in .right-btn-group */
 
   /* Timeline Content */
   .timeline-content {
@@ -444,10 +434,12 @@
 <body class="timeline-open">
 <div id="map"></div>
 <div id="last-updated">Last updated: <!-- LAST_UPDATED -->2 Apr 2026 09:00<!-- /LAST_UPDATED --></div>
-<a class="duty-roster-btn" href="https://willslawrence.github.io/thc-duty-roster/">📋 Duty Roster</a>
-
-<!-- Timeline Toggle Button -->
-<button class="timeline-toggle" onclick="toggleTimeline()">📅 Missions</button>
+<div class="right-btn-group">
+  <a class="sfla-btn" href="https://willslawrence.github.io/sfla-tracker/" target="_blank">🛬 SFLA Riyadh</a>
+  <a class="sfla-btn" href="https://willslawrence.github.io/sfla-malham-tracker/" target="_blank">🛬 SFLA Malham</a>
+  <a href="https://willslawrence.github.io/thc-duty-roster/" target="_blank">📋 Duty Roster</a>
+  <button onclick="toggleTimeline()">📅 Missions</button>
+</div>
 
 <div class="left-panels">
 

@@ -11217,3 +11217,20 @@ fatal: unable to access 'https://github.com/willslawrence/thc-fleet-map-v2.git/'
 ✅ Fleet: 11 serviceable, 1 flying, 2 maint
 
 ✅ Done!
+[main 476151d] Fleet sync 2026-04-08 16:00
+ 2 files changed, 18 insertions(+), 2 deletions(-)
+To https://github.com/willslawrence/thc-fleet-map-v2.git
+   cf9d364..476151d  main -> main
+2026-04-08 16:00:06 — Done
+2026-04-08 17:00:02 — Fleet map generation started
+
+🚁 THC Fleet Map Generator
+   2026-04-08 17:00:02
+
+✅ Loaded 14 helicopters
+✅ Loaded 2 flights
+✅ Loaded 15 H125 pilot currency records
+✅ Loaded 23 missions
+✅ Fleet: 11 serviceable, 1 flying, 2 maint
+
+✅ Done!

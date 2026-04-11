@@ -11829,3 +11829,20 @@ To https://github.com/willslawrence/thc-fleet-map-v2.git
 ✅ Fleet: 11 serviceable, 2 flying, 1 maint
 
 ✅ Done!
+[main 10cc5ce] Fleet sync 2026-04-11 07:00
+ 2 files changed, 25 insertions(+), 8 deletions(-)
+To https://github.com/willslawrence/thc-fleet-map-v2.git
+   f69c95a..10cc5ce  main -> main
+2026-04-11 07:00:03 — Done
+2026-04-11 08:00:04 — Fleet map generation started
+
+🚁 THC Fleet Map Generator
+   2026-04-11 08:00:04
+
+✅ Loaded 14 helicopters
+✅ Loaded 2 flights
+✅ Loaded 15 H125 pilot currency records
+✅ Loaded 25 missions
+✅ Fleet: 11 serviceable, 2 flying, 1 maint
+
+✅ Done!

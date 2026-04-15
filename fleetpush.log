@@ -12846,3 +12846,15 @@ fatal: unable to access 'https://github.com/willslawrence/thc-fleet-map-v2.git/'
  2 files changed, 18 insertions(+), 2 deletions(-)
 fatal: unable to access 'https://github.com/willslawrence/thc-fleet-map-v2.git/': Could not resolve host: github.com
 2026-04-15 08:00:31 — Done
+2026-04-15 09:00:00 — Fleet map generation started
+
+🚁 THC Fleet Map Generator
+   2026-04-15 09:00:00
+
+✅ Loaded 14 helicopters
+✅ Loaded 2 flights
+✅ Loaded 15 H125 pilot currency records
+✅ Loaded 25 missions
+✅ Fleet: 8 serviceable, 2 flying, 4 maint
+
+✅ Done!

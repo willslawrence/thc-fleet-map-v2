@@ -14758,3 +14758,8 @@ To https://github.com/willslawrence/thc-fleet-map-v2.git
 ✅ Fleet: 7 serviceable, 1 flying, 4 maint
 
 ✅ Done!
+[main ec2ca7e] Fleet sync 2026-04-23 13:00
+ 2 files changed, 41 insertions(+), 33 deletions(-)
+To https://github.com/willslawrence/thc-fleet-map-v2.git
+   f1b63fc..ec2ca7e  main -> main
+2026-04-23 13:00:01 — Done

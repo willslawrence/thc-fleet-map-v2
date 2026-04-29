@@ -16237,3 +16237,21 @@ To https://github.com/willslawrence/thc-fleet-map-v2.git
 ✅ Fleet: 8 serviceable, 1 flying, 3 maint
 
 ✅ Done!
+[main 9b670b2] Fleet sync 2026-04-29 08:00
+ 2 files changed, 20 insertions(+), 2 deletions(-)
+To https://github.com/willslawrence/thc-fleet-map-v2.git
+   3887070..9b670b2  main -> main
+2026-04-29 08:00:03 — Done
+2026-04-29 09:00:00 — Fleet map generation started
+
+🚁 THC Fleet Map Generator
+   2026-04-29 09:00:00
+
+✅ Loaded 12 helicopters
+  ⚠️  Unknown waypoint 'XRKD' in route for HZHC66
+✅ Loaded 1 flights
+✅ Loaded 15 H125 pilot currency records
+✅ Loaded 26 missions
+✅ Fleet: 8 serviceable, 1 flying, 3 maint
+
+✅ Done!

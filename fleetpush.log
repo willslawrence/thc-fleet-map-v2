@@ -16595,3 +16595,25 @@ To https://github.com/willslawrence/thc-fleet-map-v2.git
 ✅ Fleet: 9 serviceable, 0 flying, 3 maint
 
 ✅ Done!
+[main 8b508c6] Fleet sync 2026-04-30 14:00
+ 2 files changed, 14 insertions(+), 2 deletions(-)
+To https://github.com/willslawrence/thc-fleet-map-v2.git
+ ! [rejected]        main -> main (non-fast-forward)
+error: failed to push some refs to 'https://github.com/willslawrence/thc-fleet-map-v2.git'
+hint: Updates were rejected because the tip of your current branch is behind
+hint: its remote counterpart. Integrate the remote changes (e.g.
+hint: 'git pull ...') before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+2026-04-30 14:00:01 — Done
+2026-04-30 15:00:00 — Fleet map generation started
+
+🚁 THC Fleet Map Generator
+   2026-04-30 15:00:00
+
+✅ Loaded 12 helicopters
+✅ Loaded 0 flights
+✅ Loaded 15 H125 pilot currency records
+✅ Loaded 26 missions
+✅ Fleet: 9 serviceable, 0 flying, 3 maint
+
+✅ Done!

@@ -433,7 +433,7 @@
 </head>
 <body class="timeline-open">
 <div id="map"></div>
-<div id="last-updated">Last updated: <!-- LAST_UPDATED -->3 May 2026 11:00<!-- /LAST_UPDATED --></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->3 May 2026 11:04<!-- /LAST_UPDATED --></div>
 <div class="right-btn-group">
   <a class="sfla-btn" href="https://willslawrence.github.io/sfla-tracker/" target="_blank">🛬 SFLA Riyadh</a>
   <a class="sfla-btn" href="https://willslawrence.github.io/sfla-malham-tracker/" target="_blank">🛬 SFLA Tracker</a>
@@ -445,13 +445,20 @@
 <div id="briefing-panel" class="">
   <div class="panel-header" onclick="this.parentElement.classList.toggle('collapsed')">
     <div class="panel-title">📋 Flights <span style="font-size:0.5em">by OCC</span> ▾</div>
-    <div class="panel-date">OPS PLAN REPORT / <!-- REPORT_PERIOD -->3 May 2026<!-- /REPORT_PERIOD --></div>
-    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->3 May 2026 11:00<!-- /LAST_UPDATED2 --></div>
+    <div class="panel-date">OPS PLAN REPORT / <!-- REPORT_PERIOD -->3 May – 7 May 2026<!-- /REPORT_PERIOD --></div>
+    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->3 May 2026 11:04<!-- /LAST_UPDATED2 --></div>
   </div>
   <div class="panel-body">
 
   <!-- FLIGHTS_START -->
-  <div>No flights scheduled</div>
+  <h4>Sat 03 May</h4>
+  <div class="flight-row today"><span class="reg">HZTH56</span><span class="info">XRSC→OETH · Technical Reposition</span><span class="pilot">PIC: Kaundinya, Rohit</span></div>
+  <h4>Mon 05 May</h4>
+  <div class="flight-row"><span class="reg">HC66</span><span class="info">XRSC→OERK→XRKD→OERK→XRSC · PAX135 THC UAM</span><span class="pilot">PIC: TBA</span></div>
+  <h4>Tue 06 May</h4>
+  <div class="flight-row"><span class="reg">HC66</span><span class="info">XRSC→OERK→XRKD→OERK→XRSC · PAX135 THC UAM</span><span class="pilot">PIC: TBA</span></div>
+  <h4>Wed 07 May</h4>
+  <div class="flight-row"><span class="reg">HC66</span><span class="info">XRSC→OERK→XRKD→OERK→XRSC · PAX135 THC UAM</span><span class="pilot">PIC: TBA</span></div>
   <!-- FLIGHTS_END -->
 
   </div>
@@ -719,11 +726,11 @@ const fleet = [
   { reg: "HZHC63", loc: "RUH", status: "maint", fullStatus: "Maintenance", note: "Aircraft under Pre-inspection for Potential mission.", ert: "2026-05-15" },
   { reg: "HZHC64", loc: "OETH", status: "parked", fullStatus: "Serviceable" },
   { reg: "HZHC65", loc: "OETH", status: "parked", fullStatus: "Serviceable" },
-  { reg: "HZHC66", loc: "RUH", status: "parked", fullStatus: "Serviceable", mission: "[[UAM Riyadh]]" },
+  { reg: "HZHC66", loc: "RUH", status: "maint", fullStatus: "Under Maintenance", note: "PAX135 missions scheduled 05–07 May 2026 (XRSC→OERK→XRKD→OERK→XRSC, THC UAM).", mission: "[[UAM Riyadh]]" },
   { reg: "HZHC67", loc: "OETH", status: "parked", fullStatus: "Serviceable" },
   { reg: "HZHC68", loc: "OETH", status: "maint", fullStatus: "Maintenance", note: "Aircraft under preservation.", ert: "2026-06-28" },
   { reg: "HZHC69", loc: "OETH", status: "maint", fullStatus: "Maintenance", note: "Aircraft under preservation.", ert: "2026-06-28" },
-  { reg: "HZTH56", loc: "RUH", status: "parked", fullStatus: "EIS", note: "C of R and C of A issued by GACA. Technical Reposition scheduled 03 May 2026 (XRSC→OETH).", ert: "2026-04-09" },
+  { reg: "HZTH56", loc: "OETH", status: "flying", fullStatus: "EIS", note: "C of R and C of A issued by GACA. Technical Reposition 03 May 2026 (XRSC→OETH) completed.", ert: "2026-04-09", pilot: "PIC: Kaundinya, Rohit", route: "XRSC→OETH" },
   { reg: "HZTH58", loc: "RUH", status: "parked", fullStatus: "EIS", note: "Aircraft under preservation.", ert: "2026-06-28" },
 ];
 // FLEET_END

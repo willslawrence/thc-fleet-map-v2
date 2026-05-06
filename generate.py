@@ -415,20 +415,21 @@ def build_flights_html():
             p = [x.strip() for x in ln.split('|')]
             if len(p) < 5:
                 continue
-            flight_date = p[0]
-            if flight_date < ts:
+            # Skip header row and separator rows
+            if p[1] == 'Reg' or not is_h125(p[1]):
                 continue
-            if not is_h125(p[1]):
+            flight_date = p[2]
+            if flight_date < ts:
                 continue
             # Add day header if not yet added
             if not header_added and pending_header:
                 L.append(pending_header)
                 header_added = True
             r = normalize_reg(p[1]).replace('HZHC', 'HC')
-            cl = "flight-row today" if p[0] == ts else "flight-row"
-            route = p[2]
-            mission = p[3]
-            pilot = p[4].split('/')[0].strip()
+            cl = "flight-row today" if flight_date == ts else "flight-row"
+            route = p[5]
+            mission = p[6]
+            pilot = p[7].split('/')[0].strip().replace('PIC:', '').strip() if len(p) > 7 and p[7] else ''
             info = f"{route} · {mission}" if route else mission
             L.append(f'  <div class="{cl}"><span class="reg">{r}</span><span class="info">{info}</span><span class="pilot">{pilot}</span></div>')
     except: pass

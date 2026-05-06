@@ -201,23 +201,29 @@ def load_flights():
             if not ('|' in ln and ln.strip() and not ln.startswith('#')):
                 continue
             p = [x.strip() for x in ln.split('|')]
-            # Format: Date | Aircraft | Route | Mission | PIC
-            if len(p) < 5:
+            # Format: Reg | DOF | STD | STA | Route | Mission | Crew
+            # (table starts/ends with |, so p[0] and p[-1] are empty strings)
+            if len(p) < 8:
                 continue
-            date_str = p[0]
+            # p[1]=Reg, p[2]=DOF, p[3]=STD, p[4]=STA, p[5]=Route, p[6]=Mission, p[7]=Crew
+            reg_str = p[1]
+            date_str = p[2]
+            # Skip header row
+            if reg_str == 'Reg' or not reg_str.startswith('HZ'):
+                continue
+            route = p[5]
+            mission = p[6]
+            crew = p[7] if len(p) > 7 else ''
+            pilot = crew.split('/')[0].strip().replace('PIC:', '').strip() if crew else ''
             # Track all dates for report period
             if re.match(r'\d{4}-\d{2}-\d{2}', date_str):
                 all_dates.append(date_str)
             # Only load today's H125 flights for map display
             if not date_str.startswith(ts):
                 continue
-            if not is_h125(p[1]):
+            if not is_h125(reg_str):
                 continue
-            r = normalize_reg(p[1])
-            route = p[2]
-            mission = p[3]
-            pilot = p[4]
-            pilot = pilot.split('/')[0].strip()
+            r = normalize_reg(reg_str)
             fl.append({'reg': r, 'route': route, 'mission': mission, 'pilot': pilot})
             fy[r] = pilot
             if '→' in route:

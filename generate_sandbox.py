@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+"""Scratch / experimental copy of generate.py. Not invoked by the launchd
+jobs (morning / afternoon / push) — those run generate.py. Safe to edit
+when prototyping changes before promoting them to generate.py."""
 import os, re, glob
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo

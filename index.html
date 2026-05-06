@@ -433,7 +433,7 @@
 </head>
 <body class="timeline-open">
 <div id="map"></div>
-<div id="last-updated">Last updated: <!-- LAST_UPDATED -->6 May 2026 16:00<!-- /LAST_UPDATED --></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->6 May 2026 17:00<!-- /LAST_UPDATED --></div>
 <div class="right-btn-group">
   <a class="sfla-btn" href="https://willslawrence.github.io/sfla-tracker/" target="_blank">🛬 SFLA Riyadh</a>
   <a class="sfla-btn" href="https://willslawrence.github.io/sfla-malham-tracker/" target="_blank">🛬 SFLA Tracker</a>
@@ -445,8 +445,8 @@
 <div id="briefing-panel" class="">
   <div class="panel-header" onclick="this.parentElement.classList.toggle('collapsed')">
     <div class="panel-title">📋 Flights <span style="font-size:0.5em">by OCC</span> ▾</div>
-    <div class="panel-date">OPS PLAN REPORT / <!-- REPORT_PERIOD -->6 May 2026<!-- /REPORT_PERIOD --></div>
-    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->6 May 2026 16:00<!-- /LAST_UPDATED2 --></div>
+    <div class="panel-date">OPS PLAN REPORT / <!-- REPORT_PERIOD -->6 May – 6 May 2026<!-- /REPORT_PERIOD --></div>
+    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->6 May 2026 17:00<!-- /LAST_UPDATED2 --></div>
   </div>
   <div class="panel-body">
 
@@ -710,9 +710,9 @@ const bases = {
 const fleet = [
   { reg: "HZHC54", loc: "RUH", status: "parked", fullStatus: "Serviceable", mission: "Technical Reposition — OETH local" },
   { reg: "HZHC55", loc: "RUH", status: "parked", fullStatus: "Serviceable", note: "12mo inspection due imminently (18 days). 150hr also approaching (36:44 remaining)." },
-  { reg: "HZHC58", loc: "OETH", status: "parked", fullStatus: "Serviceable", note: "Technical Reposition XRSC→OETH 06 May 2026. EOD location: OETH." },
-  { reg: "HZHC59", loc: "OETH", status: "parked", fullStatus: "Serviceable", note: "Technical Reposition XRSC→OETH 06 May 2026. EOD location: OETH." },
-  { reg: "HZHC63", loc: "XRSC", status: "maint", fullStatus: "Maintenance", note: "Under Pre-inspection for potential mission. ERTS 15-May-26. EOD location: XRSC.", ert: "2026-05-15" },
+  { reg: "HZHC58", loc: "OETH", status: "flying", fullStatus: "Serviceable", note: "Technical Reposition XRSC→OETH 06 May 2026. EOD location: OETH.", pilot: "Munteanu, Dan", route: "XRSC → OETH" },
+  { reg: "HZHC59", loc: "OETH", status: "flying", fullStatus: "Serviceable", note: "Technical Reposition XRSC→OETH 06 May 2026. EOD location: OETH.", pilot: "Schicht, David", route: "XRSC → OETH" },
+  { reg: "HZHC63", loc: "XRSC", status: "flying", fullStatus: "Maintenance", note: "Under Pre-inspection for potential mission. ERTS 15-May-26. EOD location: XRSC.", ert: "2026-05-15", pilot: "Kaundinya, Rohit", route: "XRSC → XRSC" },
   { reg: "HZHC64", loc: "OERK", status: "parked", fullStatus: "Serviceable" },
   { reg: "HZHC65", loc: "OERK", status: "parked", fullStatus: "Serviceable" },
   { reg: "HZHC66", loc: "OERK", status: "parked", fullStatus: "Serviceable", note: "PAX135 missions scheduled 05–07 May 2026 (XRSC→OERK→XRKD→OERK→XRSC, THC UAM).", mission: "[[UAM Riyadh]]" },

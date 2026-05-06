@@ -10,6 +10,10 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
 
+LOG="$SCRIPT_DIR/fleetpush.log"
+trap 'echo "$(date "+%Y-%m-%d %H:%M:%S") ❌ auto-update failed at line $LINENO" >> "$LOG"' ERR
+exec > >(tee -a "$LOG") 2>&1
+
 DRY_RUN=false
 [[ "${1:-}" == "--dry-run" ]] && DRY_RUN=true
 

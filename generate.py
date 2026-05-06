@@ -3,10 +3,21 @@ import os, re, glob
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-# Prefer Obsidian's iCloud container; fall back to iCloud Drive
+# Resolve vault path: $THC_VAULT, then Obsidian's iCloud container, then iCloud Drive
+_VAULT_ENV      = os.environ.get("THC_VAULT")
 _VAULT_OBSIDIAN = os.path.expanduser("~/Library/Mobile Documents/iCloud~md~obsidian/Documents/THC Vault")
 _VAULT_ICLOUD   = os.path.expanduser("~/Library/Mobile Documents/com~apple~CloudDocs/THC Vault")
-VAULT = _VAULT_OBSIDIAN if os.path.isdir(_VAULT_OBSIDIAN) else _VAULT_ICLOUD
+if _VAULT_ENV:
+    VAULT = os.path.expanduser(_VAULT_ENV)
+elif os.path.isdir(_VAULT_OBSIDIAN):
+    VAULT = _VAULT_OBSIDIAN
+else:
+    VAULT = _VAULT_ICLOUD
+if not os.path.isdir(VAULT):
+    raise SystemExit(
+        f"❌ Vault not found at {VAULT!r}. Set THC_VAULT to the vault path, "
+        f"or check that one of the iCloud locations exists."
+    )
 HELIS_DIR = f"{VAULT}/THC/Helicopters"
 PILOTS_DIR = f"{VAULT}/THC/Pilots"
 FLIGHTS_FILE = f"{VAULT}/THC/Helicopters/Flights Schedule.md"
@@ -123,6 +134,16 @@ def parse_fm(fp):
     except: pass
     return d
 
+# Base codes recognised by index.html's `bases` map. Keep in sync if new
+# bases are added on the JS side; helicopters with unknown codes are warned
+# about (not failed) so map regeneration never breaks.
+KNOWN_BASES = {
+    'ALSALAM', 'KAFD', 'OEAO', 'OEGN', 'OEGS', 'OEHL', 'OEJF', 'OEJN',
+    'OEMA', 'OENN', 'OERK', 'OERS', 'OETH', 'RUH', 'VRPJ', 'VRPT', 'VRPY',
+    'VRPZ', 'XNC1', 'XNCH', 'XNNH', 'XNPI', 'XRSC', 'XSCV', 'XSDR', 'XSSB',
+    'XSTH', 'XSU3', 'XSUH', 'XUFR', 'XURC',
+}
+
 def load_helis():
     h = []
     for f in sorted(glob.glob(f"{HELIS_DIR}/HZHC*.md") + glob.glob(f"{HELIS_DIR}/HZTH*.md")):
@@ -148,6 +169,9 @@ def load_helis():
             'mel_rem_days': d.get('mel_rem_days',''),
         })
     print(f"\u2705 Loaded {len(h)} helicopters")
+    for x in h:
+        if x['loc'] and x['loc'] not in KNOWN_BASES:
+            print(f"\u26a0\ufe0f Unknown base code {x['loc']!r} for {x['reg']} (not in KNOWN_BASES)")
     return h
 
 def is_h125(reg_field):
@@ -503,7 +527,9 @@ def build_timeline(missions):
     
     def pdt(d):
         try: return datetime.strptime(d, "%Y-%m-%d")
-        except: return None
+        except Exception as e:
+            print(f"⚠️ Bad mission date {d!r}: {e}")
+            return None
     
     for m in dated: m['s'], m['e'] = pdt(m['date']), pdt(m['endDate']) or pdt(m['date'])
     dated = [m for m in dated if m['s']]
@@ -555,7 +581,7 @@ def build_timeline(missions):
         for m in tbd:
             safe_notes = m.get("special_notes","").replace('"','&quot;')
             safe_fh = m.get("flight_hours","")
-            L.append(f'      <div class="tbd-item" data-name="{m["title"]}" data-status="pending" data-dates="TBD" data-aircraft="{m.get("helicopters","TBD")}" data-pilots="{m.get("pilots","TBD")}" data-location="{m.get("location","")}" data-client="{m.get("client","")}" data-notes="{safe_notes}" data-flight-hours="{safe_fh}" onclick="showEventPopup(this,event)">\n        {m["title"]}\n      </div>')
+            L.append(f'      <div class="tbd-item" role="button" tabindex="0" aria-label="{m["title"]} — dates TBD" data-name="{m["title"]}" data-status="pending" data-dates="TBD" data-aircraft="{m.get("helicopters","TBD")}" data-pilots="{m.get("pilots","TBD")}" data-location="{m.get("location","")}" data-client="{m.get("client","")}" data-notes="{safe_notes}" data-flight-hours="{safe_fh}" onclick="showEventPopup(this,event)" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){{event.preventDefault();showEventPopup(this,event);}}">\n        {m["title"]}\n      </div>')
         L.append('    </div>')
     
     def bar(m):
@@ -567,7 +593,7 @@ def build_timeline(missions):
         loc,cli = m.get('location',''), m.get('client','')
         notes = m.get('special_notes','').replace('"','&quot;')
         fh = m.get('flight_hours','')
-        return f'          <div class="event-bar {st} {sh}" style="left:{l}%;width:{w}%;" data-name="{t}" data-status="{st}" data-dates="{dt}" data-aircraft="{h}" data-pilots="{p}" data-location="{loc}" data-client="{cli}" data-notes="{notes}" data-flight-hours="{fh}" onclick="showEventPopup(this,event)" title="{t} ({dt})">\n            <span class="event-title">{dp}</span>' + (f'\n            <span class="event-dates">{dt}</span>' if not sh else '') + '\n          </div>'
+        return f'          <div class="event-bar {st} {sh}" role="button" tabindex="0" aria-label="{t}, {dt}, status {st}" style="left:{l}%;width:{w}%;" data-name="{t}" data-status="{st}" data-dates="{dt}" data-aircraft="{h}" data-pilots="{p}" data-location="{loc}" data-client="{cli}" data-notes="{notes}" data-flight-hours="{fh}" onclick="showEventPopup(this,event)" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){{event.preventDefault();showEventPopup(this,event);}}" title="{t} ({dt})">\n            <span class="event-title">{dp}</span>' + (f'\n            <span class="event-dates">{dt}</span>' if not sh else '') + '\n          </div>'
     
     L.append('    <div class="timeline-body">')
     L.append('      <div class="lanes-above">')
@@ -617,7 +643,8 @@ def get_report_period():
                 val = ln.split(':', 1)[1].strip()
                 if val:
                     return val
-    except: pass
+    except Exception as e:
+        print(f"⚠️ Could not read report_period from {FLIGHTS_FILE}: {e}")
     # Auto-generate from parsed flight dates
     dates = load_flights._all_dates
     if dates:
@@ -625,7 +652,8 @@ def get_report_period():
             first = datetime.strptime(dates[0], "%Y-%m-%d")
             last = datetime.strptime(dates[-1], "%Y-%m-%d")
             return f"{first.strftime('%-d %b')} – {last.strftime('%-d %b %Y')}"
-        except: pass
+        except Exception as e:
+            print(f"⚠️ Could not parse flight date range {dates[0]!r}..{dates[-1]!r}: {e}")
     return TODAY.strftime("%-d %b %Y")
 
 def update(html, fleet, flights, curr, timeline):

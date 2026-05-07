@@ -98,7 +98,7 @@ def parse_fm(fp):
                         if k and not nested_key:
                             # Collecting continuation lines for a field with empty value
                             # e.g. "notes: |-" followed by "  EOD location..."
-                            cont_buffer += (' ' + stripped if not cont_buffer else ' ' + stripped)
+                            cont_buffer += stripped if not cont_buffer else ' ' + stripped
                             d[k] = cont_buffer
                             continue
                         # Inside a nested block

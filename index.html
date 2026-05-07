@@ -435,7 +435,7 @@
 </head>
 <body class="timeline-open">
 <div id="map"></div>
-<div id="last-updated">Last updated: <!-- LAST_UPDATED -->7 May 2026 19:32<!-- /LAST_UPDATED --></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->7 May 2026 19:42<!-- /LAST_UPDATED --></div>
 <div class="right-btn-group">
   <a class="sfla-btn" href="https://willslawrence.github.io/pilot-planner/" target="_blank">📅 Roster</a>
   <a class="sfla-btn" href="https://willslawrence.github.io/sfla-tracker/" target="_blank">🛬 SFLA Riyadh</a>
@@ -449,7 +449,7 @@
   <div class="panel-header" role="button" tabindex="0" aria-expanded="true" aria-controls="briefing-body" onclick="togglePanel(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePanel(this);}">
     <div class="panel-title" id="briefing-title">📋 Flights <span style="font-size:0.5em">by OCC</span> ▾</div>
     <div class="panel-date">OPS PLAN REPORT / <!-- REPORT_PERIOD -->6 May – 6 May 2026<!-- /REPORT_PERIOD --></div>
-    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->7 May 2026 19:32<!-- /LAST_UPDATED2 --></div>
+    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->7 May 2026 19:42<!-- /LAST_UPDATED2 --></div>
   </div>
   <div class="panel-body" id="briefing-body" role="region" aria-labelledby="briefing-title">
 
@@ -547,7 +547,7 @@
           <div class="event-bar complete short" role="button" tabindex="0" aria-label="🏜️ Edge of the World Tour, 27 Feb, status complete" style="left:15.7%;width:1.2%;" data-name="🏜️ Edge of the World Tour" data-status="complete" data-dates="27 Feb" data-aircraft="Count: 2" data-pilots="Lisa" data-location="Edge of the World (Riyadh)" data-client="The Private Aviation" data-notes="The Private Aviation | HZ-HC66 | Tour flyover Edge of the World | dep 0800 LT | 4 PAX" data-flight-hours="<2" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="🏜️ Edge of the World Tour (27 Feb)">
             <span class="event-title">🏜️ Edge of...</span>
           </div>
-          <div class="event-bar confirmed " role="button" tabindex="0" aria-label="🌆 UAM Riyadh, 17-31 May, status confirmed" style="left:37.4%;width:62.6%;" data-name="🌆 UAM Riyadh" data-status="confirmed" data-dates="17-31 May" data-aircraft="Count: 1" data-pilots="Stephan Mayer, David Leipsig, Nathan Piper, Lisa le Roux, Iwona Redlinska, Rohit Kaundinya, Lindsay Pentz, David Schicht" data-location="Riyadh (OERK) → KAFD / Malham / Diriyah" data-client="THC" data-notes="|-" data-flight-hours="{'Routes': 'RUH - J - Z - Y -T - KADF', 'Operational days': 'Sun–Thu | Take-off: ?L KKIA, ?L KAFD', 'SOP source': 'OneDrive/H125 Pilots - Documents/Missions/Riyadh UAM/SOP UAM Riyadh.docx', 'KMZ files': 'OneDrive/H125 Pilots - Documents/GPS and KMZ Resources/Riyadh UAM/'}" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="🌆 UAM Riyadh (17-31 May)">
+          <div class="event-bar confirmed " role="button" tabindex="0" aria-label="🌆 UAM Riyadh, 17-31 May, status confirmed" style="left:37.4%;width:62.6%;" data-name="🌆 UAM Riyadh" data-status="confirmed" data-dates="17-31 May" data-aircraft="Count: 1" data-pilots="Stephan Mayer, David Leipsig, Nathan Piper, Lisa le Roux, Iwona Redlinska, Rohit Kaundinya, Lindsay Pentz, David Schicht" data-location="Riyadh (OERK) → KAFD / Malham / Diriyah" data-client="THC" data-notes=" Routes: RUH - J - Z - Y -T - KADF Operational days: Sun–Thu | Take-off: ?L KKIA, ?L KAFD SFLA tracking Via webapp SOP source: OneDrive/H125 Pilots - Documents/Missions/Riyadh UAM/SOP UAM Riyadh.docx KMZ files: OneDrive/H125 Pilots - Documents/GPS and KMZ Resources/Riyadh UAM/" data-flight-hours="" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="🌆 UAM Riyadh (17-31 May)">
             <span class="event-title">🌆 UAM Riyadh</span>
             <span class="event-dates">17-31 May</span>
           </div>
@@ -725,9 +725,9 @@ const bases = {
 const fleet = [
   { reg: "HZHC54", loc: "RUH", status: "parked", fullStatus: "Serviceable", mission: "Technical Reposition — OETH local" },
   { reg: "HZHC55", loc: "RUH", status: "parked", fullStatus: "Serviceable", note: "12mo inspection due imminent (10 days). 150hr also approaching (36:44 remaining)." },
-  { reg: "HZHC58", loc: "OETH", status: "parked", fullStatus: "Serviceable", note: "|- . EOD location: OETH.", mission: "null", ert: "null" },
-  { reg: "HZHC59", loc: "OETH", status: "parked", fullStatus: "Serviceable", note: "|- . EOD location: OETH.", mission: "null" },
-  { reg: "HZHC63", loc: "XRSC", status: "maint", fullStatus: "Maintenance", note: "|- Under Pre-inspection for potential mission. ERTS 15-May-26.. EOD location: XRSC.", ert: "2026-05-15" },
+  { reg: "HZHC58", loc: "OETH", status: "parked", fullStatus: "Serviceable", note: " EOD location: OETH.", mission: "null", ert: "null" },
+  { reg: "HZHC59", loc: "OETH", status: "parked", fullStatus: "Serviceable", note: " EOD location: OETH.", mission: "null" },
+  { reg: "HZHC63", loc: "XRSC", status: "maint", fullStatus: "Maintenance", note: " EOD location: XRSC.", ert: "2026-05-15" },
   { reg: "HZHC64", loc: "OETH", status: "parked", fullStatus: "Serviceable" },
   { reg: "HZHC65", loc: "OETH", status: "parked", fullStatus: "Serviceable" },
   { reg: "HZHC66", loc: "RUH", status: "parked", fullStatus: "Serviceable", note: "PAX135 missions scheduled 05–07 May 2026 (XRSC→OERK→XRKD→OERK→XRSC, THC UAM).", mission: "[[UAM Riyadh]]" },

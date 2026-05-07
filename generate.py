@@ -89,10 +89,18 @@ def parse_fm(fp):
                 k, lst = None, []
                 nested_key = None
                 nested_dict = {}
+                cont_buffer = ''  # accumulator for continuation lines of a field
                 for ln in p[1].strip().split('\n'):
                     stripped = ln.strip()
                     indent = len(ln) - len(ln.lstrip())
-                    if indent >= 2 and nested_key:
+                    if indent >= 2 and (nested_key or k):
+                        # Continuation of previous field (block scalar / nested block)
+                        if k and not nested_key:
+                            # Collecting continuation lines for a field with empty value
+                            # e.g. "notes: |-" followed by "  EOD location..."
+                            cont_buffer += (' ' + stripped if not cont_buffer else ' ' + stripped)
+                            d[k] = cont_buffer
+                            continue
                         # Inside a nested block
                         if stripped.startswith('- '):
                             lst.append(stripped[2:].strip())
@@ -107,7 +115,11 @@ def parse_fm(fp):
                         d[nested_key] = nested_dict
                         nested_dict = {}
                         nested_key = None
-                    if k and lst:
+                    if k and cont_buffer:
+                        d[k] = cont_buffer
+                        cont_buffer = ''
+                        k = None
+                    elif k and lst:
                         d[k] = lst[0] if len(lst)==1 else ', '.join(lst)
                         lst = []
                         k = None
@@ -117,15 +129,27 @@ def parse_fm(fp):
                         kk, v = stripped.split(':', 1)
                         kk = kk.strip()
                         v = v.strip().strip('"').strip("'")
-                        if v:
+                        # Block scalar indicators (|-, |, >-, >) -> collect continuation lines
+                        is_block_scalar = v in ('|', '|-', '>', '>-')
+                        if v and not is_block_scalar:
                             d[kk] = v
                             k = None
+                            cont_buffer = ''
+                        elif is_block_scalar:
+                            # Block scalar: collect continuation lines via k only
+                            k = kk
+                            nested_key = None
+                            nested_dict = {}
+                            lst = []
+                            cont_buffer = ''
                         else:
+                            # Empty value (not block scalar) — start collecting continuation lines
                             # Could be start of nested block or list
                             nested_key = kk
                             nested_dict = {}
                             k = kk
                             lst = []
+                            cont_buffer = ''
                 # Flush final
                 if nested_key and nested_dict:
                     d[nested_key] = nested_dict

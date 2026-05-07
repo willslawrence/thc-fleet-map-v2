@@ -435,7 +435,7 @@
 </head>
 <body class="timeline-open">
 <div id="map"></div>
-<div id="last-updated">Last updated: <!-- LAST_UPDATED -->7 May 2026 19:21<!-- /LAST_UPDATED --></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->7 May 2026 19:26<!-- /LAST_UPDATED --></div>
 <div class="right-btn-group">
   <a class="sfla-btn" href="https://willslawrence.github.io/pilot-planner/" target="_blank">📅 Roster</a>
   <a class="sfla-btn" href="https://willslawrence.github.io/sfla-tracker/" target="_blank">🛬 SFLA Riyadh</a>
@@ -449,7 +449,7 @@
   <div class="panel-header" role="button" tabindex="0" aria-expanded="true" aria-controls="briefing-body" onclick="togglePanel(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePanel(this);}">
     <div class="panel-title" id="briefing-title">📋 Flights <span style="font-size:0.5em">by OCC</span> ▾</div>
     <div class="panel-date">OPS PLAN REPORT / <!-- REPORT_PERIOD -->6 May – 6 May 2026<!-- /REPORT_PERIOD --></div>
-    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->7 May 2026 19:21<!-- /LAST_UPDATED2 --></div>
+    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->7 May 2026 19:26<!-- /LAST_UPDATED2 --></div>
   </div>
   <div class="panel-body" id="briefing-body" role="region" aria-labelledby="briefing-title">
 
@@ -725,9 +725,9 @@ const bases = {
 const fleet = [
   { reg: "HZHC54", loc: "RUH", status: "parked", fullStatus: "Serviceable", mission: "Technical Reposition — OETH local" },
   { reg: "HZHC55", loc: "RUH", status: "parked", fullStatus: "Serviceable", note: "12mo inspection due imminent (10 days). 150hr also approaching (36:44 remaining)." },
-  { reg: "HZHC58", loc: "OETH", status: "parked", fullStatus: "Serviceable", note: "|-", mission: "null", ert: "null" },
-  { reg: "HZHC59", loc: "OETH", status: "parked", fullStatus: "Serviceable", note: "|-", mission: "null" },
-  { reg: "HZHC63", loc: "XRSC", status: "maint", fullStatus: "Maintenance", note: "|-", mission: "{'EOD location': 'XRSC.'}", ert: "2026-05-15" },
+  { reg: "HZHC58", loc: "OETH", status: "parked", fullStatus: "Serviceable", note: "|- EOD location: OETH. Technical Reposition XRSC→OETH 06 May 2026. EOD location: OETH.", mission: "null", ert: "null" },
+  { reg: "HZHC59", loc: "OETH", status: "parked", fullStatus: "Serviceable", note: "|- EOD location: OETH. Technical Reposition XRSC→OETH 06 May 2026. EOD location: OETH.", mission: "null" },
+  { reg: "HZHC63", loc: "XRSC", status: "maint", fullStatus: "Maintenance", note: "|- Under Pre-inspection for potential mission. ERTS 15-May-26. EOD location: XRSC.", ert: "2026-05-15" },
   { reg: "HZHC64", loc: "OETH", status: "parked", fullStatus: "Serviceable" },
   { reg: "HZHC65", loc: "OETH", status: "parked", fullStatus: "Serviceable" },
   { reg: "HZHC66", loc: "RUH", status: "parked", fullStatus: "Serviceable", note: "PAX135 missions scheduled 05–07 May 2026 (XRSC→OERK→XRKD→OERK→XRSC, THC UAM).", mission: "[[UAM Riyadh]]" },

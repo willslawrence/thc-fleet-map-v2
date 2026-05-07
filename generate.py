@@ -545,7 +545,14 @@ def build_currency_html(curr):
     return '\n'.join(L)
 
 
+def _is_training(m):
+    return (m.get('title') or '').strip().lower().startswith('training')
+
 def build_timeline(missions):
+    skipped = sum(1 for m in missions if _is_training(m))
+    if skipped:
+        print(f"⏭️  Skipping {skipped} training mission(s) from timeline")
+    missions = [m for m in missions if not _is_training(m)]
     tbd = [m for m in missions if not m['date']]
     dated = [m for m in missions if m['date']]
     if not dated: return "<!-- No missions -->"

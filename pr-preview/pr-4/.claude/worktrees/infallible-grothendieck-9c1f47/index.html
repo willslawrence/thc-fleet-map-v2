@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THC Fleet Map — 7 May 2026</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Inter', -apple-system, sans-serif; }
+  #map { width: 100vw; height: 100vh; transition: height 0.3s ease; }
+  body.timeline-open #map { height: 72vh; }
+  
+  .heli-pin {
+    background: rgba(0,0,0,0.85); color: #7eb8ff; padding: 1px 4px;
+    border-radius: 3px; font-size: 11px; font-weight: 700;
+    white-space: nowrap; border: 1px solid #7eb8ff;
+    text-align: center; line-height: 1.2;
+  }
+  .heli-pin.flying {
+    color: #4caf50; border-color: #4caf50;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .heli-pin.aog { color: #888; border-color: #666; }
+  .heli-pin .sub { font-size: 8px; font-weight: 400; opacity: 0.7; display: block; }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(76,175,80,0.5); }
+    50% { box-shadow: 0 0 8px 3px rgba(76,175,80,0.3); }
+  }
+  .base-label {
+    background: none; color: rgba(255,255,255,0.4);
+    font-size: 13px; font-weight: 600; letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .legend {
+    background: rgba(15,15,30,0.75); backdrop-filter: blur(12px); color: #ddd; padding: 14px 18px;
+    border-radius: 8px; font-size: 12px; line-height: 2.2;
+    border: 1px solid rgba(255,255,255,0.12); width: 400px;
+  }
+  .legend h4 { margin: 0 0 6px; font-size: 14px; color: #fff; }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; vertical-align: middle; }
+
+  .left-panels {
+    position: fixed; top: 12px; left: 12px; z-index: 1000;
+    width: 400px; max-width: calc(100vw - 24px); max-height: calc(100vh - 24px); overflow-y: auto;
+    display: flex; flex-direction: column; gap: 8px;
+    scrollbar-width: thin; scrollbar-color: #333 transparent;
+  }
+  @media (max-width: 480px) {
+    .left-panels { width: calc(100vw - 24px); left: 12px; right: 12px; }
+    .left-panels > div { padding: 12px 14px; font-size: 11px; }
+  }
+  body.timeline-open .left-panels { max-height: 70vh; }
+  .left-panels > div {
+    background: rgba(15,15,30,0.75); backdrop-filter: blur(12px); color: #ddd;
+    border-radius: 10px; border: 1px solid rgba(255,255,255,0.15);
+    padding: 16px 20px; font-size: 12px; line-height: 1.7;
+    scrollbar-width: thin; scrollbar-color: #333 transparent;
+  }
+  #briefing-panel { display: block; }
+  #briefing-panel .panel-header { cursor: pointer; user-select: none; }
+  #briefing-panel .panel-header:hover { opacity: 0.8; }
+  .panel-header:focus-visible { outline: 2px solid #4caf50; outline-offset: 2px; border-radius: 2px; }
+  .event-bar:focus-visible, .tbd-item:focus-visible { outline: 2px solid #4caf50; outline-offset: 1px; }
+  #briefing-panel .panel-title { font-size: 16px; font-weight: 600; color: #fff; margin: 0 0 2px; }
+  #briefing-panel .panel-date { font-size: 11px; color: #888; margin: 0 0 12px; }
+  #briefing-panel .panel-body { transition: all 0.3s ease; }
+  #briefing-panel.collapsed .panel-body { display: none; }
+  #currency-panel.collapsed .panel-body { display: none; }
+
+  .legend { cursor: pointer; user-select: none; }
+  .legend:hover { opacity: 0.9; }
+  .legend.collapsed .legend-body { display: none; }
+
+  #briefing-panel h4 { font-size: 12px; color: #7eb8ff; margin: 12px 0 5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 3px; }
+  #briefing-panel .flight-row {
+    display: flex; gap: 8px; padding: 3px 0;
+    border-left: 2px solid #7eb8ff; padding-left: 8px; margin: 3px 0;
+  }
+  #briefing-panel .flight-row.today { border-left-color: #4caf50; }
+  #briefing-panel .flight-row .reg { font-weight: 700; min-width: 50px; font-size: 11px; }
+  #briefing-panel .flight-row .info { flex: 1; font-size: 11px; color: #aaa; }
+  #briefing-panel .flight-row .pilot { font-size: 11px; color: #888; }
+  #briefing-panel .alert, #currency-panel .alert { padding: 3px 8px; border-radius: 4px; font-size: 11px; margin: 3px 0; }
+  #briefing-panel .alert.ok, #currency-panel .alert.ok { background: rgba(76,175,80,0.15); border-left: 2px solid #4caf50; }
+  #briefing-panel .alert.warn, #currency-panel .alert.warn { background: rgba(255,193,7,0.12); border-left: 2px solid #ffc107; }
+  #briefing-panel .alert.danger, #currency-panel .alert.danger { background: rgba(255,82,82,0.12); border-left: 2px solid #ff5252; }
+  #briefing-panel .alert.info, #currency-panel .alert.info { background: rgba(52,152,219,0.15); border-left: 2px solid #3498db; }
+  #currency-panel h4 { font-size: 12px; color: #7eb8ff; margin: 12px 0 5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 3px; }
+
+  #last-updated { display: none; }
+  #briefing-panel .panel-header { position: relative; }
+  #briefing-panel .panel-updated { position: absolute; top: 0; right: 0; font-size: 10px; color: #666; }
+  .right-btn-group {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    display: flex;
+    gap: 6px;
+    z-index: 1001;
+    transition: all 0.3s ease;
+  }
+  body.timeline-open .right-btn-group { bottom: calc(28vh + 10px); }
+  .right-btn-group a, .right-btn-group button {
+    background: rgba(15,15,30,0.85);
+    backdrop-filter: blur(12px);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+  .right-btn-group a:hover { background: rgba(52,152,219,0.3); border-color: rgba(52,152,219,0.5); }
+  .right-btn-group button:hover { background: rgba(46,204,113,0.3); border-color: rgba(46,204,113,0.5); }
+  .right-btn-group .sfla-btn:hover { background: rgba(255,165,0,0.3); border-color: rgba(255,165,0,0.5); }
+
+  /* Timeline Panel */
+  .timeline-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 28vh;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+    border-top: 2px solid rgba(46, 204, 113, 0.5);
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    overflow: hidden;
+  }
+  body.timeline-open .timeline-panel { transform: translateY(0); }
+
+  /* timeline-toggle styles now in .right-btn-group */
+
+  /* Timeline Content */
+  .timeline-content {
+    padding: 8px 20px;
+    height: 100%;
+    overflow-x: auto;
+  }
+  .timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .timeline-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: linear-gradient(90deg, #2ecc71, #3498db);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .timeline-legend {
+    display: flex;
+    gap: 12px;
+    font-size: 0.55rem;
+    color: #888;
+  }
+  .timeline-legend span { display: flex; align-items: center; gap: 4px; }
+  .tl-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .tl-dot.current { background: #2ecc71; }
+  .tl-dot.future, .tl-dot.confirmed { background: #3498db; }
+  .tl-dot.active { background: #2ecc71; }
+  .tl-dot.pending { background: #f1c40f; }
+  .tl-dot.potential { background: rgba(231, 76, 60, 0.45); }
+  .tl-dot.past, .tl-dot.complete, .tl-dot.canceled, .tl-dot.cancelled { background: #666; opacity: 0.5; }
+
+  
+  .timeline-wrapper {
+    display: flex;
+    height: 100%;
+    gap: 15px;
+  }
+  .tbd-sidebar {
+    width: 140px;
+    flex-shrink: 0;
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 10px;
+    overflow-y: auto;
+  }
+  .tbd-header {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #e74c3c;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .tbd-item {
+    font-size: 0.55rem;
+    color: #aaa;
+    padding: 6px 8px;
+    margin: 4px 0;
+    background: rgba(231, 76, 60, 0.15);
+    border-left: 2px solid #e74c3c;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tbd-item:hover {
+    background: rgba(231, 76, 60, 0.25);
+    color: #fff;
+  }
+  .timeline-body {
+    flex: 1;
+    position: relative;
+    min-width: 700px;
+  }
+  
+  .lanes-above { padding-bottom: 6px; }
+  .timeline-axis {
+    position: relative;
+    height: 18px;
+    display: flex;
+    align-items: center;
+  }
+  .axis-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #2ecc71, #3498db, #2ecc71);
+    transform: translateY(-50%);
+  }
+  .month-tick {
+    position: absolute;
+    top: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+  }
+  .month-tick::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 12px;
+    background: rgba(255,255,255,0.4);
+    top: -6px;
+  }
+  .tick-label {
+    font-size: 0.45rem;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+  .week-tick {
+    position: absolute;
+    top: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 6px;
+    background: rgba(255,255,255,0.2);
+    margin-top: -3px;
+  }
+  .today-marker {
+    position: absolute;
+    top: -50px;
+    bottom: -50px;
+    width: 2px;
+    background: #fff;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+    z-index: 100;
+  }
+  .today-label {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.4rem;
+    font-weight: 600;
+    color: #fff;
+    text-transform: uppercase;
+    white-space: nowrap;
+    background: rgba(255,255,255,0.15);
+    padding: 1px 4px;
+    border-radius: 2px;
+  }
+  .lanes-below { padding-top: 6px; }
+  .lane {
+    position: relative;
+    height: 18px;
+    margin-bottom: 2px;
+  }
+  .event-bar {
+    position: absolute;
+    height: 16px;
+    min-width: 100px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    overflow: visible;
+    font-size: 0.5rem;
+  }
+  
+  
+  .event-bar.past, .event-bar.complete, .event-bar.canceled, .event-bar.cancelled {
+    background: linear-gradient(135deg, rgba(100, 100, 100, 0.3), rgba(80, 80, 80, 0.2));
+    border: 1px dashed rgba(150, 150, 150, 0.4);
+    opacity: 0.5;
+  }
+  .event-bar.past:hover, .event-bar.complete:hover, .event-bar.canceled:hover, .event-bar.cancelled:hover {
+    opacity: 0.7;
+  }
+  .event-bar.past .event-title, .event-bar.complete .event-title, .event-bar.canceled .event-title, .event-bar.cancelled .event-title,
+  .event-bar.past .event-dates, .event-bar.complete .event-dates, .event-bar.canceled .event-dates, .event-bar.cancelled .event-dates {
+    color: rgba(255, 255, 255, 0.6);
+  }
+  .event-bar.short {
+    min-width: unset;
+    padding: 0 4px;
+  }
+  .event-bar.short .event-title {
+    font-size: 0.45rem;
+  }
+  .event-bar:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+  }
+
+/* Vertical separation used instead of minimized overlaps */
+  .event-bar.current, .event-bar.active {
+    background: linear-gradient(135deg, rgba(46, 204, 113, 0.85), rgba(46, 204, 113, 0.65));
+    border: 1px solid rgba(46, 204, 113, 0.6);
+  }
+  .event-bar.future, .event-bar.confirmed {
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.85), rgba(52, 152, 219, 0.65));
+    border: 1px solid rgba(52, 152, 219, 0.6);
+  }
+  .event-bar.pending {
+    background: linear-gradient(135deg, rgba(241, 196, 15, 0.85), rgba(241, 196, 15, 0.65));
+    border: 1px solid rgba(241, 196, 15, 0.6);
+  }
+  .event-bar.potential {
+    background: linear-gradient(135deg, rgba(231, 76, 60, 0.45), rgba(231, 76, 60, 0.3));
+    border: 1px dashed rgba(231, 76, 60, 0.4);
+  }
+  .event-icon { font-size: 0.65rem; margin-right: 4px; flex-shrink: 0; }
+  .event-title { font-size: 0.55rem; font-weight: 600; white-space: nowrap; color: #fff; margin-right: 4px; }
+  .event-dates { font-size: 0.45rem; opacity: 0.85; white-space: nowrap; }
+  .event-aircraft { display: none; }
+  .connector {
+    position: absolute;
+    width: 1px;
+    opacity: 0.4;
+  }
+  .lanes-above .connector { bottom: -6px; height: 6px; }
+  .lanes-below .connector { top: -6px; height: 6px; }
+  .event-bar.current .connector, .event-bar.active .connector { background: #2ecc71; }
+  .event-bar.future .connector, .event-bar.confirmed .connector { background: #3498db; }
+  .event-bar.pending .connector { background: #f1c40f; }
+  .event-bar.potential .connector { background: rgba(231, 76, 60, 0.45); }
+
+  /* Event popup */
+  .event-popup {
+    position: fixed;
+    background: rgba(15, 15, 30, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    padding: 12px 16px;
+    min-width: 200px;
+    max-width: 280px;
+    z-index: 2000;
+    color: #fff;
+    font-size: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    display: none;
+  }
+  .event-popup.show { display: block; }
+  .event-popup::after {
+    content: '';
+    position: absolute;
+    bottom: -30px;
+    left: 20px;
+    width: 1px;
+    height: 30px;
+    background: rgba(255,255,255,0.3);
+  }
+  .event-popup .popup-scroll {
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  .event-popup h3 {
+    margin: 0 0 8px;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .event-popup .status-badge {
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .event-popup .status-badge.current, .event-popup .status-badge.active { background: rgba(46, 204, 113, 0.3); color: #2ecc71; }
+  .event-popup .status-badge.future, .event-popup .status-badge.confirmed { background: rgba(52, 152, 219, 0.3); color: #3498db; }
+  .event-popup .status-badge.pending { background: rgba(241, 196, 15, 0.3); color: #f1c40f; }
+  .event-popup .status-badge.potential { background: rgba(231, 76, 60, 0.2); color: rgba(231, 76, 60, 0.6); }
+  .event-popup .detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .event-popup .detail-row:last-child { border-bottom: none; }
+  .event-popup .detail-label { color: #888; }
+  .event-popup .detail-value { color: #fff; font-weight: 500; }
+</style>
+</head>
+<body class="timeline-open">
+<div id="map"></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->7 May 2026 15:00<!-- /LAST_UPDATED --></div>
+<div class="right-btn-group">
+  <a class="sfla-btn" href="https://willslawrence.github.io/pilot-planner/" target="_blank">📅 Roster</a>
+  <a class="sfla-btn" href="https://willslawrence.github.io/sfla-tracker/" target="_blank">🛬 SFLA Riyadh</a>
+  <!-- <a class="sfla-btn" href="https://willslawrence.github.io/sfla-malham-tracker/" target="_blank">🛬 SFLA Tracker</a> -->
+  <button onclick="toggleTimeline()">📅 Missions</button>
+</div>
+
+<div class="left-panels">
+
+<div id="briefing-panel" class="">
+  <div class="panel-header" role="button" tabindex="0" aria-expanded="true" aria-controls="briefing-body" onclick="togglePanel(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePanel(this);}">
+    <div class="panel-title" id="briefing-title">📋 Flights <span style="font-size:0.5em">by OCC</span> ▾</div>
+    <div class="panel-date">OPS PLAN REPORT / <!-- REPORT_PERIOD -->6 May – 6 May 2026<!-- /REPORT_PERIOD --></div>
+    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->7 May 2026 15:00<!-- /LAST_UPDATED2 --></div>
+  </div>
+  <div class="panel-body" id="briefing-body" role="region" aria-labelledby="briefing-title">
+
+  <!-- FLIGHTS_START -->
+  <div>No flights scheduled</div>
+  <!-- FLIGHTS_END -->
+
+  </div>
+</div>
+
+<div id="currency-panel" class="collapsed">
+  <div class="panel-header" role="button" tabindex="0" aria-expanded="false" aria-controls="currency-body" onclick="togglePanel(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePanel(this);}">
+    <div class="panel-title" id="currency-title">🩺 Pilot Currency ▾</div>
+  </div>
+  <div class="panel-body" id="currency-body" role="region" aria-labelledby="currency-title" aria-hidden="true">
+  <!-- CURRENCY_START -->
+  <h4>Competency Checks</h4>
+  <div class="alert ok">✅ Nobody due this or next month</div>
+  <h4>30-Min REMS (6 month validity)</h4>
+  <div class="alert danger">🔴 Kevin A - expired Mar 2026</div>
+  <div class="alert danger">🔴 Lisa R - expired Apr 2026</div>
+  <div class="alert danger">🔴 Lindsay P - expired Mar 2026</div>
+  <div class="alert danger">🔴 Will L - expired Mar 2026</div>
+  <div class="alert danger">🔴 David L - expired Mar 2026</div>
+  <div class="alert danger">🔴 David S - expired Jan 2026</div>
+  <div class="alert danger">🔴 Nathan P - expired Jan 2026</div>
+  <div class="alert warn">⚠️ Stephan M - expires May 2026</div>
+  <h4>Medical Certificate (12 month validity)</h4>
+  <div class="alert warn">⚠️ Julio B - due May 2026</div>
+  <div class="alert warn">⚠️ Marius H - due May 2026</div>
+  <div class="alert warn">⚠️ Stephan M - due May 2026</div>
+  <!-- CURRENCY_END -->
+  </div>
+</div>
+
+</div><!-- /left-panels -->
+
+<!-- Timeline Panel -->
+<div class="timeline-panel">
+  <div class="timeline-content">
+    <div class="timeline-header">
+      <div class="timeline-title">THC Missions 2026</div>
+      <div class="timeline-legend">
+        <span><div class="tl-dot current"></div>Current</span>
+        <span><div class="tl-dot future"></div>Future</span>
+        <span><div class="tl-dot pending"></div>Pending</span>
+        <span><div class="tl-dot potential"></div>Potential</span>
+        <span><div class="tl-dot past"></div>Past</span>
+      </div>
+    </div>
+    <!-- TIMELINE_START -->
+    <div class="timeline-wrapper">
+    <div class="tbd-sidebar">
+      <div class="tbd-header">📋 Dates TBD</div>
+      <div class="tbd-item" role="button" tabindex="0" aria-label="ELO Jordan Borders — dates TBD" data-name="ELO Jordan Borders" data-status="pending" data-dates="TBD" data-aircraft="Main: H-145" data-pilots="2 pilots" data-location="Jordan Border" data-client="TBD" data-notes="H145 platform, not H125. 6-month deployment." data-flight-hours="" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}">
+        ELO Jordan Borders
+      </div>
+      <div class="tbd-item" role="button" tabindex="0" aria-label="Grid — dates TBD" data-name="Grid" data-status="pending" data-dates="TBD" data-aircraft="Count: 1" data-pilots="" data-location="" data-client="" data-notes="Powerline thermal camera patrol. Part 133." data-flight-hours="" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}">
+        Grid
+      </div>
+    </div>
+    <div class="timeline-body">
+      <div class="lanes-above">
+        <div class="lane">
+          <div class="event-bar potential short" role="button" tabindex="0" aria-label="Joby Aviation Visual, 1-3 Oct, status potential" style="left:75.0%;width:1.2%;" data-name="Joby Aviation Visual" data-status="potential" data-dates="1-3 Oct" data-aircraft="Count: 1" data-pilots="[]" data-location="Red Sea (OERS)" data-client="Joby Aviation" data-notes="Visual survey — LTE/Starlink aerial survey + site familiarization for Joby S4 eVTOL." data-flight-hours="6" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="Joby Aviation Visual (1-3 Oct)">
+            <span class="event-title">Joby Aviat...</span>
+          </div>
+          <div class="event-bar pending short" role="button" tabindex="0" aria-label="🏁 Rally Qassim 2026, 15-18 Oct, status pending" style="left:78.8%;width:1.2%;" data-name="🏁 Rally Qassim 2026" data-status="pending" data-dates="15-18 Oct" data-aircraft="Count: 4" data-pilots="Will (VIP), Lisa (Film), David S(EMS 2), David L (EMS 1)" data-location="Qassim" data-client="SMC" data-notes="" data-flight-hours="14" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="🏁 Rally Qassim 2026 (15-18 Oct)">
+            <span class="event-title">🏁 Rally Qa...</span>
+          </div>
+          <div class="event-bar pending short" role="button" tabindex="0" aria-label="🏁 Rally WRC 2026, 10-15 Nov, status pending" style="left:86.0%;width:1.4%;" data-name="🏁 Rally WRC 2026" data-status="pending" data-dates="10-15 Nov" data-aircraft="Count: 5" data-pilots="Will (VIP)" data-location="TBD" data-client="SMC" data-notes="H145 included | Front passenger seat for EMS 1" data-flight-hours="25" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="🏁 Rally WRC 2026 (10-15 Nov)">
+            <span class="event-title">🏁 Rally WR...</span>
+          </div>
+          <div class="event-bar pending short" role="button" tabindex="0" aria-label="🏁 Rally Jeddah 2026, 3-6 Dec, status pending" style="left:92.3%;width:1.2%;" data-name="🏁 Rally Jeddah 2026" data-status="pending" data-dates="3-6 Dec" data-aircraft="Count: 4" data-pilots="Will (VIP)" data-location="Jeddah" data-client="SMC" data-notes="" data-flight-hours="14" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="🏁 Rally Jeddah 2026 (3-6 Dec)">
+            <span class="event-title">🏁 Rally Je...</span>
+          </div>
+          <div class="event-bar pending short" role="button" tabindex="0" aria-label="🏁 Rally Dakar 2027, 25 Dec - 17 Jan, status pending" style="left:98.4%;width:1.6%;" data-name="🏁 Rally Dakar 2027" data-status="pending" data-dates="25 Dec - 17 Jan" data-aircraft="Count: 7" data-pilots="TBD" data-location="KAEC - Jeddah" data-client="" data-notes="" data-flight-hours="" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="🏁 Rally Dakar 2027 (25 Dec - 17 Jan)">
+            <span class="event-title">🏁 Rally Da...</span>
+          </div>
+        </div>
+        <div class="lane">
+          <div class="event-bar complete short" role="button" tabindex="0" aria-label="Al Fursan Cup, 5-8 Feb, status complete" style="left:9.6%;width:1.2%;" data-name="Al Fursan Cup" data-status="complete" data-dates="5-8 Feb" data-aircraft="HC55 (Film)" data-pilots="Lisa" data-location="Riyadh" data-client="Aurora" data-notes="" data-flight-hours="" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="Al Fursan Cup (5-8 Feb)">
+            <span class="event-title">Al Fursan ...</span>
+          </div>
+          <div class="event-bar pending " role="button" tabindex="0" aria-label="🔍 Survey GeoTech, 1 Sep - 31 Mar, status pending" style="left:66.8%;width:33.2%;" data-name="🔍 Survey GeoTech" data-status="pending" data-dates="1 Sep - 31 Mar" data-aircraft="Count: 4" data-pilots="Survey Pilots" data-location="Al Dawadmi, Abha" data-client="GeoTech" data-notes="Start date 1 September" data-flight-hours="450" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="🔍 Survey GeoTech (1 Sep - 31 Mar)">
+            <span class="event-title">🔍 Survey GeoTech</span>
+            <span class="event-dates">1 Sep - 31 Mar</span>
+          </div>
+        </div>
+        <div class="lane">
+          <div class="event-bar complete short" role="button" tabindex="0" aria-label="🏁 Rally Dakar 2026, 27 Dec - 18 Jan, status complete" style="left:0.0%;width:4.7%;" data-name="🏁 Rally Dakar 2026" data-status="complete" data-dates="27 Dec - 18 Jan" data-aircraft="TBA" data-pilots="Gilles, Ivona, Lindsay, Matt, Nathan, Stephan, Will" data-location="" data-client="" data-notes="" data-flight-hours="" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="🏁 Rally Dakar 2026 (27 Dec - 18 Jan)">
+            <span class="event-title">🏁 Rally Da...</span>
+          </div>
+          <div class="event-bar complete short" role="button" tabindex="0" aria-label="🏁 Rally Hail 2026, 29 Jan - 1 Feb, status complete" style="left:7.7%;width:1.2%;" data-name="🏁 Rally Hail 2026" data-status="complete" data-dates="29 Jan - 1 Feb" data-aircraft="TBA" data-pilots="TBD" data-location="" data-client="" data-notes="" data-flight-hours="" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="🏁 Rally Hail 2026 (29 Jan - 1 Feb)">
+            <span class="event-title">🏁 Rally Ha...</span>
+          </div>
+          <div class="event-bar complete short" role="button" tabindex="0" aria-label="SELA Company, 14-16 Feb, status complete" style="left:12.1%;width:1.2%;" data-name="SELA Company" data-status="complete" data-dates="14-16 Feb" data-aircraft="Main: HC65" data-pilots="Rohit Kaundinya" data-location="Asfan, Jeddah" data-client="SELA" data-notes="Static display + promo video | Stickers install on HC65 | 1 technician on site | Arrive 1100L depart 1745L on 15 Feb | Mohammed (Safety Dept) marshalling on ground" data-flight-hours="12" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="SELA Company (14-16 Feb)">
+            <span class="event-title">SELA Company</span>
+          </div>
+          <div class="event-bar complete short" role="button" tabindex="0" aria-label="🏜️ Edge of the World Tour, 27 Feb, status complete" style="left:15.7%;width:1.2%;" data-name="🏜️ Edge of the World Tour" data-status="complete" data-dates="27 Feb" data-aircraft="Count: 2" data-pilots="Lisa" data-location="Edge of the World (Riyadh)" data-client="The Private Aviation" data-notes="The Private Aviation | HZ-HC66 | Tour flyover Edge of the World | dep 0800 LT | 4 PAX" data-flight-hours="<2" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="🏜️ Edge of the World Tour (27 Feb)">
+            <span class="event-title">🏜️ Edge of...</span>
+          </div>
+          <div class="event-bar confirmed " role="button" tabindex="0" aria-label="🌆 UAM Riyadh, 17-31 May, status confirmed" style="left:37.4%;width:62.6%;" data-name="🌆 UAM Riyadh" data-status="confirmed" data-dates="17-31 May" data-aircraft="Count: 1" data-pilots="Stephan Mayer, David Leipsig, Nathan Piper, Lisa le Roux, Iwona Redlinska, Rohit Kaundinya, Lindsay Pentz, David Schicht" data-location="Riyadh (OERK) → KAFD / Malham / Diriyah" data-client="THC" data-notes="|-" data-flight-hours="{'Routes': 'RUH - J - Z - Y -T - KADF', 'Operational days': 'Sun–Thu | Take-off: ?L KKIA, ?L KAFD', 'SOP source': 'OneDrive/H125 Pilots - Documents/Missions/Riyadh UAM/SOP UAM Riyadh.docx', 'KMZ files': 'OneDrive/H125 Pilots - Documents/GPS and KMZ Resources/Riyadh UAM/'}" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="🌆 UAM Riyadh (17-31 May)">
+            <span class="event-title">🌆 UAM Riyadh</span>
+            <span class="event-dates">17-31 May</span>
+          </div>
+        </div>
+      </div>
+      <div class="timeline-axis">
+        <div class="axis-line"></div>
+        <div class="month-tick" style="left:0.0%;"><span class="tick-label">Jan</span></div>
+        <div class="month-tick" style="left:8.5%;"><span class="tick-label">Feb</span></div>
+        <div class="month-tick" style="left:16.2%;"><span class="tick-label">Mar</span></div>
+        <div class="month-tick" style="left:24.7%;"><span class="tick-label">Apr</span></div>
+        <div class="month-tick" style="left:33.0%;"><span class="tick-label">May</span></div>
+        <div class="month-tick" style="left:41.5%;"><span class="tick-label">Jun</span></div>
+        <div class="month-tick" style="left:49.7%;"><span class="tick-label">Jul</span></div>
+        <div class="month-tick" style="left:58.2%;"><span class="tick-label">Aug</span></div>
+        <div class="month-tick" style="left:66.8%;"><span class="tick-label">Sep</span></div>
+        <div class="month-tick" style="left:75.0%;"><span class="tick-label">Oct</span></div>
+        <div class="month-tick" style="left:83.5%;"><span class="tick-label">Nov</span></div>
+        <div class="month-tick" style="left:91.8%;"><span class="tick-label">Dec</span></div>
+        <div class="week-tick" style="left:1.1%;"></div>
+        <div class="week-tick" style="left:3.0%;"></div>
+        <div class="week-tick" style="left:4.9%;"></div>
+        <div class="week-tick" style="left:6.9%;"></div>
+        <div class="week-tick" style="left:8.8%;"></div>
+        <div class="week-tick" style="left:10.7%;"></div>
+        <div class="week-tick" style="left:12.6%;"></div>
+        <div class="week-tick" style="left:14.6%;"></div>
+        <div class="week-tick" style="left:16.5%;"></div>
+        <div class="week-tick" style="left:18.4%;"></div>
+        <div class="week-tick" style="left:20.3%;"></div>
+        <div class="week-tick" style="left:22.3%;"></div>
+        <div class="week-tick" style="left:24.2%;"></div>
+        <div class="week-tick" style="left:26.1%;"></div>
+        <div class="week-tick" style="left:28.0%;"></div>
+        <div class="week-tick" style="left:29.9%;"></div>
+        <div class="week-tick" style="left:31.9%;"></div>
+        <div class="week-tick" style="left:33.8%;"></div>
+        <div class="week-tick" style="left:35.7%;"></div>
+        <div class="week-tick" style="left:37.6%;"></div>
+        <div class="week-tick" style="left:39.6%;"></div>
+        <div class="week-tick" style="left:43.4%;"></div>
+        <div class="week-tick" style="left:45.3%;"></div>
+        <div class="week-tick" style="left:47.3%;"></div>
+        <div class="week-tick" style="left:49.2%;"></div>
+        <div class="week-tick" style="left:51.1%;"></div>
+        <div class="week-tick" style="left:53.0%;"></div>
+        <div class="week-tick" style="left:54.9%;"></div>
+        <div class="week-tick" style="left:56.9%;"></div>
+        <div class="week-tick" style="left:58.8%;"></div>
+        <div class="week-tick" style="left:60.7%;"></div>
+        <div class="week-tick" style="left:62.6%;"></div>
+        <div class="week-tick" style="left:64.6%;"></div>
+        <div class="week-tick" style="left:66.5%;"></div>
+        <div class="week-tick" style="left:68.4%;"></div>
+        <div class="week-tick" style="left:70.3%;"></div>
+        <div class="week-tick" style="left:72.3%;"></div>
+        <div class="week-tick" style="left:74.2%;"></div>
+        <div class="week-tick" style="left:76.1%;"></div>
+        <div class="week-tick" style="left:78.0%;"></div>
+        <div class="week-tick" style="left:79.9%;"></div>
+        <div class="week-tick" style="left:81.9%;"></div>
+        <div class="week-tick" style="left:83.8%;"></div>
+        <div class="week-tick" style="left:85.7%;"></div>
+        <div class="week-tick" style="left:87.6%;"></div>
+        <div class="week-tick" style="left:89.6%;"></div>
+        <div class="week-tick" style="left:91.5%;"></div>
+        <div class="week-tick" style="left:93.4%;"></div>
+        <div class="week-tick" style="left:95.3%;"></div>
+        <div class="week-tick" style="left:97.3%;"></div>
+        <div class="week-tick" style="left:99.2%;"></div>
+        <div class="today-marker" style="left:34.6%;"></div>
+      </div>
+      <div class="lanes-below">
+        <div class="lane">
+          <div class="event-bar complete short" role="button" tabindex="0" aria-label="🏜️ AlUla Tour 2026, 25 Jan - 1 Feb, status complete" style="left:6.6%;width:1.9%;" data-name="🏜️ AlUla Tour 2026" data-status="complete" data-dates="25 Jan - 1 Feb" data-aircraft="TBA" data-pilots="Julio" data-location="" data-client="" data-notes="" data-flight-hours="" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="🏜️ AlUla Tour 2026 (25 Jan - 1 Feb)">
+            <span class="event-title">🏜️ AlUla T...</span>
+          </div>
+          <div class="event-bar complete short" role="button" tabindex="0" aria-label="🌆 UAM KAFD Training, 19 Feb, status complete" style="left:13.5%;width:1.2%;" data-name="🌆 UAM KAFD Training" data-status="complete" data-dates="19 Feb" data-aircraft="Main: HC66" data-pilots="Will Lawrence, Rohit Kaundinya, Lisa le Roux, David Schicht, Nathan Piper" data-location="KAFD 106 Helipad / XRSC" data-client="THC" data-notes="Thursday 11am" data-flight-hours="" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="🌆 UAM KAFD Training (19 Feb)">
+            <span class="event-title">🌆 UAM KAFD...</span>
+          </div>
+          <div class="event-bar pending " role="button" tabindex="0" aria-label="🌉 UAM Bahrain Skybridge, 1 Aug - 31 Mar, status pending" style="left:58.2%;width:41.8%;" data-name="🌉 UAM Bahrain Skybridge" data-status="pending" data-dates="1 Aug - 31 Mar" data-aircraft="Count: 1" data-pilots="UAM Pilots" data-location="DMM→BAH" data-client="THC" data-notes="Pilot apartment | DMM→BAH via VRP East Gate→LADNA | BAH→DMM via NARMI (min 6000ft) | Direct route pending SANS/BAH CAA/THC meeting | Need annual landing permit BAH | Floats + 6 life jackets req | Ground handling SPA (DMM) JETEX (BAH) | ~500kg payload one-way fuel" data-flight-hours="" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="🌉 UAM Bahrain Skybridge (1 Aug - 31 Mar)">
+            <span class="event-title">🌉 UAM Bahrain Skybridge</span>
+            <span class="event-dates">1 Aug - 31 Mar</span>
+          </div>
+        </div>
+        <div class="lane">
+          <div class="event-bar complete short" role="button" tabindex="0" aria-label="🎬 Promo Filming, 8-9 Feb, status complete" style="left:10.4%;width:1.2%;" data-name="🎬 Promo Filming" data-status="complete" data-dates="8-9 Feb" data-aircraft="HC68 (Film)" data-pilots="David Liepsig (Pax)" data-location="Riyadh" data-client="THC" data-notes="6:20 - 6:40 takeoff before sunrise. Two shots — (1) blades turning, actor arrives/boards, takeoff ~10m; (2) filming in flight ~40min. Cameraman inside + outside." data-flight-hours="<1" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="🎬 Promo Filming (8-9 Feb)">
+            <span class="event-title">🎬 Promo Fi...</span>
+          </div>
+          <div class="event-bar pending " role="button" tabindex="0" aria-label="🔍 Survey ARGAS, 1 Sep - 30 Apr, status pending" style="left:66.8%;width:33.2%;" data-name="🔍 Survey ARGAS" data-status="pending" data-dates="1 Sep - 30 Apr" data-aircraft="Count: 1" data-pilots="Survey Pilots" data-location="Yanbu → Rabigh → North Abha" data-client="Argas" data-notes="" data-flight-hours="> 100" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="🔍 Survey ARGAS (1 Sep - 30 Apr)">
+            <span class="event-title">🔍 Survey ARGAS</span>
+            <span class="event-dates">1 Sep - 30 Apr</span>
+          </div>
+        </div>
+        <div class="lane">
+          <div class="event-bar potential short" role="button" tabindex="0" aria-label="🎬 Joby Aviation Film, 20-23 Oct, status potential" style="left:80.2%;width:1.2%;" data-name="🎬 Joby Aviation Film" data-status="potential" data-dates="20-23 Oct" data-aircraft="Count: 1" data-pilots="Roberto" data-location="Red Sea (OERS)" data-client="Joby Aviation" data-notes="Aerial filming for Joby S4 eVTOL launch. Camera by Air-to-Air, THC mount. Operator: Lieven Hermans." data-flight-hours="8" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="🎬 Joby Aviation Film (20-23 Oct)">
+            <span class="event-title">🎬 Joby Avi...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+    <!-- TIMELINE_END -->
+
+  </div>
+</div>
+
+<!-- Event Popup (outside timeline for z-index) -->
+<div class="event-popup" id="eventPopup"></div>
+
+<script>
+function toggleTimeline() {
+  document.body.classList.toggle('timeline-open');
+  setTimeout(() => map.invalidateSize(), 350);
+}
+
+function togglePanel(headerEl) {
+  const panel = headerEl.parentElement;
+  const collapsed = panel.classList.toggle('collapsed');
+  headerEl.setAttribute('aria-expanded', String(!collapsed));
+  const body = panel.querySelector('.panel-body');
+  if (body) body.setAttribute('aria-hidden', String(collapsed));
+}
+
+const bases = {
+  // Main bases
+  OETH:  { lat: 25.213, lng: 46.640, name: "THUMAMAH" },
+  RUH:   { lat: 24.958, lng: 46.699, name: "RIYADH" },
+  XRSC:  { lat: 24.958, lng: 46.699, name: "RIYADH" },
+  OERK:  { lat: 24.958, lng: 46.699, name: "KING KHALID INTL (OERK)" },
+  ALSALAM: { lat: 24.958, lng: 46.699, name: "RIYADH" },
+  // UAM Route VRPs (OERK → KAFD corridor)
+  VRPJ:  { lat: 24.954, lng: 46.805, name: "VRP J" },
+  VRPZ:  { lat: 24.828, lng: 46.854, name: "VRP Z" },
+  VRPT:  { lat: 24.793, lng: 46.722, name: "VRP T" },
+  VRPY:  { lat: 24.760, lng: 46.739, name: "VRP Y" },
+  KAFD:  { lat: 24.761, lng: 46.647, name: "KAFD HELIPAD" },
+  // Regional airports
+  OEHL:  { lat: 27.438, lng: 41.686, name: "HA'IL" },
+  OEGS:  { lat: 26.303, lng: 43.774, name: "GASSIM" },
+  OEAO:  { lat: 26.485, lng: 38.126, name: "AL ULA" },
+  OEGN:  { lat: 16.901, lng: 42.586, name: "JIZAN" },
+  OEJN:  { lat: 21.680, lng: 39.157, name: "JEDDAH" },
+  OEJF:  { lat: 21.348, lng: 39.173, name: "JEDDAH NAVAL" },
+  OEMA:  { lat: 24.553, lng: 39.705, name: "MADINAH" },
+  // Red Sea
+  OERS:  { lat: 22.072, lng: 39.110, name: "RED SEA INTL" },
+  XSCV:  { lat: 22.450, lng: 39.100, name: "RED SEA CAMP" },
+  XSSB:  { lat: 22.380, lng: 39.050, name: "SHURA BAY" },
+  XSTH:  { lat: 22.320, lng: 39.020, name: "TURTLE HUB" },
+  XSDR:  { lat: 22.250, lng: 38.980, name: "DISCOVERY" },
+  XSUH:  { lat: 22.400, lng: 39.080, name: "UMMAHAT" },
+  XSU3:  { lat: 22.350, lng: 39.040, name: "U3 HELIPAD" },
+  // NEOM
+  OENN:  { lat: 28.024, lng: 35.147, name: "NEOM BAY" },
+  XNC1:  { lat: 28.100, lng: 35.200, name: "NEOM CAMP 1" },
+  XNCH:  { lat: 28.050, lng: 35.180, name: "NEOM HELIPAD" },
+  XNNH:  { lat: 28.080, lng: 35.160, name: "NEOM NORTH" },
+  XNPI:  { lat: 28.000, lng: 35.100, name: "NEOM PIER" },
+  // Al Ula / XURC area
+  XUFR:  { lat: 26.600, lng: 37.900, name: "AL ULA FBO" },
+  XURC:  { lat: 26.550, lng: 37.850, name: "AL ULA RC" },
+};
+
+// FLEET_START
+const fleet = [
+  { reg: "HZHC54", loc: "RUH", status: "parked", fullStatus: "Serviceable", mission: "Technical Reposition — OETH local" },
+  { reg: "HZHC55", loc: "RUH", status: "parked", fullStatus: "Serviceable", note: "12mo inspection due imminently (18 days). 150hr also approaching (36:44 remaining)." },
+  { reg: "HZHC58", loc: "OETH", status: "parked", fullStatus: "Serviceable", note: "|-", mission: "null", ert: "null" },
+  { reg: "HZHC59", loc: "OETH", status: "parked", fullStatus: "Serviceable", note: "|-", mission: "{'Technical Reposition XRSC→OETH 06 May 2026. EOD location': 'OETH.'}" },
+  { reg: "HZHC63", loc: "OEMA", status: "maint", fullStatus: "Maintenance", note: "|-", mission: "{'Under Pre-inspection for potential mission. ERTS 15-May-26. EOD location': 'OEMA.'}", ert: "2026-05-15" },
+  { reg: "HZHC64", loc: "OERK", status: "parked", fullStatus: "Serviceable" },
+  { reg: "HZHC65", loc: "OERK", status: "parked", fullStatus: "Serviceable" },
+  { reg: "HZHC66", loc: "OERK", status: "parked", fullStatus: "Serviceable", note: "PAX135 missions scheduled 05–07 May 2026 (XRSC→OERK→XRKD→OERK→XRSC, THC UAM).", mission: "[[UAM Riyadh]]" },
+  { reg: "HZHC67", loc: "OETH", status: "parked", fullStatus: "Serviceable" },
+  { reg: "HZHC68", loc: "OETH", status: "maint", fullStatus: "Maintenance", note: "Aircraft under preservation. ERTS 28-Jun-26.", ert: "2026-06-28" },
+  { reg: "HZHC69", loc: "OETH", status: "maint", fullStatus: "Maintenance", note: "Aircraft under preservation. ERTS 28-Jun-26.", ert: "2026-06-28" },
+  { reg: "HZTH56", loc: "OERK", status: "parked", fullStatus: "EIS", note: "C of R and C of A issued by GACA. Technical Reposition 03 May 2026 (XRSC→OETH) completed.", ert: "2026-04-09" },
+  { reg: "HZTH58", loc: "OERK", status: "parked", fullStatus: "EIS", note: "Aircraft under preservation. ERTS 28-Jun-26.", ert: "2026-06-28" },
+];
+// FLEET_END
+
+const map = L.map('map', { zoomControl: false }).setView([26.2, 42.5], 6);
+L.control.zoom({ position: 'topright' }).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '© OSM © CARTO', maxZoom: 18
+}).addTo(map);
+
+Object.values(bases).forEach(b => {
+  const isSmall = b.name.startsWith('VRP') || b.name === 'KAFD HELIPAD';
+  L.marker([b.lat, b.lng], {
+    icon: L.divIcon({ className: isSmall ? 'vrp-label' : 'base-label', html: b.name, iconAnchor: isSmall ? [20, -8] : [40, -20] }),
+    interactive: false
+  }).addTo(map);
+  const isVRP = b.name.startsWith('VRP') || b.name === 'KAFD HELIPAD';
+  const r = isVRP ? 500 : 12000;
+  L.circle([b.lat, b.lng], { radius: r, color: 'rgba(255,255,255,0.08)', fillColor: 'rgba(255,255,255,0.03)', weight: 1 }).addTo(map);
+});
+
+
+const groups = {};
+// Group by actual coordinates (not loc name) so overlapping bases merge
+const coordKey = loc => { const b = bases[loc]; return b ? `${b.lat},${b.lng}` : loc; };
+fleet.forEach(h => {
+  const k = coordKey(h.loc);
+  if (!groups[k]) groups[k] = [];
+  groups[k].push(h);
+});
+
+// Layer group for helicopters (so we can redraw on zoom)
+const heliLayer = L.layerGroup().addTo(map);
+
+// Calculate radius based on zoom (larger when zoomed out)
+function getRadius(zoom) {
+  // Zoom 6 = very far out (whole country), zoom 12 = close
+  // Increased separation for better readability
+  const baseRadius = 1.5;
+  const scale = Math.pow(2, 10 - zoom);
+  return Math.max(0.08, Math.min(2.0, baseRadius * scale / 16));
+}
+
+function drawHelicopters() {
+  heliLayer.clearLayers();
+  const zoom = map.getZoom();
+  const radius = getRadius(zoom);
+  
+  fleet.forEach(h => {
+    const b = bases[h.loc];
+    if (!b) return;
+    const g = groups[coordKey(h.loc)];
+    const i = g.indexOf(h);
+    const n = g.length;
+    
+    // Radial layout: arrange helicopters in a semicircle
+    // OETH → north half only, RUH/Alsalam/OERK → south 90° arc
+    // Angle 0° = North, 90° = East, 180° = South, -90° = West
+    const northBases = ['OETH'];
+    const southBases = ['RUH', 'XRSC', 'OERK'];
+    
+    let startAngle, spread;
+    if (northBases.includes(h.loc)) {
+      startAngle = -90; spread = 180; // West through North to East
+    } else if (southBases.includes(h.loc)) {
+      startAngle = 135; spread = 90; // SE through South to SW (90° arc)
+    } else {
+      startAngle = 0; spread = 360; // Full circle for other bases
+    }
+    
+    const angle = (startAngle + (i * spread / Math.max(n - 1, 1))) * Math.PI / 180;
+    // Vary distance: alternating helicopters closer/further (0.7x and 1.0x)
+    const distMult = (i % 2 === 0) ? 1.0 : 0.7;
+    const latOff = n > 1 ? radius * distMult * Math.cos(angle) : 0;
+    const lngOff = n > 1 ? radius * distMult * 1.3 * Math.sin(angle) : 0;
+    const lat = b.lat + latOff;
+    const lng = b.lng + lngOff;
+    
+    // Draw radial line from base to helicopter
+    if (n > 1) {
+      L.polyline([[b.lat, b.lng], [lat, lng]], {
+        color: 'rgba(255,255,255,0.3)', weight: 1
+      }).addTo(heliLayer);
+    }
+
+    const cls = h.status === 'flying' ? 'flying' : h.status === 'aog' ? 'aog' : h.status === 'maint' ? 'aog' : '';
+    let label = h.reg.replace('HZHC','HC');
+    if (h.pilot) label += `<span class="sub">${h.pilot}</span>`;
+    if (h.status === 'aog') label += `<span class="sub">AOG</span>`;
+    if (h.status === 'maint' && h.ert) label += `<span class="sub">ERT ${h.ert}</span>`;
+    else if (h.status === 'maint') label += `<span class="sub">MAINT</span>`;
+
+    const color = h.status === 'flying' ? '#4caf50' : h.status === 'aog' ? '#666' : h.status === 'maint' ? '#ff9800' : '#7eb8ff';
+    L.circleMarker([lat, lng], {
+      radius: 3, fillColor: color, color: '#fff', weight: 1, fillOpacity: 0.85
+    }).addTo(heliLayer);
+
+    const statusLabel = h.status === 'flying' ? 'flying' : h.status === 'maint' ? 'in maintenance' : h.status === 'aog' ? 'AOG' : 'serviceable';
+    L.marker([lat, lng], {
+      alt: `Helicopter ${h.reg} — ${statusLabel} at ${h.loc}`,
+      keyboard: true,
+      icon: L.divIcon({
+        className: `heli-pin ${cls}`,
+        html: label,
+        iconSize: [46, 18],
+        iconAnchor: [-6, 12]
+      })
+    }).addTo(heliLayer).bindPopup(
+      `<b>${h.reg}</b><br>Base: ${h.loc}` +
+      `<br>Status: ${h.status === 'flying' ? '🟢 Flying' : h.status === 'maint' ? '🟠 Maintenance' : h.status === 'aog' ? '🔴 AOG' : '🔵 Serviceable'}` +
+      (h.ert ? `<br>🔧 ERT: ${h.ert}` : '') +
+      (h.note ? `<br><em>${h.note}</em>` : '') +
+      (h.mission ? `<br>Mission: ${h.mission}` : '') +
+      (h.pilot ? `<br>PIC: ${h.pilot}` : '') + (h.route ? `<br>Route: ${h.route}` : '')
+    );
+  });
+}
+
+// Draw initially and on zoom changes
+drawHelicopters();
+map.on('zoomend', drawHelicopters);
+
+// Draw flight path lines for helicopters with routes
+fleet.filter(h => h.route && h.status === 'flying').forEach(h => {
+  const parts = h.route.split('→').map(p => p.trim());
+  const coords = parts.map(p => bases[p]).filter(b => b);
+  if (coords.length >= 2) {
+    const latlngs = coords.map(c => [c.lat, c.lng]);
+    L.polyline(latlngs, {
+      color: '#4caf50', weight: 2.5, opacity: 0.6, dashArray: '10 8'
+    }).addTo(map).bindPopup(`<b>${h.reg}</b><br>${h.route}<br>PIC: ${h.pilot || 'TBD'}`);
+    // Add waypoint markers
+    coords.forEach((c, i) => {
+      if (i > 0 && i < coords.length - 1) {
+        L.circleMarker([c.lat, c.lng], {
+          radius: 4, fillColor: '#4caf50', color: '#fff', weight: 1, fillOpacity: 0.8
+        }).addTo(map);
+      }
+    });
+  }
+});
+
+const pts = fleet.filter(h => bases[h.loc]).map(h => [bases[h.loc].lat, bases[h.loc].lng]);
+map.fitBounds(L.latLngBounds(pts).pad(0.15));
+
+// Legend removed per Will's request (2026-02-08)
+
+// Event popup handling
+function dismissEventPopup() {
+  document.getElementById('eventPopup').style.display = 'none';
+  document.getElementById('eventPopup').classList.remove('show');
+}
+
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape') dismissEventPopup();
+});
+
+function showEventPopup(el, e) {
+  const popup = document.getElementById('eventPopup');
+  const data = el.dataset;
+  const statusLabel = {'active':'Active','current':'Active','confirmed':'Confirmed','future':'Confirmed','pending':'Pending','potential':'Potential','past':'Past','complete':'Complete'}[data.status] || data.status;
+  
+  // Format aircraft roles as individual lines
+  let aircraftHtml = data.aircraft;
+  if (data.aircraft && data.aircraft.includes('|')) {
+    aircraftHtml = data.aircraft.split(' | ').map(r => {
+      const [role, reg] = r.split(': ');
+      const isTBD = !reg || reg === 'TBD';
+      return `<div style="padding:1px 0;"><span style="color:#888;">${role}:</span> <span style="color:${isTBD ? '#666' : '#7eb8ff'}">${reg || 'TBD'}</span></div>`;
+    }).join('');
+  }
+  
+  var html = '<div class="popup-scroll"><h3 style="padding-right:20px">' + data.name + ' <span class="status-badge ' + data.status + '">' + statusLabel + '</span></h3>';
+  html += '<div class="detail-row"><span class="detail-label">Dates</span><span class="detail-value">' + data.dates + '</span></div>';
+  if (data.location) html += '<div class="detail-row"><span class="detail-label">Location</span><span class="detail-value">' + data.location + '</span></div>';
+  if (data.client) html += '<div class="detail-row"><span class="detail-label">Client</span><span class="detail-value">' + data.client + '</span></div>';
+  html += '<div class="detail-row"><span class="detail-label">Aircraft</span><span class="detail-value">' + aircraftHtml + '</span></div>';
+  html += '<div class="detail-row"><span class="detail-label">Pilots</span><span class="detail-value">' + data.pilots + '</span></div>';
+  if (data.flightHours) html += '<div class="detail-row"><span class="detail-label">Flight Hours</span><span class="detail-value">' + data.flightHours + ' hrs (est)</span></div>';
+  if (data.notes) html += '<div class="detail-row"><span class="detail-label">Notes</span><span class="detail-value" style="font-size:0.7rem;color:#aaa">' + data.notes + '</span></div>';
+  html += '</div>'; // close popup-scroll
+  html = '<div style="text-align:right;margin:-4px -8px 4px 0"><a href="javascript:void(0)" id="eventPopupClose" style="color:#888;font-size:20px;text-decoration:none;padding:4px 8px">&times;</a></div>' + html;
+  popup.innerHTML = html;
+  document.getElementById('eventPopupClose').onclick = function() { dismissEventPopup(); return false; };
+  
+  const rect = el.getBoundingClientRect();
+  // Position popup, then measure and adjust to stay on screen
+  popup.style.visibility = 'hidden';
+  popup.style.display = 'block';
+  popup.style.left = Math.min(rect.left, window.innerWidth - 290) + 'px';
+  popup.style.top = '0px'; // temporary
+  const popupH = popup.offsetHeight;
+  // Place above the bar with a 30px connector gap
+  let top = rect.top - popupH - 30;
+  if (top < 8) top = 8; // don't go off top of screen
+  popup.style.top = top + 'px';
+  popup.style.visibility = '';
+  popup.classList.add('show');
+}
+</script>
+</body>
+</html>

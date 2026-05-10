@@ -435,7 +435,7 @@
 </head>
 <body class="timeline-open">
 <div id="map"></div>
-<div id="last-updated">Last updated: <!-- LAST_UPDATED -->10 May 2026 17:00<!-- /LAST_UPDATED --></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->10 May 2026 17:54<!-- /LAST_UPDATED --></div>
 <div class="right-btn-group">
   <a class="sfla-btn" href="https://willslawrence.github.io/pilot-planner/" target="_blank">📅 Roster</a>
   <a class="sfla-btn" href="https://willslawrence.github.io/sfla-tracker/" target="_blank">🛬 SFLA Riyadh</a>
@@ -449,7 +449,7 @@
   <div class="panel-header" role="button" tabindex="0" aria-expanded="true" aria-controls="briefing-body" onclick="togglePanel(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePanel(this);}">
     <div class="panel-title" id="briefing-title">📋 Flights <span style="font-size:0.5em">by OCC</span> ▾</div>
     <div class="panel-date">OPS PLAN REPORT / <!-- REPORT_PERIOD -->10 May 2026<!-- /REPORT_PERIOD --></div>
-    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->10 May 2026 17:00<!-- /LAST_UPDATED2 --></div>
+    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->10 May 2026 17:54<!-- /LAST_UPDATED2 --></div>
   </div>
   <div class="panel-body" id="briefing-body" role="region" aria-labelledby="briefing-title">
 
@@ -719,8 +719,8 @@ const bases = {
 
 // FLEET_START
 const fleet = [
-  { reg: "HZHC54", loc: "RUH", status: "parked", fullStatus: "Serviceable", mission: "Technical Reposition — OETH local" },
-  { reg: "HZHC55", loc: "RUH", status: "parked", fullStatus: "Serviceable", ert: "null" },
+  { reg: "HZHC54", loc: "RUH", status: "maint", fullStatus: "Maintenance", mission: "Technical Reposition — OETH local" },
+  { reg: "HZHC55", loc: "RUH", status: "parked", fullStatus: "Preservation", ert: "null" },
   { reg: "HZHC58", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "null", ert: "null" },
   { reg: "HZHC59", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "null", ert: "null" },
   { reg: "HZHC63", loc: "RUH", status: "maint", fullStatus: "Maintenance", ert: "2026-05-15" },
@@ -728,8 +728,8 @@ const fleet = [
   { reg: "HZHC65", loc: "OETH", status: "parked", fullStatus: "Serviceable" },
   { reg: "HZHC66", loc: "RUH", status: "parked", fullStatus: "Serviceable", mission: "[['UAM Riyadh']]" },
   { reg: "HZHC67", loc: "OETH", status: "parked", fullStatus: "Serviceable", ert: "null" },
-  { reg: "HZHC68", loc: "OETH", status: "maint", fullStatus: "Maintenance", ert: "2026-06-28" },
-  { reg: "HZHC69", loc: "OETH", status: "maint", fullStatus: "Maintenance", ert: "2026-06-28" },
+  { reg: "HZHC68", loc: "OETH", status: "parked", fullStatus: "Preservation" },
+  { reg: "HZHC69", loc: "OETH", status: "parked", fullStatus: "Preservation" },
   { reg: "HZTH56", loc: "OETH", status: "parked", fullStatus: "Serviceable", ert: "null" },
   { reg: "HZTH58", loc: "RUH", status: "parked", fullStatus: "EIS", ert: "2026-06-28" },
 ];

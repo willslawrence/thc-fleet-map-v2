@@ -176,6 +176,7 @@ def load_helis():
         st = raw_status.lower()
         if 'serviceable' in st: pin_st = 'parked'
         elif 'maint' in st or 'aog' in st: pin_st = 'maint'
+        elif 'preserv' in st: pin_st = 'preserv'
         else: pin_st = 'parked'
         h.append({
             'reg': d.get('registration', os.path.basename(f).replace('.md','')),
@@ -388,7 +389,7 @@ def load_missions():
 
 def build_fleet_js(helis, fy, fr):
     L = ["const fleet = ["]
-    cnt = {'parked':0, 'flying':0, 'maint':0}
+    cnt = {'parked':0, 'flying':0, 'maint':0, 'preserv':0}
     for h in helis:
         st = 'flying' if h['reg'] in fy else h['status']
         cnt[st] = cnt.get(st,0) + 1
@@ -406,7 +407,7 @@ def build_fleet_js(helis, fy, fr):
             e += f', route: "{fr[h["reg"]]["route"]}"'
         L.append(e + ' },')
     L.append("];")
-    print(f"✅ Fleet: {cnt['parked']} serviceable, {cnt['flying']} flying, {cnt['maint']} maint")
+    print(f"✅ Fleet: {cnt['parked']} serviceable, {cnt['flying']} flying, {cnt['maint']} maint, {cnt['preserv']} preserv")
     return '\n'.join(L)
 
 def build_flights_html():

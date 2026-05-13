@@ -345,16 +345,16 @@ def load_missions():
             helis = d.get('helicopters', d.get('Helicopter', ''))
             if isinstance(helis, dict):
                 # Old nested format: {Film: HZHC55, EMS 1: HZHC57, ...}
-                heli_str = ' | '.join(f"{reg.replace('HZHC','HC')} ({role})" for role, reg in helis.items())
+                heli_str = ' | '.join(f"{reg.replace('HZHC','HC').replace('HZTH','TH')} ({role})" for role, reg in helis.items())
             elif isinstance(helis, str) and helis:
-                heli_str = helis.replace('HZHC','HC')
+                heli_str = helis.replace('HZHC','HC').replace('HZTH','TH')
             else:
                 # New flat format: helicopter_main, helicopter_backup, etc.
                 heli_parts = []
                 for k, v in d.items():
                     if k.startswith('helicopter_') and v:
                         role = k.replace('helicopter_', '').replace('_', ' ').title()
-                        reg = v.replace('HZHC','HC') if v.upper() not in ('TBD','TBA') else 'TBA'
+                        reg = v.replace('HZHC','HC').replace('HZTH','TH') if v.upper() not in ('TBD','TBA') else 'TBA'
                         heli_parts.append(f"{role}: {reg}")
                 heli_str = ' | '.join(heli_parts) if heli_parts else 'TBA'
             pilots = d.get('Pilots', '')
@@ -449,7 +449,7 @@ def build_flights_html():
             if not header_added and pending_header:
                 L.append(pending_header)
                 header_added = True
-            r = normalize_reg(p[1]).replace('HZHC', 'HC')
+            r = normalize_reg(p[1]).replace('HZHC', 'HC').replace('HZTH', 'TH')
             cl = "flight-row today" if flight_date == ts else "flight-row"
             route = p[5]
             mission = p[6]

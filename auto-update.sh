@@ -21,6 +21,11 @@ echo "🚁 THC Fleet Map Auto-Update"
 echo "   $(date '+%Y-%m-%d %H:%M:%S %Z')"
 echo ""
 
+# 0. Pull first so generation runs on the latest state (a manual push from
+#    another machine won't jam the scheduled run).
+echo "🔄 Pulling latest..."
+git pull --rebase --autostash || { echo "⚠️  pull --rebase failed — continuing"; git rebase --abort 2>/dev/null || true; }
+
 # 1. Run the generator
 echo "📊 Generating fleet map..."
 python3 generate.py
@@ -41,7 +46,8 @@ if [ "$DRY_RUN" = true ]; then
     echo "🔍 DRY RUN — would push to GitHub"
 else
     echo "🚀 Pushing to GitHub..."
-    git push
+    # If the remote moved in the meantime, rebase once and retry.
+    git push || { git pull --rebase --autostash && git push; }
     echo "✅ Live at: https://willslawrence.github.io/thc-ops-map/"
 fi
 

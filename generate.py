@@ -168,6 +168,14 @@ KNOWN_BASES = {
     'XSTH', 'XSU3', 'XSUH', 'XUFR', 'XURC',
 }
 
+def short_reg(r):
+    """Shorten a registration for display: HZHC54 -> HC54, HZTH50 -> TH50.
+    Unassigned values (blank, TBD, TBA) normalise to 'TBD'."""
+    r = (r or '').strip()
+    if not r or r.upper() in ('TBD', 'TBA'):
+        return 'TBD'
+    return r.replace('HZHC', 'HC').replace('HZTH', 'TH')
+
 def load_helis():
     h = []
     for f in sorted(glob.glob(f"{HELIS_DIR}/HZHC*.md") + glob.glob(f"{HELIS_DIR}/HZTH*.md")):
@@ -342,22 +350,40 @@ def load_missions():
                 t = '🏜️ ' + t
             elif 'film' in tl:
                 t = '🎬 ' + t
-            # Format helicopter roles - support nested dict, flat helicopter_* fields, or plain string
-            helis = d.get('helicopters', d.get('Helicopter', ''))
-            if isinstance(helis, dict):
-                # Old nested format: {Film: HZHC55, EMS 1: HZHC57, ...}
-                heli_str = ' | '.join(f"{reg.replace('HZHC','HC').replace('HZTH','TH')} ({role})" for role, reg in helis.items())
-            elif isinstance(helis, str) and helis:
-                heli_str = helis.replace('HZHC','HC').replace('HZTH','TH')
+            # Format helicopter roles. Canonical vault format is heli_N_reg /
+            # heli_N_role (one slot per aircraft); fall back to legacy fields.
+            heli_entries = []
+            try:
+                heli_count = int(d.get('helicopter_count', '0') or 0)
+            except (ValueError, TypeError):
+                heli_count = 0
+            # Scan max(count, 10) slots so a wrong/absent count never drops entries
+            for n in range(1, max(heli_count, 10) + 1):
+                reg = d.get(f'heli_{n}_reg')
+                role = (d.get(f'heli_{n}_role') or '').strip()
+                if not reg and not role:
+                    continue  # empty slot
+                rs = short_reg(reg)
+                heli_entries.append(f"{rs} ({role})" if role else rs)
+            if heli_entries:
+                heli_str = ' | '.join(heli_entries)
             else:
-                # New flat format: helicopter_main, helicopter_backup, etc.
-                heli_parts = []
-                for k, v in d.items():
-                    if k.startswith('helicopter_') and v:
-                        role = k.replace('helicopter_', '').replace('_', ' ').title()
-                        reg = v.replace('HZHC','HC').replace('HZTH','TH') if v.upper() not in ('TBD','TBA') else 'TBA'
-                        heli_parts.append(f"{role}: {reg}")
-                heli_str = ' | '.join(heli_parts) if heli_parts else 'TBA'
+                # Legacy fallbacks: nested dict, plain string, or helicopter_main/backup
+                helis = d.get('helicopters', d.get('Helicopter', ''))
+                if isinstance(helis, dict):
+                    # Old nested format: {Film: HZHC55, EMS 1: HZHC57, ...}
+                    heli_str = ' | '.join(f"{short_reg(reg)} ({role})" for role, reg in helis.items())
+                elif isinstance(helis, str) and helis:
+                    heli_str = helis.replace('HZHC','HC').replace('HZTH','TH')
+                else:
+                    # Flat helicopter_main / helicopter_backup fields.
+                    # Exclude helicopter_count — it is a tally, not an aircraft.
+                    heli_parts = []
+                    for k, v in d.items():
+                        if k.startswith('helicopter_') and k != 'helicopter_count' and v:
+                            role = k.replace('helicopter_', '').replace('_', ' ').strip()
+                            heli_parts.append(f"{short_reg(v)} ({role})")
+                    heli_str = ' | '.join(heli_parts) if heli_parts else 'TBD'
             pilots = d.get('Pilots', '')
             # Auto-determine status from dates
             # complete/canceled = done or cancelled (grey)

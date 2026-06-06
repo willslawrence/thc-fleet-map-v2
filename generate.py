@@ -231,63 +231,75 @@ def normalize_reg(raw):
         return 'HZHC' + m.group(1)
     return s
 
+def parse_flight_bullet(ln, ts):
+    """Parse a bullet line: - REG — MISSION, DD MON HH:MM-HH:MM, ROUTE (CREW) [FLAGS]"""
+    pattern = r'^-\s*(HZ\w+)\s*[\u2014\u2013-]\s*([^,]+),\s*(\d{2}\s+\w{3})\s+(\d{2}:\d{2}-\d{2}:\d{2}),\s*([^()]+)\s*(?:\(([^)]+)\))?\s*(\[.*\])?'
+    m = re.match(pattern, ln.strip())
+    if not m:
+        return None
+    reg_str, mission, date_str, time_str, route, crew, flags = m.groups()
+    reg_str = reg_str.strip()
+    mission = mission.strip()
+    route = route.strip()
+    # Parse date — assume current year, or next year if past
+    try:
+        date_full = datetime.strptime(f"{date_str} {ts.year}", "%d %b %Y")
+        if date_full < ts.replace(hour=0, minute=0, second=0, microsecond=0):
+            date_full = date_full.replace(year=ts.year + 1)
+        date_iso = date_full.strftime("%Y-%m-%d")
+    except:
+        date_iso = ""
+    pilot = ""
+    if crew:
+        pilot = crew.split('/')[0].strip().replace('PIC:', '').strip()
+    return {
+        'reg': reg_str, 'mission': mission, 'date': date_iso,
+        'route': route, 'pilot': pilot, 'flags': flags or '',
+        'time': time_str, 'date_short': date_str,
+    }
+
 def load_flights():
-    """Parse Flights Schedule.md — handles ## H125 / ### Day headers and ## Other Aircraft sections."""
+    """Parse Flights Schedule.md — handles bullet list format from ops plan pipeline."""
     fl, fy, fr = [], {}, {}  # fr = flight routes
     all_dates = []  # Track all flight dates for report period
     try:
         t = open(FLIGHTS_FILE).read()
-        ts = TODAY.strftime("%Y-%m-%d")
+        ts = TODAY
+        ts_str = TODAY.strftime("%Y-%m-%d")
         in_h125 = False
-        in_other = False
         for ln in t.split('\n'):
-            # Track which section we're in
+            # Track H125 section
             if ln.startswith('## H125'):
                 in_h125 = True
-                in_other = False
                 continue
-            elif ln.startswith('## Other'):
+            elif ln.startswith('## Other') or (ln.startswith('## ') and not ln.startswith('### ')):
                 in_h125 = False
-                in_other = True
                 continue
-            elif ln.startswith('## ') and not ln.startswith('### '):
-                in_h125 = False
-                in_other = False
+            if not in_h125:
                 continue
-            # Skip ### day headers and non-data lines
-            if not ('|' in ln and ln.strip() and not ln.startswith('#')):
+            # Skip non-bullet lines
+            if not ln.strip().startswith('- ') or ln.startswith('## ') or ln.startswith('### '):
                 continue
-            p = [x.strip() for x in ln.split('|')]
-            # Format: Reg | DOF | STD | STA | Route | Mission | Crew
-            # (table starts/ends with |, so p[0] and p[-1] are empty strings)
-            if len(p) < 8:
+            parsed = parse_flight_bullet(ln, ts)
+            if not parsed:
                 continue
-            # p[1]=Reg, p[2]=DOF, p[3]=STD, p[4]=STA, p[5]=Route, p[6]=Mission, p[7]=Crew
-            reg_str = p[1]
-            date_str = p[2]
-            # Skip header row
-            if reg_str == 'Reg' or not reg_str.startswith('HZ'):
-                continue
-            route = p[5]
-            mission = p[6]
-            crew = p[7] if len(p) > 7 else ''
-            pilot = crew.split('/')[0].strip().replace('PIC:', '').strip() if crew else ''
-            # Track all dates for report period
-            if re.match(r'\d{4}-\d{2}-\d{2}', date_str):
-                all_dates.append(date_str)
-            # Only load today's H125 flights for map display
-            if not date_str.startswith(ts):
-                continue
+            reg_str = parsed['reg']
             if not is_h125(reg_str):
                 continue
+            # Track all dates for report period
+            if parsed['date']:
+                all_dates.append(parsed['date'])
+            # Only load today's H125 flights for map display
+            if parsed['date'] != ts_str:
+                continue
             r = normalize_reg(reg_str)
-            fl.append({'reg': r, 'route': route, 'mission': mission, 'pilot': pilot})
-            fy[r] = pilot
-            if '→' in route:
-                fr[r] = {'route': route}
-                validate_route_waypoints(route, r)
-    except: pass
-    # Store report period for later use
+            fl.append({'reg': r, 'route': parsed['route'], 'mission': parsed['mission'], 'pilot': parsed['pilot']})
+            fy[r] = parsed['pilot']
+            if '→' in parsed['route']:
+                fr[r] = {'route': parsed['route']}
+                validate_route_waypoints(parsed['route'], r)
+    except Exception as e:
+        print(f"⚠️ load_flights error: {e}")
     load_flights._all_dates = sorted(set(all_dates)) if all_dates else []
     print(f"✅ Loaded {len(fl)} flights")
     return fl, fy, fr
@@ -437,53 +449,50 @@ def build_fleet_js(helis, fy, fr):
     return '\n'.join(L)
 
 def build_flights_html():
-    """Build flights panel HTML — handles ## H125 / ### Day / ## Other Aircraft format."""
+    """Build flights panel HTML — handles bullet list format from ops plan pipeline."""
+    from collections import defaultdict
     L = []
-    ts = TODAY.strftime("%Y-%m-%d")
+    ts_str = TODAY.strftime("%Y-%m-%d")
+    by_date = defaultdict(list)
     try:
         t = open(FLIGHTS_FILE).read()
+        ts = TODAY
         in_h125 = False
-        pending_header = None
-        header_added = False
         for ln in t.split('\n'):
-            # Track sections
             if ln.startswith('## H125'):
                 in_h125 = True
                 continue
             elif ln.startswith('## Other') or (ln.startswith('## ') and not ln.startswith('### ')):
                 in_h125 = False
                 continue
-            # Day headers (### Sun 8 Feb)
-            if ln.startswith('### ') and in_h125:
-                section_title = ln[4:].strip()
-                pending_header = f'  <h4>{section_title}</h4>'
-                header_added = False
-                continue
             if not in_h125:
                 continue
-            if not ('|' in ln and not ln.startswith('#')):
+            if not ln.strip().startswith('- ') or ln.startswith('## ') or ln.startswith('### '):
                 continue
-            p = [x.strip() for x in ln.split('|')]
-            if len(p) < 5:
+            parsed = parse_flight_bullet(ln, ts)
+            if not parsed:
                 continue
-            # Skip header row and separator rows
-            if p[1] == 'Reg' or not is_h125(p[1]):
+            if not is_h125(parsed['reg']):
                 continue
-            flight_date = p[2]
-            if flight_date < ts:
+            if parsed['date'] < ts_str:
                 continue
-            # Add day header if not yet added
-            if not header_added and pending_header:
-                L.append(pending_header)
-                header_added = True
-            r = normalize_reg(p[1]).replace('HZHC', 'HC').replace('HZTH', 'TH')
-            cl = "flight-row today" if flight_date == ts else "flight-row"
-            route = p[5]
-            mission = p[6]
-            pilot = p[7].split('/')[0].strip().replace('PIC:', '').strip() if len(p) > 7 and p[7] else ''
-            info = f"{route} · {mission}" if route else mission
-            L.append(f'  <div class="{cl}"><span class="reg">{r}</span><span class="info">{info}</span><span class="pilot">{pilot}</span></div>')
-    except: pass
+            by_date[parsed['date']].append(parsed)
+    except Exception as e:
+        print(f"⚠️ build_flights_html error: {e}")
+    if not by_date:
+        return '  <div>No flights scheduled</div>'
+    # Day name lookup
+    DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    for date_iso in sorted(by_date.keys()):
+        dt = datetime.strptime(date_iso, "%Y-%m-%d")
+        day_name = f"{DAY_NAMES[dt.weekday()]} {dt.day} {MONTH_NAMES[dt.month - 1]}"
+        L.append(f'  <h4>{day_name}</h4>')
+        for f in sorted(by_date[date_iso], key=lambda x: x['time']):
+            r = normalize_reg(f['reg']).replace('HZHC', 'HC').replace('HZTH', 'TH')
+            cl = "flight-row today" if f['date'] == ts_str else "flight-row"
+            info = f["route"] + " · " + f["mission"] if f["route"] else f["mission"]
+            L.append(f'  <div class="{cl}"><span class="reg">{r}</span><span class="info">{info}</span><span class="pilot">{f["pilot"]}</span></div>')
     return '\n'.join(L) if L else '  <div>No flights scheduled</div>'
 
 def build_currency_html(curr):

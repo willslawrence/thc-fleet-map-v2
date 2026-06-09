@@ -500,6 +500,7 @@ def build_currency_html(curr):
     next_mo_end = (next_mo + timedelta(days=32)).replace(day=1)
     
     # Competency - 12 months from last check
+    comp_overdue = []
     comp_this = []
     comp_next = []
     for c in curr:
@@ -509,19 +510,24 @@ def build_currency_html(curr):
                 cd = datetime.strptime(cp, "%Y-%m-%d")
                 exp = cd.replace(year=cd.year+1)
                 first_name = c['name'].split()[0] + ' ' + c['name'].split()[-1][0] if len(c['name'].split()) > 1 else c['name'].split()[0]
-                if this_mo <= exp < this_mo_end:
+                if exp < this_mo:
+                    comp_overdue.append((first_name, exp.strftime("%b %Y")))
+                elif this_mo <= exp < this_mo_end:
                     comp_this.append((first_name, exp.strftime("%b %Y")))
                 elif next_mo <= exp < next_mo_end:
                     comp_next.append((first_name, exp.strftime("%b %Y")))
             except: pass
     L.append('  <h4>Competency Checks</h4>')
+    if comp_overdue:
+        for n, d in comp_overdue:
+            L.append(f'  <div class="alert danger">🔴 {n} - overdue since {d}</div>')
     if comp_this:
         for n, d in comp_this:
             L.append(f'  <div class="alert warn">⚠️ {n} - due {d}</div>')
     if comp_next:
         for n, d in comp_next:
             L.append(f'  <div class="alert info">📅 {n} - due {d}</div>')
-    if not comp_this and not comp_next:
+    if not comp_overdue and not comp_this and not comp_next:
         L.append(f'  <div class="alert ok">✅ Nobody due this or next month</div>')
     
     # REMS 30 - 6 calendar months from last flight date

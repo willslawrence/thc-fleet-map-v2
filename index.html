@@ -436,7 +436,7 @@
 </head>
 <body class="timeline-open">
 <div id="map"></div>
-<div id="last-updated">Last updated: <!-- LAST_UPDATED -->9 Jun 2026 11:00<!-- /LAST_UPDATED --></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->9 Jun 2026 11:23<!-- /LAST_UPDATED --></div>
 <div class="right-btn-group">
   <a class="sfla-btn" href="https://willslawrence.github.io/pilot-planner/" target="_blank">📅 Roster</a>
   <a class="sfla-btn" href="https://willslawrence.github.io/sfla-tracker/" target="_blank">🛬 SFLA Riyadh</a>
@@ -450,7 +450,7 @@
   <div class="panel-header" role="button" tabindex="0" aria-expanded="true" aria-controls="briefing-body" onclick="togglePanel(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePanel(this);}">
     <div class="panel-title" id="briefing-title">📋 Flights <span style="font-size:0.5em">by OCC</span> ▾</div>
     <div class="panel-date">OPS PLAN REPORT / <!-- REPORT_PERIOD -->10 Jun – 15 Jun 2026<!-- /REPORT_PERIOD --></div>
-    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->9 Jun 2026 11:00<!-- /LAST_UPDATED2 --></div>
+    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->9 Jun 2026 11:23<!-- /LAST_UPDATED2 --></div>
   </div>
   <div class="panel-body" id="briefing-body" role="region" aria-labelledby="briefing-title">
 
@@ -476,7 +476,7 @@
   <div class="panel-body" id="currency-body" role="region" aria-labelledby="currency-title" aria-hidden="true">
   <!-- CURRENCY_START -->
   <h4>Competency Checks</h4>
-  <div class="alert ok">✅ Nobody due this or next month</div>
+  <div class="alert danger">🔴 Davide Z - overdue since Jan 2026</div>
   <h4>30-Min REMS (6 month validity)</h4>
   <div class="alert danger">🔴 Kevin A - expired Mar 2026</div>
   <div class="alert danger">🔴 Lisa R - expired Apr 2026</div>
@@ -538,6 +538,9 @@
         <div class="lane">
           <div class="event-bar complete short" role="button" tabindex="0" aria-label="Al Fursan Cup, 5-8 Feb, status complete" style="left:9.6%;width:1.2%;" data-name="Al Fursan Cup" data-status="complete" data-dates="5-8 Feb" data-aircraft="HC55 (Film)" data-pilots="Lisa" data-location="Riyadh" data-client="Aurora" data-notes="" data-flight-hours="" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="Al Fursan Cup (5-8 Feb)">
             <span class="event-title">Al Fursan ...</span>
+          </div>
+          <div class="event-bar potential short" role="button" tabindex="0" aria-label="SAMI Yanbu-Jeddah, 1-7 Jul, status potential" style="left:49.7%;width:1.6%;" data-name="SAMI Yanbu-Jeddah" data-status="potential" data-dates="1-7 Jul" data-aircraft="TBD" data-pilots="Roberto" data-location="Yanbu / Jeddah" data-client="SAMI" data-notes="Over-water ops — floats + life jackets required. Part 133 aerial work. May need D100 ops spec review." data-flight-hours="" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="SAMI Yanbu-Jeddah (1-7 Jul)">
+            <span class="event-title">SAMI Yanbu...</span>
           </div>
           <div class="event-bar pending " role="button" tabindex="0" aria-label="🔍 Survey ARGAS, 1 Sep - 30 Apr, status pending" style="left:66.8%;width:33.2%;" data-name="🔍 Survey ARGAS" data-status="pending" data-dates="1 Sep - 30 Apr" data-aircraft="HC59 (primary) | HC63 (backup) | HC54 (backup)" data-pilots="Survey Pilots" data-location="Yanbu → Rabigh → North Abha" data-client="Argas" data-notes="" data-flight-hours="> 100" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="🔍 Survey ARGAS (1 Sep - 30 Apr)">
             <span class="event-title">🔍 Survey ARGAS</span>

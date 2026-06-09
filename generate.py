@@ -320,12 +320,9 @@ def load_currency():
             try:
                 t = open(pf).read()
                 # Only include H125 pilots in currency box
-                helicopter = ""
-                for ln in t.split('\n'):
-                    if ln.strip().startswith('Helicopter:'):
-                        helicopter = ln.split(':',1)[1].strip()
-                        break
-                if 'H125' not in helicopter:
+                # Handle both single-line (Helicopter: H125) and YAML list (Helicopter:\n  - H125) formats
+                frontmatter = t.split('---')[1] if t.startswith('---') and t.count('---') >= 2 else ''
+                if 'H125' not in frontmatter:
                     continue  # Skip non-H125 pilots
                 med = rems = comp = ""
                 for ln in t.split('\n'):

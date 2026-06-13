@@ -324,12 +324,15 @@ def load_currency():
                 frontmatter = t.split('---')[1] if t.startswith('---') and t.count('---') >= 2 else ''
                 if 'H125' not in frontmatter:
                     continue  # Skip non-H125 pilots
-                med = rems = comp = ""
+                med = rems = comp = line = cp = ""
                 for ln in t.split('\n'):
                     if 'Medical Certificate Date:' in ln: med = ln.split(':',1)[1].strip()
                     if '30 Mins REMS:' in ln: rems = ln.split(':',1)[1].strip()
                     if 'Last Competency Check:' in ln: comp = ln.split(':',1)[1].strip()
-                c.append({'name': nm, 'medical': med, 'rems': rems, 'competency': comp})
+                    if 'Last Line Check:' in ln: line = ln.split(':',1)[1].strip()
+                    if 'Check Pilot Renewal:' in ln: cp = ln.split(':',1)[1].strip()
+                c.append({'name': nm, 'medical': med, 'rems': rems, 'competency': comp,
+                          'line_check': line, 'check_pilot': cp})
             except: pass
     print(f"✅ Loaded {len(c)} H125 pilot currency records")
     return c
@@ -580,7 +583,26 @@ def build_currency_html(curr):
         L.append('  <h4>Medical Certificate (12 month validity)</h4>')
         for n,d,lv,status in sorted(med_issues, key=lambda x: x[2]!='danger'):
             L.append(f'  <div class="alert {lv}">{"🔴" if lv=="danger" else "⚠️"} {n} - {status} {d}</div>')
-    
+
+    # Check Pilot authorisation - 24 months from last renewal (check pilots only)
+    cp_issues = []
+    for c in curr:
+        cp = c.get('check_pilot','')
+        if cp:
+            try:
+                cpd = datetime.strptime(cp, "%Y-%m-%d")
+                exp = cpd.replace(year=cpd.year+2)
+                first_name = c['name'].split()[0] + ' ' + c['name'].split()[-1][0] if len(c['name'].split()) > 1 else c['name'].split()[0]
+                if exp < this_month_start:
+                    cp_issues.append((first_name, exp.strftime("%b %Y"), 'danger', 'overdue since'))
+                elif this_month_start <= exp < this_month_end:
+                    cp_issues.append((first_name, exp.strftime("%b %Y"), 'warn', 'due'))
+            except: pass
+    if cp_issues:
+        L.append('  <h4>Check Pilot Authorisation (24 month validity)</h4>')
+        for n,d,lv,status in sorted(cp_issues, key=lambda x: x[2]!='danger'):
+            L.append(f'  <div class="alert {lv}">{"🔴" if lv=="danger" else "⚠️"} {n} - {status} {d}</div>')
+
     return '\n'.join(L)
 
 

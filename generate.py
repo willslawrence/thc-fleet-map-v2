@@ -34,7 +34,7 @@ KNOWN_WAYPOINTS = {
     'OENN', 'XNC1', 'XNCH', 'XNNH', 'XNPI',
     'XUFR', 'XURC',
     'XRKF', 'XRNG', 'ALSALAM',  # Riyadh area
-    'VRPJ', 'VRPZ', 'VRPT', 'VRPY', 'KAFD',  # UAM route VRPs (OERK→KAFD corridor)
+    'VRPJ', 'VRPZ', 'VRPT', 'VRPY', 'KAFD', 'XRFD',  # UAM route VRPs (OERK→KAFD corridor; XRFD = KAFD alias)
 }
 
 def validate_route_waypoints(route, reg=''):
@@ -165,7 +165,7 @@ KNOWN_BASES = {
     'ALSALAM', 'KAFD', 'OEAO', 'OEGN', 'OEGS', 'OEHL', 'OEJF', 'OEJN',
     'OEMA', 'OENN', 'OERK', 'OERS', 'OETH', 'RUH', 'VRPJ', 'VRPT', 'VRPY',
     'VRPZ', 'XNC1', 'XNCH', 'XNNH', 'XNPI', 'XRSC', 'XSCV', 'XSDR', 'XSSB',
-    'XSTH', 'XSU3', 'XSUH', 'XUFR', 'XURC',
+    'XSTH', 'XSU3', 'XSUH', 'XUFR', 'XURC', 'XRFD',
 }
 
 def short_reg(r):

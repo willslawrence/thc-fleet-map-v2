@@ -407,7 +407,9 @@ def load_missions():
             end = d.get('endDate', start)
             if raw_status in ('canceled', 'cancelled'):
                 continue  # Skip canceled missions entirely
-            if raw_status == 'complete':
+            if raw_status == 'paused':
+                auto_status = 'paused'  # short-circuit — don't let date logic force 'active'
+            elif raw_status == 'complete':
                 auto_status = 'complete'
             elif start:
                 ts = TODAY.strftime("%Y-%m-%d")

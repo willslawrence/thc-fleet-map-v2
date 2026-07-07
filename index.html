@@ -447,7 +447,7 @@
 </head>
 <body class="timeline-open">
 <div id="map"></div>
-<div id="last-updated">Last updated: <!-- LAST_UPDATED -->7 Jul 2026 21:00<!-- /LAST_UPDATED --></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->7 Jul 2026 22:08<!-- /LAST_UPDATED --></div>
 <div class="right-btn-group">
   <a class="sfla-btn" href="https://willslawrence.github.io/pilot-planner/" target="_blank">📅 Roster</a>
   <a class="sfla-btn" href="https://willslawrence.github.io/SFLA/" target="_blank">🛬 SFLA Riyadh</a>
@@ -460,14 +460,13 @@
 <div id="briefing-panel" class="">
   <div class="panel-header" role="button" tabindex="0" aria-expanded="true" aria-controls="briefing-body" onclick="togglePanel(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePanel(this);}">
     <div class="panel-title" id="briefing-title">📋 Flights <span style="font-size:0.5em">by OCC</span> ▾</div>
-    <div class="panel-date">OPS PLAN REPORT / <!-- REPORT_PERIOD -->7 Jul – 7 Jul 2026<!-- /REPORT_PERIOD --></div>
-    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->7 Jul 2026 21:00<!-- /LAST_UPDATED2 --></div>
+    <div class="panel-date">OPS PLAN REPORT / <!-- REPORT_PERIOD -->7 Jul 2026<!-- /REPORT_PERIOD --></div>
+    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->7 Jul 2026 22:08<!-- /LAST_UPDATED2 --></div>
   </div>
   <div class="panel-body" id="briefing-body" role="region" aria-labelledby="briefing-title">
 
   <!-- FLIGHTS_START -->
-  <h4>Tue 7 Jul</h4>
-  <div class="flight-row today"><span class="reg">TH56</span><span class="info">OETH→OETH · Off-Line Training Flight</span><span class="pilot">SIC: Zambonini, Davide</span></div>
+  <div>No flights scheduled</div>
   <!-- FLIGHTS_END -->
 
   </div>
@@ -757,7 +756,7 @@ const fleet = [
   { reg: "HZHC67", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "UAM Backup", remFH: "136:02" },
   { reg: "HZHC68", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "138:33" },
   { reg: "HZHC69", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "140:55" },
-  { reg: "HZTH56", loc: "OETH", status: "flying", fullStatus: "Serviceable", remFH: "139:13", pilot: "SIC: Zambonini, Davide", route: "OETH→OETH" },
+  { reg: "HZTH56", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "139:13" },
   { reg: "HZTH58", loc: "RUH", status: "parked", fullStatus: "Serviceable", remFH: "139:13" },
 ];
 // FLEET_END

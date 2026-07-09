@@ -7,6 +7,15 @@ on:
 
 jobs:
   inline-js-syntax:
+    # Skip the syntax check on data-only automated commits (hourly "Fleet sync" and
+    # "Auto-update fleet map" pushes only change generated data, never the HTML/JS
+    # templates). This cuts ~21 wasteful runs/day and reduces the hosted-runner
+    # contention that causes transient "job not acquired by Runner" failures.
+    # Always runs on pull_requests and on any human/code push.
+    if: >-
+      github.event_name == 'pull_request' ||
+      ( !startsWith(github.event.head_commit.message, 'Fleet sync') &&
+        !startsWith(github.event.head_commit.message, 'Auto-update fleet map') )
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

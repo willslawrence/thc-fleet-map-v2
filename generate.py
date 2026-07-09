@@ -6,7 +6,7 @@ from zoneinfo import ZoneInfo
 # Resolve vault path: $THC_VAULT, then Obsidian's iCloud container, then iCloud Drive
 _VAULT_ENV      = os.environ.get("THC_VAULT")
 _VAULT_OBSIDIAN = os.path.expanduser("~/Library/Mobile Documents/iCloud~md~obsidian/Documents/THC Vault")
-_VAULT_ICLOUD   = os.path.expanduser("~/Library/Mobile Documents/com~apple~CloudDocs/THC Vault")
+_VAULT_ICLOUD   = os.path.expanduser("~/Library/CloudStorage/OneDrive-TheHelicopterCompany/THC Vault")
 if _VAULT_ENV:
     VAULT = os.path.expanduser(_VAULT_ENV)
 elif os.path.isdir(_VAULT_OBSIDIAN):

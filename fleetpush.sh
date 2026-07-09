@@ -1,7 +1,7 @@
 #!/bin/bash
 # THC Fleet Map — generate from vault and push to GitHub
 set -euo pipefail
-cd ~/Projects/FleetMapAndTimeline
+cd ~/Projects/thc-fleet-map-v2
 
 LOG="./fleetpush.log"
 trap 'echo "$(date "+%Y-%m-%d %H:%M:%S") ❌ fleetpush failed at line $LINENO" >> "$LOG"' ERR

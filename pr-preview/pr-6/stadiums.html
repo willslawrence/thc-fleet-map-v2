@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Riyadh Soccer Stadiums</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        #map { width: 100%; height: 100vh; }
+        .stadium-popup { font-size: 14px; }
+        .stadium-popup b { color: #1a73e8; }
+        .legend {
+            position: absolute;
+            bottom: 30px;
+            left: 10px;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            z-index: 1000;
+            font-size: 12px;
+            max-width: 200px;
+        }
+        .legend h4 { margin: 0 0 8px 0; }
+        .legend-item { margin: 4px 0; }
+        .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+        .riyadh { background: #ea4335; }
+        .outside { background: #9aa0a6; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div class="legend">
+        <h4>⚽ Stadiums</h4>
+        <div class="legend-item"><span class="dot riyadh"></span>In Riyadh</div>
+        <div class="legend-item"><span class="dot outside"></span>Outside Riyadh</div>
+    </div>
+    <script>
+        var map = L.map('map').setView([24.7136, 46.6753], 10);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        // Riyadh stadiums (red markers)
+        var riyadhIcon = L.divIcon({
+            className: 'custom-div-icon',
+            html: "<div style='background:#ea4335;width:24px;height:24px;border-radius:50%;border:3px solid white;box-shadow:0 2px 4px rgba(0,0,0,0.4);'></div>",
+            iconSize: [24, 24],
+            iconAnchor: [12, 12]
+        });
+
+        // Outside Riyadh stadiums (gray markers)
+        var outsideIcon = L.divIcon({
+            className: 'custom-div-icon',
+            html: "<div style='background:#9aa0a6;width:20px;height:20px;border-radius:50%;border:2px solid white;box-shadow:0 2px 4px rgba(0,0,0,0.3);'></div>",
+            iconSize: [20, 20],
+            iconAnchor: [10, 10]
+        });
+
+        // RIYADH STADIUMS
+        var stadiums = [
+            // In Riyadh
+            {name: "Al-Awwal Park (Mrsool Park)", lat: 24.7527, lng: 46.6128, team: "Al Nassr", inRiyadh: true},
+            {name: "Prince Faisal Bin Fahd Stadium", lat: 24.7282, lng: 46.7016, team: "Al-Shabab", inRiyadh: true},
+            {name: "King Fahd International Stadium", lat: 24.8008, lng: 46.6986, team: "National Team / Major Events", inRiyadh: true},
+            {name: "Prince Abdullah Al Faisal Stadium", lat: 24.6284, lng: 46.7189, team: "Al-Riyadh FC", inRiyadh: true},
+            {name: "Alinma Stadium", lat: 24.6950, lng: 46.7450, team: "Training/Events", inRiyadh: true},
+            {name: "SHG Arena", lat: 24.7650, lng: 46.6350, team: "Events", inRiyadh: true},
+            {name: "EGO Stadium", lat: 24.7100, lng: 46.6900, team: "Events", inRiyadh: true},
+            
+            // Outside Riyadh (from the list)
+            {name: "King Abdullah Sports City", lat: 21.7250, lng: 39.1500, team: "Jeddah", inRiyadh: false},
+            {name: "Al Hazem Stadium", lat: 25.8667, lng: 43.5000, team: "Ar Rass", inRiyadh: false},
+            {name: "Al Taawoun Stadium", lat: 26.3333, lng: 43.9667, team: "Buraidah", inRiyadh: false},
+            {name: "Al Majma'a Sport City", lat: 25.9000, lng: 45.3500, team: "Al Majma'a", inRiyadh: false},
+            {name: "Damac Club Stadium", lat: 18.3000, lng: 42.7333, team: "Abha area", inRiyadh: false},
+            {name: "Prince Mohammed Bin Fahad Stadium", lat: 26.4167, lng: 50.0833, team: "Dammam", inRiyadh: false},
+        ];
+
+        stadiums.forEach(function(s) {
+            var icon = s.inRiyadh ? riyadhIcon : outsideIcon;
+            var marker = L.marker([s.lat, s.lng], {icon: icon}).addTo(map);
+            marker.bindPopup("<div class='stadium-popup'><b>" + s.name + "</b><br>" + s.team + (s.inRiyadh ? "" : "<br><i>(Outside Riyadh)</i>") + "</div>");
+        });
+
+        // Fit to Riyadh stadiums only
+        var riyadhBounds = L.latLngBounds(
+            stadiums.filter(s => s.inRiyadh).map(s => [s.lat, s.lng])
+        );
+        map.fitBounds(riyadhBounds.pad(0.2));
+    </script>
+</body>
+</html>

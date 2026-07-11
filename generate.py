@@ -753,10 +753,21 @@ def get_report_period():
             print(f"⚠️ Could not parse flight date range {dates[0]!r}..{dates[-1]!r}: {e}")
     return TODAY.strftime("%-d %b %Y")
 
+def _strip_md_links(s):
+    """Obsidian auto-links dates and note names inside Notices.md bullets.
+    Reduce wikilinks and markdown links to their display text so the parser
+    sees plain '- YYYY-MM-DD | message' regardless."""
+    s = re.sub(r'\[\[([^\]|]+)\|([^\]]+)\]\]', r'\2', s)   # [[target|alias]] -> alias
+    s = re.sub(r'\[\[([^\]]+)\]\]', r'\1', s)              # [[target]]       -> target
+    s = re.sub(r'\[([^\]]+)\]\([^)]*\)', r'\1', s)         # [text](url)      -> text
+    return s
+
 def load_notices():
     """DFO notices from THC/Notices.md — bullets '- YYYY-MM-DD | message'
-    under the '## Active' heading only. Each gets a stable id (hash of
-    date+text) so a browser can remember which ones were dismissed."""
+    under the '## Active' heading only. Wiki/markdown links are stripped to
+    display text first. Each notice gets a stable id (hash of date+text) so
+    a browser can remember which ones were dismissed; identical bullets
+    (e.g. an auto-linked duplicate of a plain one) collapse to one."""
     try:
         text = open(NOTICES_FILE).read()
     except OSError:
@@ -764,10 +775,17 @@ def load_notices():
     m = re.search(r'^## Active\s*$(.*?)(?=^## |\Z)', text, re.M | re.S)
     if not m:
         return []
-    notices = []
-    for b in re.finditer(r'^\s*-\s*(\d{4}-\d{2}-\d{2})\s*\|\s*(.+?)\s*$', m.group(1), re.M):
-        date, msg = b.group(1), b.group(2)
+    notices, seen = [], set()
+    for b in re.finditer(r'^\s*-\s+(.+?)\s*$', m.group(1), re.M):
+        line = _strip_md_links(b.group(1))
+        b2 = re.match(r'(\d{4}-\d{2}-\d{2})\s*\|\s*(.+)$', line)
+        if not b2:
+            continue
+        date, msg = b2.group(1), b2.group(2).strip()
         nid = hashlib.md5(f"{date}|{msg}".encode()).hexdigest()[:10]
+        if nid in seen:
+            continue
+        seen.add(nid)
         notices.append({"id": nid, "date": date, "msg": msg})
     print(f"📣 Notices: {len(notices)} active")
     return notices

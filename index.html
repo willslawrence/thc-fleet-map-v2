@@ -121,7 +121,10 @@
     font-size: 13px;
     line-height: 1.4;
     box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+    cursor: pointer;             /* whole banner is the dismiss button */
+    user-select: none;
   }
+  .notice-banner:hover { background: rgba(158, 27, 27, 0.85); }
   .notice-banner .notice-date {
     margin-top: 3px;
     font-size: 10px;
@@ -1023,15 +1026,22 @@ const notices = [{"id": "c9ce942d8b", "date": "2026-07-11", "msg": "📘 OMA Rev
     if (dismissed.indexOf(n.id) >= 0) return;
     var d = document.createElement('div');
     d.className = 'notice-banner';
-    var x = document.createElement('button');
-    x.className = 'notice-x';
-    x.setAttribute('aria-label', 'Dismiss notice');
-    x.textContent = '×';
-    x.onclick = function () {
+    d.setAttribute('role', 'button');
+    d.setAttribute('tabindex', '0');
+    d.setAttribute('aria-label', 'Dismiss notice');
+    d.title = 'Tap to dismiss';
+    // Whole banner dismisses — tap anywhere on it.
+    var dismiss = function () {
       dismissed.push(n.id);
       try { localStorage.setItem(KEY, JSON.stringify(dismissed)); } catch (e) {}
       d.remove();
     };
+    d.onclick = dismiss;
+    d.onkeydown = function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); dismiss(); } };
+    var x = document.createElement('span');
+    x.className = 'notice-x';
+    x.setAttribute('aria-hidden', 'true');
+    x.textContent = '×';
     var msg = document.createElement('div');
     msg.className = 'notice-msg';
     msg.textContent = n.msg;            // textContent: notice text can never inject HTML

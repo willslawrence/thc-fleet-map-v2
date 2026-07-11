@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
-import os, re, glob
+import os, re, glob, json, hashlib
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-# Resolve vault path: $THC_VAULT, then Obsidian's iCloud container, then iCloud Drive
+# Resolve vault path: $THC_VAULT, then OneDrive (live since the 2026-07-09
+# migration), then Obsidian's old iCloud container (stale fallback only).
 _VAULT_ENV      = os.environ.get("THC_VAULT")
 _VAULT_OBSIDIAN = os.path.expanduser("~/Library/Mobile Documents/iCloud~md~obsidian/Documents/THC Vault")
-_VAULT_ICLOUD   = os.path.expanduser("~/Library/CloudStorage/OneDrive-TheHelicopterCompany/THC Vault")
+_VAULT_ONEDRIVE = os.path.expanduser("~/Library/CloudStorage/OneDrive-TheHelicopterCompany/THC Vault")
 if _VAULT_ENV:
     VAULT = os.path.expanduser(_VAULT_ENV)
-elif os.path.isdir(_VAULT_OBSIDIAN):
-    VAULT = _VAULT_OBSIDIAN
+elif os.path.isdir(_VAULT_ONEDRIVE):
+    VAULT = _VAULT_ONEDRIVE
 else:
-    VAULT = _VAULT_ICLOUD
+    VAULT = _VAULT_OBSIDIAN
 if not os.path.isdir(VAULT):
     raise SystemExit(
         f"❌ Vault not found at {VAULT!r}. Set THC_VAULT to the vault path, "
@@ -22,6 +23,7 @@ HELIS_DIR = f"{VAULT}/THC/Helicopters"
 PILOTS_DIR = f"{VAULT}/THC/Pilots"
 FLIGHTS_FILE = f"{VAULT}/THC/Helicopters/Flights Schedule.md"
 MISSIONS_DIR = f"{VAULT}/THC/Missions"
+NOTICES_FILE = f"{VAULT}/THC/Notices.md"
 HTML_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "index.html")
 # Use Saudi Arabia timezone, then strip tz for naive comparisons
 _now = datetime.now(ZoneInfo("Asia/Riyadh"))
@@ -751,8 +753,31 @@ def get_report_period():
             print(f"⚠️ Could not parse flight date range {dates[0]!r}..{dates[-1]!r}: {e}")
     return TODAY.strftime("%-d %b %Y")
 
-def update(html, fleet, flights, curr, timeline):
+def load_notices():
+    """DFO notices from THC/Notices.md — bullets '- YYYY-MM-DD | message'
+    under the '## Active' heading only. Each gets a stable id (hash of
+    date+text) so a browser can remember which ones were dismissed."""
+    try:
+        text = open(NOTICES_FILE).read()
+    except OSError:
+        return []
+    m = re.search(r'^## Active\s*$(.*?)(?=^## |\Z)', text, re.M | re.S)
+    if not m:
+        return []
+    notices = []
+    for b in re.finditer(r'^\s*-\s*(\d{4}-\d{2}-\d{2})\s*\|\s*(.+?)\s*$', m.group(1), re.M):
+        date, msg = b.group(1), b.group(2)
+        nid = hashlib.md5(f"{date}|{msg}".encode()).hexdigest()[:10]
+        notices.append({"id": nid, "date": date, "msg": msg})
+    print(f"📣 Notices: {len(notices)} active")
+    return notices
+
+def build_notices_js(notices):
+    return "const notices = " + json.dumps(notices, ensure_ascii=False) + ";"
+
+def update(html, fleet, flights, curr, timeline, notices_js):
     html = re.sub(r'const fleet = \[.*?\];', fleet, html, flags=re.DOTALL)
+    html = re.sub(r'const notices = \[.*?\];', lambda _: notices_js, html, flags=re.DOTALL)
     html = re.sub(r'<!-- FLIGHTS_START -->.*?<!-- FLIGHTS_END -->', f'<!-- FLIGHTS_START -->\n{flights}\n  <!-- FLIGHTS_END -->', html, flags=re.DOTALL)
     html = re.sub(r'<!-- CURRENCY_START -->.*?<!-- CURRENCY_END -->', f'<!-- CURRENCY_START -->\n{curr}\n  <!-- CURRENCY_END -->', html, flags=re.DOTALL)
     html = re.sub(r'<!-- TIMELINE_START -->.*?<!-- TIMELINE_END -->', f'<!-- TIMELINE_START -->\n{timeline}\n    <!-- TIMELINE_END -->', html, flags=re.DOTALL)
@@ -771,7 +796,7 @@ def main():
     c = load_currency()
     m = load_missions()
     html = open(HTML_FILE).read()
-    html = update(html, build_fleet_js(h, fy, fr), build_flights_html(), build_currency_html(c), build_timeline(m))
+    html = update(html, build_fleet_js(h, fy, fr), build_flights_html(), build_currency_html(c), build_timeline(m), build_notices_js(load_notices()))
     open(HTML_FILE, 'w').write(html)
     print(f"\n✅ Done!")
 

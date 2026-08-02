@@ -8,3 +8,6 @@ __pycache__/
 
 # Logs
 *.log
+
+# Agent worktrees (never commit these)
+.claude/worktrees/

@@ -6,7 +6,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>THC Fleet Map — 31 Jul 2026</title>
+<title>THC Fleet Map — 2 Aug 2026</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -494,7 +494,7 @@
 </head>
 <body class="timeline-open">
 <div id="map"></div>
-<div id="last-updated">Last updated: <!-- LAST_UPDATED -->31 Jul 2026 22:08<!-- /LAST_UPDATED --></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->2 Aug 2026 10:19<!-- /LAST_UPDATED --></div>
 <div class="right-btn-group">
   <a class="sfla-btn" href="https://willslawrence.github.io/pilot-planner/" target="_blank">📅 Roster</a>
   <a class="sfla-btn" href="https://willslawrence.github.io/SFLA/" target="_blank">🛬 SFLA Riyadh</a>
@@ -509,16 +509,14 @@
 <div id="briefing-panel" class="">
   <div class="panel-header" role="button" tabindex="0" aria-expanded="true" aria-controls="briefing-body" onclick="togglePanel(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePanel(this);}">
     <div class="panel-title" id="briefing-title">📋 Flights <span style="font-size:0.5em">by OCC</span> ▾</div>
-    <div class="panel-date">OPS PLAN REPORT / <!-- REPORT_PERIOD -->1 Aug – 2 Aug 2026<!-- /REPORT_PERIOD --></div>
-    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->31 Jul 2026 22:08<!-- /LAST_UPDATED2 --></div>
+    <div class="panel-date">OPS PLAN REPORT / <!-- REPORT_PERIOD -->2 Aug – 2 Aug 2026<!-- /REPORT_PERIOD --></div>
+    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->2 Aug 2026 10:19<!-- /LAST_UPDATED2 --></div>
   </div>
   <div class="panel-body" id="briefing-body" role="region" aria-labelledby="briefing-title">
 
   <!-- FLIGHTS_START -->
-  <h4>Sat 1 Aug</h4>
-  <div class="flight-row"><span class="reg">HC54</span><span class="info">XRSC→OETH→XRSC · Maintenance Check Flight</span><span class="pilot">Bonet, Julio</span></div>
   <h4>Sun 2 Aug</h4>
-  <div class="flight-row"><span class="reg">HC59</span><span class="info">OETH→OETH→OETH→OETH · Maintenance Check Flight</span><span class="pilot">Munteanu, Dan Cristian</span></div>
+  <div class="flight-row today"><span class="reg">HC59</span><span class="info">OETH→OETH→OETH→OETH · Maintenance Check Flight</span><span class="pilot">Munteanu, Dan Cristian</span></div>
   <!-- FLIGHTS_END -->
 
   </div>
@@ -532,9 +530,9 @@
   <!-- CURRENCY_START -->
   <h4>Competency Checks</h4>
   <div class="alert danger">🔴 Davide Z - overdue since Jan 2026</div>
-  <div class="alert info">📅 Julio B - due Aug 2026</div>
-  <div class="alert info">📅 David S - due Aug 2026</div>
-  <div class="alert info">📅 Nathan P - due Aug 2026</div>
+  <div class="alert warn">⚠️ Julio B - due Aug 2026</div>
+  <div class="alert warn">⚠️ David S - due Aug 2026</div>
+  <div class="alert warn">⚠️ Nathan P - due Aug 2026</div>
   <h4>30-Min REMS (6 month validity)</h4>
   <div class="alert danger">🔴 Kevin A - expired Mar 2026</div>
   <div class="alert danger">🔴 Lisa R - expired Apr 2026</div>
@@ -544,6 +542,8 @@
   <div class="alert danger">🔴 David S - expired Jan 2026</div>
   <div class="alert danger">🔴 Nathan P - expired Jan 2026</div>
   <div class="alert danger">🔴 Stephan M - expired May 2026</div>
+  <h4>Medical Certificate (12 month validity)</h4>
+  <div class="alert warn">⚠️ Kevin A - due Aug 2026</div>
   <!-- CURRENCY_END -->
   </div>
 </div>
@@ -602,9 +602,12 @@
           <div class="event-bar complete short" role="button" tabindex="0" aria-label="Al Fursan Cup, 5-8 Feb, status complete" style="left:9.6%;width:1.2%;" data-name="Al Fursan Cup" data-status="complete" data-dates="5-8 Feb" data-aircraft="HC55 (Film)" data-pilots="Lisa" data-location="Riyadh" data-client="Aurora" data-notes="" data-flight-hours="" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="Al Fursan Cup (5-8 Feb)">
             <span class="event-title">Al Fursan ...</span>
           </div>
-          <div class="event-bar pending " role="button" tabindex="0" aria-label="🔍 Survey GeoTech, 1 Oct - 31 Jan, status pending" style="left:75.0%;width:25.0%;" data-name="🔍 Survey GeoTech" data-status="pending" data-dates="1 Oct - 31 Jan" data-aircraft="HC64 (primary) | HC63 (primary) | HC58 (additional) | HC54 (backup)" data-pilots="Survey Pilots" data-location="Ad Dawadmi, Taif" data-client="GeoTech" data-notes="Starts with 2× H125 (HC63/64). HC58 ramps in after ~10 days; HC54 backup." data-flight-hours="450" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="🔍 Survey GeoTech (1 Oct - 31 Jan)">
+          <div class="event-bar pending short" role="button" tabindex="0" aria-label="LEAP, 30-31 Aug, status pending" style="left:66.2%;width:1.2%;" data-name="LEAP" data-status="pending" data-dates="30-31 Aug" data-aircraft="TBD (primary)" data-pilots="Lindsay Pentz" data-location="KAFD → RYA-5 / Malham corridor → Malham Airport" data-client="LEAP" data-notes="Filming mission on H125 (single-engine — SFLA gate applies to the RYA-5 corridor). Films an AW139 on the ground at KAFD, its departure, then tracks it north over the Malham route to Malham Airport. 2–3 day mission." data-flight-hours="" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="LEAP (30-31 Aug)">
+            <span class="event-title">LEAP</span>
+          </div>
+          <div class="event-bar pending " role="button" tabindex="0" aria-label="🔍 Survey GeoTech, 1 Oct - 31 Mar, status pending" style="left:75.0%;width:25.0%;" data-name="🔍 Survey GeoTech" data-status="pending" data-dates="1 Oct - 31 Mar" data-aircraft="HC64 (primary) | HC63 (primary) | HC58 (additional) | HC54 (backup)" data-pilots="Survey Pilots" data-location="Ad Dawadmi, Taif" data-client="GeoTech" data-notes="Oct 2026 – Mar 2027 (6 months). Starts with 2× H125 (HC63/64). HC58 ramps in after ~10 days; HC54 backup." data-flight-hours="450" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="🔍 Survey GeoTech (1 Oct - 31 Mar)">
             <span class="event-title">🔍 Survey GeoTech</span>
-            <span class="event-dates">1 Oct - 31 Jan</span>
+            <span class="event-dates">1 Oct - 31 Mar</span>
           </div>
         </div>
         <div class="lane">
@@ -691,7 +694,7 @@
         <div class="week-tick" style="left:95.3%;"></div>
         <div class="week-tick" style="left:97.3%;"></div>
         <div class="week-tick" style="left:99.2%;"></div>
-        <div class="today-marker" style="left:58.0%;"></div>
+        <div class="today-marker" style="left:58.5%;"></div>
       </div>
       <div class="lanes-below">
         <div class="lane">
@@ -701,7 +704,7 @@
           <div class="event-bar complete short" role="button" tabindex="0" aria-label="🌆 UAM KAFD Training, 19 Feb, status complete" style="left:13.5%;width:1.2%;" data-name="🌆 UAM KAFD Training" data-status="complete" data-dates="19 Feb" data-aircraft="HC66 (main)" data-pilots="Will Lawrence, Rohit Kaundinya, Lisa le Roux, David Schicht, Nathan Piper" data-location="KAFD 106 Helipad / XRSC" data-client="THC" data-notes="Thursday 11am" data-flight-hours="" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="🌆 UAM KAFD Training (19 Feb)">
             <span class="event-title">🌆 UAM KAFD...</span>
           </div>
-          <div class="event-bar confirmed " role="button" tabindex="0" aria-label="ELO Jordan Borders, 15 Aug - 15 Dec, status confirmed" style="left:62.1%;width:33.5%;" data-name="ELO Jordan Borders" data-status="confirmed" data-dates="15 Aug - 15 Dec" data-aircraft="TBD (H145)" data-pilots="2 pilots" data-location="Jordan Border" data-client="TBD" data-notes="Single continuous mission — starts 15 Aug 2026, runs ~4 months (to ~15 Dec 2026). H145 platform; possibly an H125 at the beginning. 2 pilots (Matt O'Brien + 1). Merged from the former Phase 1 / Phase 2 split (2026-07-09)." data-flight-hours="" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="ELO Jordan Borders (15 Aug - 15 Dec)">
+          <div class="event-bar confirmed " role="button" tabindex="0" aria-label="ELO Jordan Borders, 15 Aug - 15 Dec, status confirmed" style="left:62.1%;width:33.5%;" data-name="ELO Jordan Borders" data-status="confirmed" data-dates="15 Aug - 15 Dec" data-aircraft="HC54 (primary) | TBD (primary)" data-pilots="Dan Munteanu, Matt O'Brien" data-location="Jordan Border" data-client="TBD" data-notes="Single continuous mission — starts 15 Aug 2026, runs ~4 months (to ~15 Dec 2026). Confirmed 2026-08-02 to START on an H125 (HZHC54, pilot Dan Munteanu), then transition to the H145 platform; HC54 ferries to Yanbu for Survey ARGAS." data-flight-hours="" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="ELO Jordan Borders (15 Aug - 15 Dec)">
             <span class="event-title">ELO Jordan Borders</span>
             <span class="event-dates">15 Aug - 15 Dec</span>
           </div>
@@ -713,9 +716,9 @@
           <div class="event-bar complete short" role="button" tabindex="0" aria-label="🎬 Promo Filming, 8-9 Feb, status complete" style="left:10.4%;width:1.2%;" data-name="🎬 Promo Filming" data-status="complete" data-dates="8-9 Feb" data-aircraft="HC68 (Film)" data-pilots="David Liepsig (Pax)" data-location="Riyadh" data-client="THC" data-notes="6:20 - 6:40 takeoff before sunrise. Two shots — (1) blades turning, actor arrives/boards, takeoff ~10m; (2) filming in flight ~40min. Cameraman inside + outside." data-flight-hours="<1" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="🎬 Promo Filming (8-9 Feb)">
             <span class="event-title">🎬 Promo Fi...</span>
           </div>
-          <div class="event-bar pending " role="button" tabindex="0" aria-label="🔍 Survey ARGAS, 1 Oct - 31 Jan, status pending" style="left:75.0%;width:25.0%;" data-name="🔍 Survey ARGAS" data-status="pending" data-dates="1 Oct - 31 Jan" data-aircraft="HC59 (primary) | HC63 (backup) | HC54 (backup)" data-pilots="Survey Pilots" data-location="Yanbu → Rabigh → North Abha" data-client="Argas" data-notes="4-month mission starting Oct 2026. Awaiting government approval." data-flight-hours="> 100" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="🔍 Survey ARGAS (1 Oct - 31 Jan)">
+          <div class="event-bar pending " role="button" tabindex="0" aria-label="🔍 Survey ARGAS, 7 Sep - 10 Dec, status pending" style="left:68.4%;width:25.8%;" data-name="🔍 Survey ARGAS" data-status="pending" data-dates="7 Sep - 10 Dec" data-aircraft="HC54 (primary) | HC59 (backup) | HC63 (backup)" data-pilots="Survey Pilots" data-location="Yanbu → Rabigh → North Abha" data-client="Argas" data-notes="7 Sep – 10 Dec 2026. HC54 comes off the Jordan Borders H125 start and ferries to Yanbu for the mission." data-flight-hours="> 100" onclick="showEventPopup(this,event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showEventPopup(this,event);}" title="🔍 Survey ARGAS (7 Sep - 10 Dec)">
             <span class="event-title">🔍 Survey ARGAS</span>
-            <span class="event-dates">1 Oct - 31 Jan</span>
+            <span class="event-dates">7 Sep - 10 Dec</span>
           </div>
         </div>
         <div class="lane">
@@ -794,19 +797,19 @@ const bases = {
 
 // FLEET_START
 const fleet = [
-  { reg: "HZHC54", loc: "RUH", status: "maint", fullStatus: "Maintenance", ert: "30-Jul-26", remFH: "76:09" },
-  { reg: "HZHC55", loc: "RUH", status: "preserv", fullStatus: "Preservation", ert: "01-Aug-26", remFH: "36:44" },
+  { reg: "HZHC54", loc: "RUH", status: "maint", fullStatus: "Maintenance", ert: "30-Jul-26", remFH: "75:07" },
+  { reg: "HZHC55", loc: "RUH", status: "preserv", fullStatus: "Preservation", ert: "07-Oct-26", remFH: "36:44" },
   { reg: "HZHC58", loc: "OETH", status: "preserv", fullStatus: "Preservation", ert: "14-Aug-26", remFH: "65:28" },
-  { reg: "HZHC59", loc: "OETH", status: "preserv", fullStatus: "Preservation", ert: "14-Aug-26", remFH: "89:52" },
-  { reg: "HZHC63", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "101:03" },
-  { reg: "HZHC64", loc: "RUH", status: "parked", fullStatus: "Serviceable", remFH: "90:52" },
+  { reg: "HZHC59", loc: "OETH", status: "flying", fullStatus: "Preservation", ert: "14-Aug-26", remFH: "89:52", pilot: "Munteanu, Dan Cristian", route: "OETH→OETH→OETH→OETH" },
+  { reg: "HZHC63", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "100:19" },
+  { reg: "HZHC64", loc: "RUH", status: "preserv", fullStatus: "Preservation", ert: "21-Sep-26", remFH: "90:37" },
   { reg: "HZHC65", loc: "OETH", status: "preserv", fullStatus: "Preservation", ert: "08-Sep-26", remFH: "125:21" },
-  { reg: "HZHC66", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "UAM", remFH: "120:14" },
-  { reg: "HZHC67", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "UAM Backup", remFH: "136:02" },
-  { reg: "HZHC68", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "138:33" },
-  { reg: "HZHC69", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "140:55" },
-  { reg: "HZTH56", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "138:01" },
-  { reg: "HZTH58", loc: "RUH", status: "parked", fullStatus: "Serviceable", remFH: "139:13" },
+  { reg: "HZHC66", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "UAM", remFH: "119:36" },
+  { reg: "HZHC67", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "UAM Backup", remFH: "134:49" },
+  { reg: "HZHC68", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "134:23" },
+  { reg: "HZHC69", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "139:51" },
+  { reg: "HZTH56", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "133:42" },
+  { reg: "HZTH58", loc: "RUH", status: "parked", fullStatus: "Serviceable", remFH: "137:03" },
 ];
 // FLEET_END
 
@@ -1019,7 +1022,7 @@ function showEventPopup(el, e) {
 </script>
 <script>
 /* DFO notices — array rewritten by generate.py from THC/Notices.md */
-const notices = [{"id": "c9ce942d8b", "date": "2026-07-11", "msg": "📘 OMA Rev 04 coming next week. Check it out when it lands on your EFB."}, {"id": "ca48cf9cf4", "date": "2026-07-11", "msg": "Will is on Vacation till July 31st"}];
+const notices = [];
 (function () {
   var KEY = 'thc-dismissed-notices';
   var dismissed = [];

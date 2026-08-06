@@ -48,7 +48,7 @@ else
     echo "🚀 Pushing to GitHub..."
     # If the remote moved in the meantime, rebase once and retry.
     git push || { git pull --rebase --autostash && git push; }
-    echo "✅ Live at: https://willslawrence.github.io/thc-ops-map/"
+    echo "✅ Live at: https://willslawrence.github.io/thc-fleet-map-v2/"
 fi
 
 echo ""

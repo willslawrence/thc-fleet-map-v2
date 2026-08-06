@@ -1,7 +1,7 @@
 # THC Fleet Map
 
 Real-time helicopter operations dashboard for THC. Live at
-<https://willslawrence.github.io/thc-ops-map/>.
+<https://willslawrence.github.io/thc-fleet-map-v2/>.
 
 The site shows aircraft positions on an interactive Leaflet map, current
 flight status, pilot currency (medical / REMS / competency), and a 12-month

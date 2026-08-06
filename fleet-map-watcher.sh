@@ -4,7 +4,10 @@
 # Debounces: waits 5 minutes after last change before regenerating
 
 VAULT_BASE="$HOME/Library/CloudStorage/OneDrive-TheHelicopterCompany/THC Vault/THC"
-FLEET_REPO="$HOME/Projects/thc-fleet-map-v2"
+# Resolve the repo from this script's own location — it lives inside the repo,
+# so this is correct on Po-Pro and the MacBook alike. The old hardcoded
+# ~/Projects path only existed on Po-Pro (2026-08-06).
+FLEET_REPO="$(cd "$(dirname "$0")" && pwd)"
 DEBOUNCE_SEC=300
 LOG="/tmp/openclaw/fleet-map-watcher.log"
 NTFY="https://ntfy.sh/thc-bridge-will-c333ed3bee86b1cc"   # same topic the ops-plan heartbeat uses
@@ -75,6 +78,20 @@ regenerate() {
         return 1
     fi
     log "✅ generate.py succeeded"
+
+    # Skip the publish when the ONLY change is the "Last updated" stamp —
+    # generate.py rewrites it every run, so a vault touch that changed nothing
+    # the map shows still cost a full Pages deploy. See fleetpush.sh (2026-08-06).
+    if ! git diff --quiet -- index.html; then
+        substantive=$(git diff -U0 -- index.html \
+            | grep -E '^[+-]' | grep -vE '^(\+\+\+|---)' \
+            | grep -vE 'LAST_UPDATED' || true)
+        if [ -z "$substantive" ]; then
+            log "⏭️ Only the 'Last updated' stamp changed — nothing to publish"
+            git checkout -- index.html
+            return 0
+        fi
+    fi
 
     # Only the generated artifact — `git add -A` is how a .claude/worktrees
     # snapshot got committed once already (4c50975).

@@ -18,6 +18,23 @@ echo "$(date '+%Y-%m-%d %H:%M:%S') — Fleet map generation started"
 git pull --rebase --autostash || { echo "⚠️  pull --rebase failed — continuing"; git rebase --abort 2>/dev/null || true; }
 
 python3 generate.py
+
+# Skip the publish when the ONLY change is the "Last updated" stamp.
+#
+# generate.py rewrites that stamp on every run, so an hourly job committed and
+# pushed even when no fleet data had moved — ~21 pushes/day, each firing a full
+# Pages deploy. That volume is what causes the "job was not acquired by Runner
+# of type hosted" failures this repo kept hitting (2026-08-06).
+if ! git diff --quiet -- index.html; then
+    substantive=$(git diff -U0 -- index.html \
+        | grep -E '^[+-]' | grep -vE '^(\+\+\+|---)' \
+        | grep -vE 'LAST_UPDATED' || true)
+    if [ -z "$substantive" ]; then
+        echo "⏭️  Only the 'Last updated' stamp changed — nothing to publish"
+        git checkout -- index.html
+    fi
+fi
+
 git add -A
 git diff --cached --quiet || git commit -m "Fleet sync $(date '+%Y-%m-%d %H:%M')"
 

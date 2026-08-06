@@ -6,9 +6,15 @@ on:
   pull_request:
     types: [opened, reopened, synchronize, closed]
 
+# One group, so writes to gh-pages stay serialized. cancel-in-progress is TRUE
+# so a newer push supersedes an older queued deploy instead of stacking behind
+# it: each run republishes the whole site, so the newest is always the only one
+# worth waiting for. Was false until 2026-08-06, when a pages-build-deployment
+# run stuck for 3h47m backed up every deploy behind it — main carried a corrected
+# HZTH58 location for over an hour while gh-pages kept serving the old one.
 concurrency:
   group: pages-${{ github.workflow }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   deploy-main:

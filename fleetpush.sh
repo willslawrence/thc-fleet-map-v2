@@ -1,9 +1,13 @@
 #!/bin/bash
 # THC Fleet Map — generate from vault and push to GitHub
 set -euo pipefail
-cd ~/Projects/thc-fleet-map-v2
+# Resolve the repo from this script's own location — the old hardcoded
+# ~/Projects/thc-fleet-map-v2 has not existed since the move under
+# ~/Connected/Cowork/Projects/, so every run died on the cd (2026-08-06).
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$SCRIPT_DIR"
 
-LOG="./fleetpush.log"
+LOG="$SCRIPT_DIR/fleetpush.log"
 trap 'echo "$(date "+%Y-%m-%d %H:%M:%S") ❌ fleetpush failed at line $LINENO" >> "$LOG"' ERR
 exec > >(tee -a "$LOG") 2>&1
 

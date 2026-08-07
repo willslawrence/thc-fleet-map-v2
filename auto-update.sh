@@ -30,6 +30,19 @@ git pull --rebase --autostash || { echo "⚠️  pull --rebase failed — contin
 echo "📊 Generating fleet map..."
 python3 generate.py
 
+# 1b. Skip the publish when the ONLY change is the "Last updated" stamp.
+#     generate.py rewrites it every run, so a scheduled job pushed even when no
+#     fleet data had moved. See fleetpush.sh for the full note (2026-08-06).
+if ! git diff --quiet -- index.html; then
+    substantive=$(git diff -U0 -- index.html \
+        | grep -E '^[+-]' | grep -vE '^(\+\+\+|---)' \
+        | grep -vE 'LAST_UPDATED' || true)
+    if [ -z "$substantive" ]; then
+        echo "⏭️  Only the 'Last updated' stamp changed — nothing to publish"
+        git checkout -- index.html
+    fi
+fi
+
 # 2. Check for changes
 if git diff --quiet && git diff --cached --quiet; then
     echo "✅ No changes detected — skipping push"
@@ -48,7 +61,7 @@ else
     echo "🚀 Pushing to GitHub..."
     # If the remote moved in the meantime, rebase once and retry.
     git push || { git pull --rebase --autostash && git push; }
-    echo "✅ Live at: https://willslawrence.github.io/thc-ops-map/"
+    echo "✅ Live at: https://willslawrence.github.io/thc-fleet-map-v2/"
 fi
 
 echo ""

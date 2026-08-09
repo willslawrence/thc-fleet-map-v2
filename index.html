@@ -494,7 +494,7 @@
 </head>
 <body class="timeline-open">
 <div id="map"></div>
-<div id="last-updated">Last updated: <!-- LAST_UPDATED -->9 Aug 2026 07:00<!-- /LAST_UPDATED --></div>
+<div id="last-updated">Last updated: <!-- LAST_UPDATED -->9 Aug 2026 08:13<!-- /LAST_UPDATED --></div>
 <div class="right-btn-group">
   <a class="sfla-btn" href="https://willslawrence.github.io/pilot-planner/" target="_blank">📅 Roster</a>
   <a class="sfla-btn" href="https://willslawrence.github.io/SFLA/" target="_blank">🛬 SFLA Riyadh</a>
@@ -513,7 +513,7 @@
   <div class="panel-header" role="button" tabindex="0" aria-expanded="true" aria-controls="briefing-body" onclick="togglePanel(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePanel(this);}">
     <div class="panel-title" id="briefing-title">📋 Flights <span style="font-size:0.5em">by OCC</span> ▾</div>
     <div class="panel-date">OPS PLAN REPORT / <!-- REPORT_PERIOD -->9 Aug – 9 Aug 2026<!-- /REPORT_PERIOD --></div>
-    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->9 Aug 2026 07:00<!-- /LAST_UPDATED2 --></div>
+    <div class="panel-updated">Last Updated: <!-- LAST_UPDATED2 -->9 Aug 2026 08:13<!-- /LAST_UPDATED2 --></div>
   </div>
   <div class="panel-body" id="briefing-body" role="region" aria-labelledby="briefing-title">
 
@@ -800,16 +800,16 @@ const bases = {
 
 // FLEET_START
 const fleet = [
-  { reg: "HZHC54", loc: "RUH", status: "maint", fullStatus: "Maintenance", ert: "30-Jul-26", remFH: "75:07" },
+  { reg: "HZHC54", loc: "RUH", status: "parked", fullStatus: "Serviceable", remFH: "75:07" },
   { reg: "HZHC55", loc: "RUH", status: "preserv", fullStatus: "Preservation", ert: "07-Oct-26", remFH: "36:44" },
   { reg: "HZHC58", loc: "OETH", status: "preserv", fullStatus: "Preservation", ert: "14-Aug-26", remFH: "65:28" },
-  { reg: "HZHC59", loc: "OETH", status: "maint", fullStatus: "Maintenance", ert: "14-Aug-26", remFH: "89:52" },
+  { reg: "HZHC59", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "89:52" },
   { reg: "HZHC63", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "100:19" },
   { reg: "HZHC64", loc: "RUH", status: "maint", fullStatus: "Maintenance", ert: "21-Sep-26", remFH: "90:37" },
   { reg: "HZHC65", loc: "OETH", status: "preserv", fullStatus: "Preservation", ert: "08-Sep-26", remFH: "125:21" },
   { reg: "HZHC66", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "UAM", remFH: "119:36" },
-  { reg: "HZHC67", loc: "OETH", status: "parked", fullStatus: "Serviceable", mission: "UAM Backup", remFH: "134:49" },
-  { reg: "HZHC68", loc: "OETH", status: "flying", fullStatus: "Serviceable", remFH: "134:23", pilot: "Zambonini, Davide", route: "XRSC→OEKD→XRSC" },
+  { reg: "HZHC67", loc: "OETH", status: "preserv", fullStatus: "Preservation", mission: "UAM Backup", ert: "06-Sep-26", remFH: "134:49" },
+  { reg: "HZHC68", loc: "RUH", status: "flying", fullStatus: "Serviceable", remFH: "134:07", pilot: "Zambonini, Davide", route: "XRSC→OEKD→XRSC" },
   { reg: "HZHC69", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "139:51" },
   { reg: "HZTH56", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "133:42" },
   { reg: "HZTH58", loc: "OETH", status: "parked", fullStatus: "Serviceable", remFH: "137:03" },

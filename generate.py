@@ -29,6 +29,34 @@ HTML_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "index.html
 _now = datetime.now(ZoneInfo("Asia/Riyadh"))
 TODAY = datetime(_now.year, _now.month, _now.day, _now.hour, _now.minute, _now.second)
 
+# ── Pilot-facing note scrubbing ──────────────────────────────────────────────
+# The map is read by pilots. Nothing published to it may reference the vault
+# (wikilinks, note titles) or point at internal source paths.
+_WIKILINK = re.compile(r'\[\[([^\]|]+?)(?:\|([^\]]+?))?\]\]')
+_INTERNAL_REF = re.compile(
+    r'(OneDrive|iCloud|/Users/|\bvault\b|\.docx|\.xlsx|\.pdf\b|\.md\b|SOP source|KMZ files)', re.I)
+
+def scrub(text):
+    """Strip vault cross-references and internal source paths from any string
+    that reaches the pilot-facing map."""
+    if not text:
+        return ''
+    out = []
+    for line in str(text).splitlines():
+        if _INTERNAL_REF.search(line):
+            continue                                    # never publish a source path
+        line = _WIKILINK.sub(lambda m: m.group(2) or m.group(1), line).strip()
+        if line:
+            out.append(line)
+    return ' | '.join(out)
+
+def pilot_notes(d):
+    """Mission note shown to pilots. FAIL-CLOSED: only `pilot_notes` is ever
+    published. `special_notes` is the internal/commercial field (contract
+    status, stakeholder names, CEO/steering decisions, vault cross-refs) and
+    must never reach the map — a mission with no `pilot_notes` shows no note."""
+    return scrub(d.get('pilot_notes', ''))
+
 # Known waypoint coordinates — must match bases dict in index.html
 KNOWN_WAYPOINTS = {
     'OETH', 'RUH', 'XRSC', 'OERK', 'OEHL', 'OEGS', 'OEAO', 'OEGN', 'OEJN', 'OEJF', 'OEMA',
@@ -194,7 +222,7 @@ def load_helis():
             'status': pin_st,
             'fullStatus': raw_status,
             'mission': d.get('current_mission',''),
-            'note': d.get('notes', d.get('note','')),
+            'note': scrub(d.get('notes', d.get('note',''))),
             'ert': d.get('ert',''),
             'total_fh': d.get('total_fh',''),
             '150hr_rem_fh': d.get('150hr_rem_fh',''),
@@ -398,7 +426,9 @@ def load_missions():
                             role = k.replace('helicopter_', '').replace('_', ' ').strip()
                             heli_parts.append(f"{short_reg(v)} ({role})")
                     heli_str = ' | '.join(heli_parts) if heli_parts else 'TBD'
-            pilots = d.get('Pilots', '')
+            # Scrub: pilot lists are sometimes written as wikilinks, which both
+            # leak vault note titles and break the data-pilots attribute quoting.
+            pilots = scrub(d.get('Pilots', '')).replace('"', '')
             # Auto-determine status from dates
             # complete/canceled = done or cancelled (grey)
             # active = happening now (green)
@@ -424,7 +454,7 @@ def load_missions():
                     auto_status = raw_status if raw_status in ('confirmed', 'pending', 'potential') else 'pending'
             else:
                 auto_status = raw_status
-            m.append({'title': t, 'date': start, 'endDate': end, 'status': auto_status, 'helicopters': heli_str, 'pilots': pilots, 'location': d.get('location',''), 'client': d.get('client', d.get('customer','')), 'special_notes': d.get('special_notes',''), 'flight_hours': d.get('flight_hours','')})
+            m.append({'title': t, 'date': start, 'endDate': end, 'status': auto_status, 'helicopters': heli_str, 'pilots': pilots, 'location': scrub(d.get('location','')), 'client': scrub(d.get('client', d.get('customer',''))), 'special_notes': pilot_notes(d), 'flight_hours': d.get('flight_hours','')})
     m.sort(key=lambda x: x['date'] if x['date'] else 'zzzz')
     print(f"✅ Loaded {len(m)} missions")
     return m

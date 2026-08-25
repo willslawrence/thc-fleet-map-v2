@@ -640,6 +640,9 @@ def build_currency_html(curr):
     return '\n'.join(L)
 
 
+# Horizontal pixels per month on the scrollable mission timeline.
+MONTH_PX = 78
+
 def _is_training(m):
     return (m.get('title') or '').strip().lower().startswith('training')
 
@@ -662,12 +665,19 @@ def build_timeline(missions):
     dated = [m for m in dated if m['s']]
     dated.sort(key=lambda x: x['s'])
     
-    # Jan-Dec of current year
+    # Window: Jan of the current year through Dec of NEXT year, so 2027 missions
+    # (Dakar, City Tour season, ELO tails) are reachable by scrolling right instead
+    # of being clamped at the 31 Dec edge. Extends further if a mission runs beyond.
     yr = TODAY.year
-    mn, mx = datetime(yr,1,1), datetime(yr,12,31)
+    mn = datetime(yr, 1, 1)
+    mx = datetime(yr + 1, 12, 31)
+    if dated:
+        far = max(m['e'] for m in dated)
+        if far > mx:
+            mx = datetime(far.year, 12, 31)
     td = (mx-mn).days
     
-    # Filter to only missions that overlap with 2026
+    # Filter to missions overlapping the window
     dated = [m for m in dated if m['e'] >= mn and m['s'] <= mx]
     
     def pos(s,e): 
@@ -722,7 +732,12 @@ def build_timeline(missions):
         fh = m.get('flight_hours','')
         return f'          <div class="event-bar {st} {sh}" role="button" tabindex="0" aria-label="{t}, {dt}, status {st}" style="left:{l}%;width:{w}%;" data-name="{t}" data-status="{st}" data-dates="{dt}" data-aircraft="{h}" data-pilots="{p}" data-location="{loc}" data-client="{cli}" data-notes="{notes}" data-flight-hours="{fh}" onclick="showEventPopup(this,event)" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){{event.preventDefault();showEventPopup(this,event);}}" title="{t} ({dt})">\n            <span class="event-title">{dp}</span>' + (f'\n            <span class="event-dates">{dt}</span>' if not sh else '') + '\n          </div>'
     
-    L.append('    <div class="timeline-body">')
+    # Track is wider than the panel so the window scrolls horizontally.
+    n_months = (mx.year - mn.year) * 12 + (mx.month - mn.month) + 1
+    track_px = n_months * MONTH_PX
+    today_pct = round(((TODAY-mn).days/td)*100, 2) if mn <= TODAY <= mx else 0
+    L.append(f'    <div class="timeline-scroll" data-today-pct="{today_pct}" data-track-px="{track_px}">')
+    L.append(f'      <div class="timeline-track" style="width:{track_px}px;">')
     L.append('      <div class="lanes-above">')
     for lane in reversed(above):
         L.append('        <div class="lane">')
@@ -732,11 +747,17 @@ def build_timeline(missions):
     L.append('      <div class="timeline-axis">')
     L.append('        <div class="axis-line"></div>')
     
-    # Month ticks (larger) with labels
-    for month in range(1, 13):
-        d = datetime(yr, month, 1)
-        pct = round(((d-mn).days/td)*100,1)
-        L.append(f'        <div class="month-tick" style="left:{pct}%;"><span class="tick-label">{d.strftime("%b")}</span></div>')
+    # Month ticks (larger) with labels, across every month in the window.
+    # January carries the year, and every year boundary after the first gets a divider.
+    d = datetime(mn.year, mn.month, 1)
+    while d <= mx:
+        pct = round(((d-mn).days/td)*100,2)
+        lbl = d.strftime("%b") if d.month != 1 else d.strftime("%b %Y")
+        cls = "month-tick year-start" if d.month == 1 else "month-tick"
+        L.append(f'        <div class="{cls}" style="left:{pct}%;"><span class="tick-label">{lbl}</span></div>')
+        if d.month == 1 and d > mn:
+            L.append(f'        <div class="year-divider" style="left:{pct}%;"><span class="year-divider-label">{d.year}</span></div>')
+        d = datetime(d.year + 1, 1, 1) if d.month == 12 else datetime(d.year, d.month + 1, 1)
     
     # Week ticks (smaller) - every Monday
     c = mn
@@ -755,6 +776,7 @@ def build_timeline(missions):
         L.append('        <div class="lane">')
         for m in sorted(lane, key=lambda x: x['s']): L.append(bar(m))
         L.append('        </div>')
+    L.append('      </div>')
     L.append('      </div>')
     L.append('    </div>')
     L.append('    </div>')

@@ -17,7 +17,24 @@ echo "$(date '+%Y-%m-%d %H:%M:%S') — Fleet map generation started"
 # another machine won't jam the scheduled run).
 git pull --rebase --autostash || { echo "⚠️  pull --rebase failed — continuing"; git rebase --abort 2>/dev/null || true; }
 
+# --autostash can fail to re-apply and leave CONFLICT MARKERS in the working
+# tree, and the run below would then `git add -A` and publish them to the live
+# site (happened 2026-08-25 — commit 3794375 shipped `<<<<<<< Updated upstream`
+# into index.html). The stash is NOT lost when this happens, so bail loudly and
+# let a human resolve it rather than pushing a broken page.
+if grep -qE '^(<<<<<<< |>>>>>>> )' index.html; then
+    echo "🛑 Conflict markers in index.html after the pull — refusing to generate or publish."
+    echo "   Your changes are in the stash: git stash list / git stash pop"
+    exit 1
+fi
+
 python3 generate.py
+
+# Same check after generation, in case a marker sits inside a replaced block.
+if grep -qE '^(<<<<<<< |>>>>>>> )' index.html; then
+    echo "🛑 Conflict markers in index.html after generate.py — refusing to publish."
+    exit 1
+fi
 
 # Skip the publish when the ONLY change is the "Last updated" stamp.
 #

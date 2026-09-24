@@ -354,15 +354,16 @@ def load_currency():
                 frontmatter = t.split('---')[1] if t.startswith('---') and t.count('---') >= 2 else ''
                 if 'H125' not in frontmatter:
                     continue  # Skip non-H125 pilots
-                med = rems = comp = line = cp = ""
+                med = rems = comp = line = cp = base = ""
                 for ln in t.split('\n'):
                     if 'Medical Certificate Date:' in ln: med = ln.split(':',1)[1].strip()
                     if '30 Mins REMS:' in ln: rems = ln.split(':',1)[1].strip()
                     if 'Last Competency Check:' in ln: comp = ln.split(':',1)[1].strip()
                     if 'Last Line Check:' in ln: line = ln.split(':',1)[1].strip()
                     if 'Check Pilot Renewal:' in ln: cp = ln.split(':',1)[1].strip()
+                    if 'Base Month:' in ln: base = ln.split(':',1)[1].strip()
                 c.append({'name': nm, 'medical': med, 'rems': rems, 'competency': comp,
-                          'line_check': line, 'check_pilot': cp})
+                          'line_check': line, 'check_pilot': cp, 'base_month': base})
             except: pass
     print(f"✅ Loaded {len(c)} H125 pilot currency records")
     return c
@@ -529,6 +530,46 @@ def build_flights_html():
             L.append(f'  <div class="{cl}"><span class="reg">{r}</span><span class="info">{info}</span><span class="pilot">{f["pilot"]}</span></div>')
     return '\n'.join(L) if L else '  <div>No flights scheduled</div>'
 
+# Competency currency runs on CALENDAR MONTHS against the pilot's base month,
+# with a 3-month renewal period (month before / month due / month after). A
+# check taken inside that window counts as the due month and does NOT shift the
+# base month. Date-to-date "+12 months" is an approximation and must never be
+# published to a pilot as a deadline. See the vault: CLAUDE.md / Patterns
+# "Currency runs on base months and a 3-month renewal period" (2026-08-17).
+_MONTHS = {m.lower(): i for i, m in enumerate(
+    ['January','February','March','April','May','June','July','August',
+     'September','October','November','December'], start=1)}
+
+def parse_base_month(v):
+    """'September' / 'Sep' -> 9. Blank, 'NA', or anything unparseable -> None."""
+    if not v:
+        return None
+    k = str(v).strip().strip('"').strip("'").lower()
+    if k in _MONTHS:
+        return _MONTHS[k]
+    if len(k) >= 3:
+        for name, i in _MONTHS.items():
+            if name.startswith(k):
+                return i
+    return None
+
+def _add_months(d, n):
+    m = d.month - 1 + n
+    return datetime(d.year + m // 12, m % 12 + 1, 1)
+
+def competency_due(last_check, base_mo):
+    """Due month (1st of month) for the NEXT competency check.
+
+    The base-month occurrence nearest the last completed check is the due month
+    that check satisfied; the next one falls 12 months later. A check taken one
+    month early or one month late therefore does not move the base month.
+    """
+    anchor = last_check.replace(day=1)
+    cand = [datetime(y, base_mo, 1) for y in
+            (last_check.year - 1, last_check.year, last_check.year + 1)]
+    satisfied = min(cand, key=lambda d: abs((d - anchor).days))
+    return datetime(satisfied.year + 1, base_mo, 1)
+
 def build_currency_html(curr):
     L = []
     this_mo = TODAY.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
@@ -536,37 +577,55 @@ def build_currency_html(curr):
     next_mo = this_mo_end
     next_mo_end = (next_mo + timedelta(days=32)).replace(day=1)
     
-    # Competency - 12 months from last check
+    # Competency - due MONTH from the pilot's base month, 3-month renewal period.
+    # Falls back to date-to-date +12 months only when no base month is recorded.
     comp_overdue = []
+    comp_last = []   # final month of the renewal period
     comp_this = []
     comp_next = []
     for c in curr:
         cp = c.get('competency','')
-        if cp:
-            try:
-                cd = datetime.strptime(cp, "%Y-%m-%d")
-                exp = cd.replace(year=cd.year+1)
-                first_name = c['name'].split()[0] + ' ' + c['name'].split()[-1][0] if len(c['name'].split()) > 1 else c['name'].split()[0]
-                if exp < this_mo:
-                    comp_overdue.append((first_name, exp.strftime("%b %Y")))
-                elif this_mo <= exp < this_mo_end:
-                    comp_this.append((first_name, exp.strftime("%b %Y")))
-                elif next_mo <= exp < next_mo_end:
-                    comp_next.append((first_name, exp.strftime("%b %Y")))
-            except: pass
+        if not cp:
+            continue
+        try:
+            cd = datetime.strptime(cp, "%Y-%m-%d")
+        except Exception:
+            continue
+        parts = c['name'].split()
+        first_name = (parts[0] + ' ' + parts[-1][0]) if len(parts) > 1 else parts[0]
+        base_mo = parse_base_month(c.get('base_month'))
+        if base_mo:
+            due = competency_due(cd, base_mo)
+            label = due.strftime("%b %Y")
+            if this_mo >= _add_months(due, 2):
+                comp_overdue.append((first_name, label))
+            elif this_mo == _add_months(due, 1):
+                comp_last.append((first_name, label))
+            elif this_mo == due:
+                comp_this.append((first_name, label))
+            elif this_mo == _add_months(due, -1):
+                comp_next.append((first_name, label))
+        else:
+            exp = cd.replace(year=cd.year+1)
+            label = exp.strftime("%b %Y")
+            if exp < this_mo:
+                comp_overdue.append((first_name, label))
+            elif this_mo <= exp < this_mo_end:
+                comp_this.append((first_name, label))
+            elif next_mo <= exp < next_mo_end:
+                comp_next.append((first_name, label))
     L.append('  <h4>Competency Checks</h4>')
-    if comp_overdue:
-        for n, d in comp_overdue:
-            L.append(f'  <div class="alert danger">🔴 {n} - overdue since {d}</div>')
-    if comp_this:
-        for n, d in comp_this:
-            L.append(f'  <div class="alert warn">⚠️ {n} - due {d}</div>')
-    if comp_next:
-        for n, d in comp_next:
-            L.append(f'  <div class="alert info">📅 {n} - due {d}</div>')
-    if not comp_overdue and not comp_this and not comp_next:
-        L.append(f'  <div class="alert ok">✅ Nobody due this or next month</div>')
-    
+    for n, d in comp_overdue:
+        L.append(f'  <div class="alert danger">🔴 {n} - overdue, was due {d}</div>')
+    for n, d in comp_last:
+        L.append(f'  <div class="alert danger">🔴 {n} - due {d}, last month to renew</div>')
+    for n, d in comp_this:
+        L.append(f'  <div class="alert warn">⚠️ {n} - due {d}</div>')
+    for n, d in comp_next:
+        L.append(f'  <div class="alert info">📅 {n} - due {d}, renewal period open</div>')
+    if not (comp_overdue or comp_last or comp_this or comp_next):
+        L.append('  <div class="alert ok">✅ Nobody due this or next month</div>')
+
     # REMS 30 - 6 calendar months from last flight date
     # Flight in Aug = valid Aug,Sep,Oct,Nov,Dec,Jan = expires end of Jan (5 months after flight month)
     rems_issues = []

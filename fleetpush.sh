@@ -65,4 +65,9 @@ git diff --cached --quiet || git commit -m "Fleet sync $(date '+%Y-%m-%d %H:%M')
 
 # Push; if the remote moved in the meantime, rebase once and retry.
 git push || { git pull --rebase --autostash && git push; }
+
+# Also publish to Cloudflare Pages — the address pilots are moving to (2026-10-06).
+# Fail-soft while both hosts run side by side: a Cloudflare problem must never
+# stop the GitHub copy updating. Make this fatal once the repo goes private.
+./deploy.sh --if-changed || echo "⚠️  Cloudflare deploy failed — GitHub copy is still current"
 echo "$(date '+%Y-%m-%d %H:%M:%S') ✅ Done"

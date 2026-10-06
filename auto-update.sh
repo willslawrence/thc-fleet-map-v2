@@ -103,6 +103,8 @@ else
     # If the remote moved in the meantime, rebase once and retry.
     git push || { git pull --rebase --autostash && git push; }
     echo "✅ Live at: https://willslawrence.github.io/thc-fleet-map-v2/"
+    # Also publish to Cloudflare Pages (2026-10-06). Fail-soft — see fleetpush.sh.
+    ./deploy.sh --if-changed || echo "⚠️  Cloudflare deploy failed — GitHub copy is still current"
 fi
 
 echo ""

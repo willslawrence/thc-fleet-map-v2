@@ -212,8 +212,11 @@ def load_helis():
         d = parse_fm(f)
         raw_status = d.get('status', 'Parked')
         st = raw_status.lower()
-        if 'serviceable' in st: pin_st = 'parked'
-        elif 'maint' in st or 'aog' in st: pin_st = 'maint'
+        # 'unserviceable' contains 'serviceable' — test it FIRST or an AOG tail
+        # pins as serviceable on the live map (HZHC54, 2026-10-06).
+        if 'unserv' in st or 'aog' in st: pin_st = 'aog'
+        elif 'maint' in st: pin_st = 'maint'
+        elif 'serviceable' in st: pin_st = 'parked'
         elif 'preserv' in st: pin_st = 'preserv'
         else: pin_st = 'parked'
         h.append({
